@@ -66,7 +66,7 @@ exp = data.ExperimentHandler(name=params['exp_name'],
                                 # version='0.1',
                                 extraInfo=info_dict,
                                 runtimeInfo=True,
-                                originPath='./active_experiment.py',
+                                originPath='./non_immersive_experiment.py',
                                 savePickle=True,
                                 saveWideText=True,
                                 dataFileName=subject_folder + file_name)
@@ -80,9 +80,6 @@ basic_emotions = {'1': '1. Anger', '2': '2. Fear', '3': '3. Disgust',
 # Basic emotion positions
 pos_basic_emotions = [(-7.0, 4.0), (0.0, 4.0), (7.0, 4.0),
                         (-7.0, -4.0), (0.0, -4.0), (7.0, -4.0)]
-
-# pos_basic_emotions = [(-18.0, 18.0), (-18.0, 0.0),
-#   (-18.0, -18.0), (18.0, 18.0), (18.0, 0.0), (18.0, -18.0)]
 
 ##########################################################################
 # Create a window
@@ -104,31 +101,21 @@ exp_info = {'fullscreen': params['fullscreen'],
             }
 exp_info.update(info_dict)
 
-############## TO RUN IN MAC AND LINUX ##############
-# if os.name == 'posix':
-#     launchHubServer(window=win)
-#####################################################
-
-##########################################################################
-# init PurpleGaze
-# pg_filename = str(info_dict['Subject_id']) + '.bdf'
-#pg = PurpleGaze(path=subject_folder, subject_id=str(info_dict['Subject_id']),
-#                message_screen=params['message_screen'],
-#                exp_info=exp_info,
-#                calibration_object=calibration)
-# 'q' to quit experiment
-event.globalKeys.add(key='q', func=core.quit, name='shutdown')
 # setting keyboard for experiment
 kb = keyboard.Keyboard()
 
-#pg.log('Annotation', txt='Expt Started')
+############## TO RUN IN MAC AND LINUX ##############
+# if os.name == 'posix':
+#     launchHubServer(window=win)
+
+#####################################################
 
 ##########################################################################
 ########                    PRACTICE BLOCK                        ########
 ##########################################################################
 
 # Create practice instructions ('text' visual stimuli)
-for _, value in sorted(instructions.active_instructions_text.items())[:3]:
+for _, value in sorted(instructions.non_immersive_instructions_text.items())[:3]:
     instruction_practice = visual.TextStim(win,
                                             height=params['text_height'],
                                             pos=[0, 0],
@@ -149,12 +136,9 @@ for _, value in sorted(instructions.active_instructions_text.items())[:3]:
         if 'space' in keys or 1 in mouse_click:
             press_button = False
 
-    # Wait until 'space' is pressed
-    # event.waitKeys(keyList=['space',], timeStamped=False)
-
 # Create trial handler
 practice_trials = data.TrialHandler(
-    trialList=data.importConditions('active_practice_conditions.csv'),
+    trialList=data.importConditions('non_immersive_practice_conditions.csv'),
     originPath=-1, nReps=1, method='random', name='practice')
 
 exp.addLoop(practice_trials)
@@ -176,7 +160,6 @@ valence_slider = visual.Slider(win=win, name='valence', ticks=(-1, 1), labels=No
 # Create a custom white circle as the slider thumb
 slider_thumb = visual.Circle(win, radius=0.30, fillColor='white', lineColor='black', edges=32)
 
-
 # Loop over trials handler
 for trial in practice_trials:
 
@@ -195,8 +178,6 @@ for trial in practice_trials:
     fixation.draw()
     win.flip()
     core.wait(params['fixation_time'])
-    # Write BDF and metadata
-    #pg.log("ScreenOut", screenname=f'Fixation: {scr_idlog}')
 
     # Flush the buffers
     kb.clearEvents()
@@ -207,7 +188,6 @@ for trial in practice_trials:
     # Reset the valence_slider for the new trial
     valence_slider.reset()
     valence_slider.markerPos = 0  # Set the initial position of the marker
-
 
     # Get the mouse object
     mouse = event.Mouse(visible=True, win=win)  # Make the mouse visible
@@ -223,11 +203,11 @@ for trial in practice_trials:
 
         unhappy_image.draw()
         happy_image.draw()
-        intensity_cue_image.draw()         
+        intensity_cue_image.draw()
+
         # Draw the slider (without the default marker)
         valence_slider.draw()
-        # Draw the slider track
-        #slider_track.draw()
+
         # Draw the slider thumb
         slider_thumb.draw()
 
@@ -258,21 +238,6 @@ for trial in practice_trials:
         # Limpia el buffer de eventos de ratón que ya se han procesado
         mouse.getWheelRel()  # This is a trick to prevent mouse wheel buffer from filling up
 
-
-        ## Revisa las teclas presionadas
-        #keys = kb.getKeys(['left', 'right', 'escape'], waitRelease=False)
-        #for key in keys:
-        #    if key.name == 'left':
-        #        # Disminuye la valencia
-        #        valence_slider.markerPos = max(1, valence_slider.markerPos - 0.25)
-        #    elif key.name == 'right':
-        #        # Aumenta la valencia
-        #        valence_slider.markerPos = min(9, valence_slider.markerPos + 0.25)
-        #    elif key.name == 'escape':
-        #        # Termina el experimento si se presiona 'escape'
-        #        win.close()
-        #        core.quit()
-
         # Limpia el buffer de teclas que ya se han procesado
         kb.clearEvents()
 
@@ -280,7 +245,6 @@ for trial in practice_trials:
         practice_trials.addData('continuous_annotation', mouse_annotation)
 
     # Draw visual stimulus for emotional faces
-    #pg.log('Annotation', txt='Emotions presented')
     for emotion, position in zip(basic_emotions.values(), pos_basic_emotions):
         emotion_response = visual.TextStim(
             win, text=str(emotion), height=params['text_height'],
@@ -292,9 +256,6 @@ for trial in practice_trials:
     # Get key response
     key, rt = event.waitKeys(keyList=basic_emotions.keys(),
                                 timeStamped=core.Clock())[0]
-    # log response
-    #pg.log('Annotation', txt='Response key and rt'+str(key)+','+str(rt))
-
     practice_trials.addData('emotion_key', key)
     practice_trials.addData('emotion_rt', rt)
 
@@ -313,7 +274,6 @@ for trial in practice_trials:
     trial_idlog += 1
     exp.nextEntry()
 
-#pg.log('Annotation', txt='Practice Block ended')
 
 ##########################################################################
 ########                        TEST BLOCK                        ########
@@ -323,7 +283,7 @@ for trial in practice_trials:
 instruction_test = visual.TextStim(win,
                                     height=params['text_height'],
                                     pos=[0, 0],
-                                    text=instructions.active_instructions_text['4_test_text'],
+                                    text=instructions.non_immersive_instructions_text['4_test_text'],
                                     wrapWidth=80)
 
 # Draw test instructions
@@ -348,7 +308,7 @@ while press_button:
 
 # Create trial handler
 trials = data.TrialHandler(
-    trialList=data.importConditions('./active_conditions.csv'),
+    trialList=data.importConditions('./non_immersive_conditions.csv'),
     originPath=-1, nReps=1, method='random', name='test')
 
 exp.addLoop(trials)
@@ -480,7 +440,7 @@ feedback_msg = visual.TextStim(win,
 goodbye_msg = visual.TextStim(win,
                                 height=params['text_height'],
                                 pos=[0, -6],
-                                text=instructions.active_instructions_text['5_goodbye_text'],
+                                text=instructions.non_immersive_instructions_text['5_goodbye_text'],
                                 wrapWidth=80)
 
 feedback_msg.draw()
