@@ -180,13 +180,48 @@ if __name__ == "__main__":
     scr_idlog = 0
     trial_idlog = 0
 
-    # Crear slider para la anotación de valencia
-    valence_slider = visual.Slider(win=win, name='valence',
-                                size=(5.0, 0.5), pos=(0, 0),
-                                labels=None, ticks=(1, 9),
-                                granularity=0, style=['slider'],
-                                color='LightGray', font='HelveticaBold',
-                                flip=False)
+    # Cargar imágenes para los extremos y el marcador del slider
+    unhappy_image = visual.ImageStim(win, image='./images_scale/AS_unhappy.png', pos=(-4, -8.1), size=1.3)
+    happy_image = visual.ImageStim(win, image='./images_scale/AS_happy.png', pos=(4, -8.1), size=1.3)
+    intensity_cue_image = visual.ImageStim(win, image='./images_scale/AS_intensity_cue.png', pos=(0, -9.25), size=(6, 0.4))
+
+    # Initialize the slider
+    valence_slider = visual.Slider(win=win, name='valence', ticks=(1, 9), labels=None, pos=(0, -8.1), size=(6, 0.4),
+                                style=['slider'], granularity=0.1, color='white', font='HelveticaBold',
+                                lineColor='white', fillColor='white', borderColor='white', markerColor='white')
+    
+    # Define the size and position of the slider track
+    track_width = 6
+    track_height = 0.4
+    track_pos = (-10, 0)  # Center of the window
+
+    # Radius of the semicircles at the ends
+    radius = track_height / 2
+    half_width = track_width / 2
+
+    # Generate the vertices for the left semi-circle
+    vertices = []
+    angle_step = np.pi / 32  # Increase this for more precision
+    for angle in np.arange(np.pi / 2, 3 * np.pi / 2, angle_step):
+        x = -half_width + radius * np.cos(angle)
+        y = radius * np.sin(angle)
+        vertices.append([x, y])
+
+    # Add the straight lines of the rectangle
+    vertices += [[-half_width, -radius], [half_width, -radius], [half_width, radius]]
+
+    # Close the right semi-circle
+    for angle in np.arange(-np.pi / 2, np.pi / 2 + angle_step, angle_step):
+        x = half_width + radius * np.cos(angle)
+        y = radius * np.sin(angle)
+        vertices.append([x, y])
+
+    # Define the slider track as a ShapeStim
+    #slider_track = visual.ShapeStim(win, vertices=vertices, fillColor='white', lineColor='white', pos=track_pos)
+
+    # Create a custom white circle as the slider thumb
+    slider_thumb = visual.Circle(win, radius=0.25, fillColor='white', lineColor='black', edges=32)
+
 
     # Loop over trials handler
     for trial in practice_trials:
@@ -231,8 +266,24 @@ if __name__ == "__main__":
             # Dibuja el video
             mov.draw()
 
-            # Dibuja el slider
+            unhappy_image.draw()
+            happy_image.draw()
+            intensity_cue_image.draw()
+
+            # Calculate the x position of the thumb based on the marker position
+            norm_pos = (valence_slider.markerPos - 1) / 8  # Normalize markerPos to range [0, 1]
+            thumb_pos_x = norm_pos * (valence_slider.size[0] - slider_thumb.radius*2) - (valence_slider.size[0]/2) + slider_thumb.radius
+
+            # Draw the custom thumb on the slider
+            slider_thumb.setPos([thumb_pos_x, valence_slider.pos[1]])
+            
+
+            # Draw the slider (without the default marker)
             valence_slider.draw()
+            # Draw the slider track
+            #slider_track.draw()
+            # Draw the slider thumb
+            slider_thumb.draw()
 
             # Actualiza la ventana
             win.flip()
