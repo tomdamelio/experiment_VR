@@ -40,7 +40,7 @@ info_dict = {
 order = ['Subject_id', 'Age', 'Gender', 'Group']
 
 ### UNCOMMENT THIS TO USE THE FORMS. It's commented for practicity.###
-# Instantiate dialog box
+# Instantiate dialog boxqq
 # my_dlg = gui.DlgFromDict(info_dict, title=params.exp_name,
 #                          order=order)
 # if my_dlg.OK == False:
@@ -160,6 +160,7 @@ valence_slider = visual.Slider(win=win, name='valence', ticks=(-1, 1), labels=No
 # Create a custom white circle as the slider thumb
 slider_thumb = visual.Circle(win, radius=0.30, fillColor='white', lineColor='black', edges=32)
 
+green_screen_variation = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.029446019086674102, 0.029446019086674102, 0.03680752385834252, 0.03680752385834252, 0.03680752385834252, 0.03680752385834252, 0.05153053340167957, 0.05889203817334798, 0.05889203817334798, 0.05889203817334798, 0.05889203817334798, 0.05889203817334798, 0.05889203817334798, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.06625354294501662, 0.05889203817334798, 0.0073615047716684145, -0.04416902863001104, -0.06625354294501651, -0.10306106680335902, -0.161953104976707, -0.18403761929171258, -0.21348363837838658, -0.23556815269339204, -0.2576526670083975, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.279737181323403, -0.29446019086674, -0.30182169563840844, -0.30182169563840844, -0.30182169563840844, -0.30182169563840844, -0.30182169563840844, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3239062099534139, -0.3239062099534139, -0.3239062099534139, -0.3239062099534139, -0.3239062099534139, -0.3239062099534139, -0.33862921949675096, -0.3459907242684195, -0.3459907242684195, -0.3459907242684195, -0.3459907242684195, -0.3459907242684195, -0.3607137338117564, -0.3607137338117564, -0.3607137338117564, -0.3607137338117564, -0.3607137338117564, -0.3607137338117564, -0.3607137338117564, -0.36807523858342495, -0.36807523858342495, -0.36807523858342495, -0.36807523858342495, -0.36807523858342495, -0.36807523858342495, -0.36807523858342495, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347]
 
 # Loop over trials handler
 for trial in practice_trials:
@@ -190,34 +191,44 @@ for trial in practice_trials:
 
     # Si el ensayo es el especial para mostrar la pantalla verde
     if trial['movie_path'] == 'green_screen':
-        win.setColor('green')  # Configurar color de fondo a verde
-        win.flip()
-
         # Tiempo de inicio para el ensayo de pantalla verde
         green_screen_start_time = core.getTime()
 
-        while core.getTime() - green_screen_start_time < 5:  # Durante 5 segundos
-            # Manejar interacción con el deslizador
+        # Calcular el número total de frames basado en la duración y el frame rate de la ventana
+        num_frames = len(green_screen_variation)
+
+        for frame in range(num_frames):
+            # Calcular el valor de intensidad verde para el frame actual
+            # Ajustando el rango de -1 a 1 para mapearlo a 25 a 255
+            green_intensity = ((green_screen_variation[frame] + 1) / 2) * (255 - 25) + 25
+            
+            # Establecer el color de la ventana usando el valor calculado (manteniendo rojo y azul constantes)
+            win.setColor([20, green_intensity, 12], 'rgb255')
+            
+            # Dibujar todo lo necesario en este frame
+            win.flip()
+            
+            # Manejar interacción con el deslizador en cada frame
             if mouse.getPressed()[0]:  # Si se presiona el botón izquierdo del ratón
                 mouse_x, _ = mouse.getPos()
                 if slider_start <= mouse_x <= slider_end:  # Si la posición del ratón está dentro del rango del deslizador
                     norm_pos = (mouse_x - slider_start) / valence_slider.size[0]
                     slider_value = norm_pos * (valence_slider.ticks[-1] - valence_slider.ticks[0]) + valence_slider.ticks[0]
                     valence_slider.markerPos = round(slider_value, 2)
-                    mouse_annotation.append(slider_value)  # Añadir valor al registro de anotaciones
+                    mouse_annotation.append([slider_value, core.getTime() - green_screen_start_time])  # Añadir valor al registro de anotaciones junto con el timestamp
+
+            unhappy_image.draw()
+            happy_image.draw()
+            intensity_cue_image.draw()
+            valence_slider.draw()
+            slider_thumb.draw()
 
             # Actualizar posición del pulgar en el deslizador
             thumb_pos_x = (valence_slider.markerPos - valence_slider.ticks[0]) / (valence_slider.ticks[-1] - valence_slider.ticks[0]) * valence_slider.size[0] - (valence_slider.size[0] / 2)
             slider_thumb.setPos([thumb_pos_x, valence_slider.pos[1]])
 
-            unhappy_image.draw()  # Dibujar imagen de referencia de valencia negativa
-            happy_image.draw()  # Dibujar imagen de referencia de valencia positiva
-            intensity_cue_image.draw()  # Dibujar imagen de referencia de intensidad
-            valence_slider.draw()  # Dibujar el deslizador
-            slider_thumb.draw()  # Dibujar el pulgar en el deslizador
-            win.flip()
-
-        win.setColor('black')  # Restablecer color de fondo a negro
+        # Restablecer el color de fondo a negro al final del ensayo
+        win.setColor('black')
         win.flip()
     else:
         # Procesamiento para ensayos que involucran la presentación de un video
@@ -251,7 +262,7 @@ for trial in practice_trials:
     # Añadir anotaciones continuas al final del ensayo
     practice_trials.addData('continuous_annotation', mouse_annotation)
 
-    # Draw visual stimulus for emotional faces
+
     for emotion, position in zip(basic_emotions.values(), pos_basic_emotions):
         emotion_response = visual.TextStim(
             win, text=str(emotion), height=params['text_height'],
