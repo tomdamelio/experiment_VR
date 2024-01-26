@@ -181,46 +181,17 @@ if __name__ == "__main__":
     trial_idlog = 0
 
     # Cargar imágenes para los extremos y el marcador del slider
-    unhappy_image = visual.ImageStim(win, image='./images_scale/AS_unhappy.png', pos=(-4, -8.1), size=1.3)
-    happy_image = visual.ImageStim(win, image='./images_scale/AS_happy.png', pos=(4, -8.1), size=1.3)
-    intensity_cue_image = visual.ImageStim(win, image='./images_scale/AS_intensity_cue.png', pos=(0, -9.25), size=(6, 0.4))
+    unhappy_image = visual.ImageStim(win, image='./images_scale/AS_unhappy_final.png', pos=(-5, -8.4), size=1.3)
+    happy_image = visual.ImageStim(win, image='./images_scale/AS_happy_final.png', pos=(5, -8.4), size=1.3)
+    intensity_cue_image = visual.ImageStim(win, image='./images_scale/AS_intensity_cue.png', pos=(0, -8.7), size=(8, 0.6))
 
     # Initialize the slider
-    valence_slider = visual.Slider(win=win, name='valence', ticks=(1, 9), labels=None, pos=(0, -8.1), size=(6, 0.4),
+    valence_slider = visual.Slider(win=win, name='valence', ticks=(1, 9), labels=None, pos=(0, -8.1), size=(8, 0.25),
                                 style=['slider'], granularity=0.1, color='white', font='HelveticaBold',
                                 lineColor='white', fillColor='white', borderColor='white', markerColor='white')
-    
-    # Define the size and position of the slider track
-    track_width = 6
-    track_height = 0.4
-    track_pos = (-10, 0)  # Center of the window
-
-    # Radius of the semicircles at the ends
-    radius = track_height / 2
-    half_width = track_width / 2
-
-    # Generate the vertices for the left semi-circle
-    vertices = []
-    angle_step = np.pi / 32  # Increase this for more precision
-    for angle in np.arange(np.pi / 2, 3 * np.pi / 2, angle_step):
-        x = -half_width + radius * np.cos(angle)
-        y = radius * np.sin(angle)
-        vertices.append([x, y])
-
-    # Add the straight lines of the rectangle
-    vertices += [[-half_width, -radius], [half_width, -radius], [half_width, radius]]
-
-    # Close the right semi-circle
-    for angle in np.arange(-np.pi / 2, np.pi / 2 + angle_step, angle_step):
-        x = half_width + radius * np.cos(angle)
-        y = radius * np.sin(angle)
-        vertices.append([x, y])
-
-    # Define the slider track as a ShapeStim
-    #slider_track = visual.ShapeStim(win, vertices=vertices, fillColor='white', lineColor='white', pos=track_pos)
 
     # Create a custom white circle as the slider thumb
-    slider_thumb = visual.Circle(win, radius=0.25, fillColor='white', lineColor='black', edges=32)
+    slider_thumb = visual.Circle(win, radius=0.30, fillColor='white', lineColor='black', edges=32)
 
 
     # Loop over trials handler
@@ -235,10 +206,6 @@ if __name__ == "__main__":
                                 size=(1024, 768), pos=[0, 0], noAudio=True)
 
         # Draw fixation
-        # Log BDF and metadata
-        #pg.log("ScreenIn", screenname=f'Fixation: {scr_idlog}', screenid=scr_idlog, trialname=f'trial_{trial_idlog}',
-        #       stims=[['fixation_cross', [int(fixation.size[0]), int(fixation.size[1])],
-        #               [int(fixation.pos[0]), int(fixation.pos[1])]]])
         fixation.draw()
         win.flip()
         core.wait(params['fixation_time'])
@@ -252,12 +219,6 @@ if __name__ == "__main__":
         kb.clock.reset()
 
         valence_slider.reset()
-
-        # log information of the stimuli to the eytracker BDF file
-        #pg.log("ScreenIn", screenname=f"{trial['movie_path']}: {scr_idlog}", screenid=scr_idlog,
-        #       condition=trial['emotion'],
-        #       duration=params['stim_time'], trialname=f'trial_{trial_idlog}',
-        #       stims=[[trial['movie_path'], [int(mov.size[0]), int(mov.size[1])], [int(mov.pos[0]), int(mov.pos[1])]]])
 
         # Inicializa markerPos antes de empezar a reproducir el video
         valence_slider.markerPos = 5
