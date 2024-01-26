@@ -1,3 +1,0 @@
-﻿movie_path,emotion,stim_gender,correct_response,practice.thisRepN,practice.thisTrialN,practice.thisN,practice.thisIndex,test.thisRepN,test.thisTrialN,test.thisN,test.thisIndex,emotion_key,emotion_rt,response,Subject_id,Age,Gender,Group,date,frame_rate,
-./amsterdam_dynamic_facial_expression_set/F03-Fear-Face Forward.mp4,Fear,female,2,0,0,0,0,,,,,3,3.088982399989618,incorrect,S6,21,"['Male', 'Female', 'Non-binary', 'Rather not say']","['Test', 'Control']",2024-01-26_00h01.31.520,59.83244522617991,
-./amsterdam_dynamic_facial_expression_set/M02-Surprise-Face Forward.mp4,Suprise,male,6,0,1,1,1,,,,,1,1.2067478999961168,incorrect,S6,21,"['Male', 'Female', 'Non-binary', 'Rather not say']","['Test', 'Control']",2024-01-26_00h01.31.520,59.83244522617991,
