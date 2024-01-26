@@ -6,7 +6,7 @@ params = dict(
     ##########################################################################
     ########                        SETTINGS                          ########
     ##########################################################################
-    exp_name='Active_emotion_recognition',
+    exp_name='non_immersive_pilot',
 
     results_folder='./results/',
 

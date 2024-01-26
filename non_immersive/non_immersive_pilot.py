@@ -160,89 +160,96 @@ valence_slider = visual.Slider(win=win, name='valence', ticks=(-1, 1), labels=No
 # Create a custom white circle as the slider thumb
 slider_thumb = visual.Circle(win, radius=0.30, fillColor='white', lineColor='black', edges=32)
 
+
 # Loop over trials handler
 for trial in practice_trials:
-
-    # Initialize a list to store continuous annotations for this trial
+    # Inicializar lista para almacenar anotaciones continuas para este ensayo
     mouse_annotation = []
     
-    # Create fixation cross 2
-    fixation = visual.GratingStim(win, color=1, colorSpace='rgb',
-                                    tex=None, mask='cross', size=2)
-
-    # Create visual stimulus for emotional faces
-    mov = visual.MovieStim3(win=win, filename=trial['movie_path'],
-                            size=(1024, 768), pos=[0, 0], noAudio=True)
-
-    # Draw fixation
+    # Crear cruz de fijación
+    fixation = visual.GratingStim(win, color=1, colorSpace='rgb', tex=None, mask='cross', size=2)
     fixation.draw()
     win.flip()
     core.wait(params['fixation_time'])
 
-    # Flush the buffers
+    # Limpiar buffers y reloj
     kb.clearEvents()
-
-    # Clock reset
     kb.clock.reset()
 
-    # Reset the valence_slider for the new trial
+    # Restablecer el deslizador de valencia para el nuevo ensayo
     valence_slider.reset()
-    valence_slider.markerPos = 0  # Set the initial position of the marker
+    valence_slider.markerPos = 0  # Establecer la posición inicial del marcador
 
-    # Get the mouse object
-    mouse = event.Mouse(visible=True, win=win)  # Make the mouse visible
-    mouse.setPos(newPos=(0, valence_slider.pos[1]))  # Start the mouse at the center of the slider
+    # Obtener objeto del ratón y hacerlo visible
+    mouse = event.Mouse(visible=True, win=win)
+    mouse.setPos(newPos=(0, valence_slider.pos[1]))
 
     # Calculate the range in pixels for the slider
     slider_start = valence_slider.pos[0] - (valence_slider.size[0] / 2)
     slider_end = valence_slider.pos[0] + (valence_slider.size[0] / 2)
 
-    while mov.status != constants.FINISHED:
-        # Dibuja el video
-        mov.draw()
-
-        unhappy_image.draw()
-        happy_image.draw()
-        intensity_cue_image.draw()
-
-        # Draw the slider (without the default marker)
-        valence_slider.draw()
-
-        # Draw the slider thumb
-        slider_thumb.draw()
-
-        # Check for mouse button press and position
-        if mouse.getPressed()[0]:  # If left mouse button is pressed
-            mouse_x, _ = mouse.getPos()
-            if slider_start <= mouse_x <= slider_end:  # If the mouse x position is within the slider
-                # Normalize the mouse position to a slider value
-                norm_pos = (mouse_x - slider_start) / valence_slider.size[0]
-                slider_value = norm_pos * (valence_slider.ticks[-1] - valence_slider.ticks[0]) + valence_slider.ticks[0]
-                valence_slider.markerPos = round(slider_value, 2) 
-                # Add the current slider value to the continuous annotations
-                mouse_annotation.append(slider_value)
-
-
-        # Draw the custom thumb on the slider
-        thumb_pos_x = (valence_slider.markerPos - valence_slider.ticks[0]) / (valence_slider.ticks[-1] - valence_slider.ticks[0]) * valence_slider.size[0] - (valence_slider.size[0] / 2)
-        slider_thumb.setPos([thumb_pos_x, valence_slider.pos[1]])
-
-        # Actualiza la ventana
+    # Si el ensayo es el especial para mostrar la pantalla verde
+    if trial['movie_path'] == 'green_screen':
+        win.setColor('green')  # Configurar color de fondo a verde
         win.flip()
 
-        # Revisa si se ha presionado 'escape' para terminar el experimento
-        if 'escape' in keys:
-            win.close()
-            core.quit()
+        # Tiempo de inicio para el ensayo de pantalla verde
+        green_screen_start_time = core.getTime()
 
-        # Limpia el buffer de eventos de ratón que ya se han procesado
-        mouse.getWheelRel()  # This is a trick to prevent mouse wheel buffer from filling up
+        while core.getTime() - green_screen_start_time < 5:  # Durante 5 segundos
+            # Manejar interacción con el deslizador
+            if mouse.getPressed()[0]:  # Si se presiona el botón izquierdo del ratón
+                mouse_x, _ = mouse.getPos()
+                if slider_start <= mouse_x <= slider_end:  # Si la posición del ratón está dentro del rango del deslizador
+                    norm_pos = (mouse_x - slider_start) / valence_slider.size[0]
+                    slider_value = norm_pos * (valence_slider.ticks[-1] - valence_slider.ticks[0]) + valence_slider.ticks[0]
+                    valence_slider.markerPos = round(slider_value, 2)
+                    mouse_annotation.append(slider_value)  # Añadir valor al registro de anotaciones
 
-        # Limpia el buffer de teclas que ya se han procesado
-        kb.clearEvents()
+            # Actualizar posición del pulgar en el deslizador
+            thumb_pos_x = (valence_slider.markerPos - valence_slider.ticks[0]) / (valence_slider.ticks[-1] - valence_slider.ticks[0]) * valence_slider.size[0] - (valence_slider.size[0] / 2)
+            slider_thumb.setPos([thumb_pos_x, valence_slider.pos[1]])
 
-        # At the end of the trial, add the continuous annotations to the trial data
-        practice_trials.addData('continuous_annotation', mouse_annotation)
+            unhappy_image.draw()  # Dibujar imagen de referencia de valencia negativa
+            happy_image.draw()  # Dibujar imagen de referencia de valencia positiva
+            intensity_cue_image.draw()  # Dibujar imagen de referencia de intensidad
+            valence_slider.draw()  # Dibujar el deslizador
+            slider_thumb.draw()  # Dibujar el pulgar en el deslizador
+            win.flip()
+
+        win.setColor('black')  # Restablecer color de fondo a negro
+        win.flip()
+    else:
+        # Procesamiento para ensayos que involucran la presentación de un video
+        mov = visual.MovieStim3(win=win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=True)
+        while mov.status != constants.FINISHED:
+            mov.draw()
+            unhappy_image.draw()
+            happy_image.draw()
+            intensity_cue_image.draw()
+            valence_slider.draw()
+            slider_thumb.draw()
+
+            if mouse.getPressed()[0]:
+                mouse_x, _ = mouse.getPos()
+                if slider_start <= mouse_x <= slider_end:
+                    norm_pos = (mouse_x - slider_start) / valence_slider.size[0]
+                    slider_value = norm_pos * (valence_slider.ticks[-1] - valence_slider.ticks[0]) + valence_slider.ticks[0]
+                    valence_slider.markerPos = round(slider_value, 2)
+                    mouse_annotation.append(slider_value)
+
+            thumb_pos_x = (valence_slider.markerPos - valence_slider.ticks[0]) / (valence_slider.ticks[-1] - valence_slider.ticks[0]) * valence_slider.size[0] - (valence_slider.size[0] / 2)
+            slider_thumb.setPos([thumb_pos_x, valence_slider.pos[1]])
+            win.flip()
+
+            # Manejar la salida anticipada
+            keys = event.getKeys()
+            if 'escape' in keys:
+                win.close()
+                core.quit()
+
+    # Añadir anotaciones continuas al final del ensayo
+    practice_trials.addData('continuous_annotation', mouse_annotation)
 
     # Draw visual stimulus for emotional faces
     for emotion, position in zip(basic_emotions.values(), pos_basic_emotions):
