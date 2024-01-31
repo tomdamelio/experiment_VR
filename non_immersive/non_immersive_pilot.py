@@ -143,10 +143,6 @@ practice_trials = data.TrialHandler(
 
 exp.addLoop(practice_trials)
 
-#pg.log('Annotation', txt='Practice Block begun')
-scr_idlog = 0
-trial_idlog = 0
-
 # Cargar imágenes para los extremos y el marcador del slider
 unhappy_image = visual.ImageStim(win, image='./images_scale/AS_unhappy_final.png', pos=(-5, -8.4), size=1.3)
 happy_image = visual.ImageStim(win, image='./images_scale/AS_happy_final.png', pos=(5, -8.4), size=1.3)
@@ -254,42 +250,145 @@ for trial in practice_trials:
             win.flip()
 
             # Manejar la salida anticipada
-            keys = event.getKeys()
+            keys = event.getKeys()  
             if 'escape' in keys:
                 win.close()
                 core.quit()
 
+    ############### SCALES ################
     # Añadir anotaciones continuas al final del ensayo
-    practice_trials.addData('continuous_annotation', mouse_annotation)
+    # Diccionario para definir los sliders y su configuración
+    sliders_dict = {
+        "Valencia": {"slider_position": (0, 5)},
+        "Arousal": {"slider_position": (0, 2)},
+        "Preferencia": {"slider_position": (0, -1)},
+        "Engagement": {"slider_position": (0, -4)},
+        "Familiaridad": {"slider_position": (0, -7)},
+    }
 
+    # Lista para mantener los objetos de los sliders
+    sliders = []
 
-    for emotion, position in zip(basic_emotions.values(), pos_basic_emotions):
-        emotion_response = visual.TextStim(
-            win, text=str(emotion), height=params['text_height'],
-            pos=position)
-        emotion_response.draw()
+    # Crear y dibujar los sliders y las imágenes asociadas
+    for slider_name, slider_info in sliders_dict.items():
+        # Crea el slider
+        slider_info['slider'] = visual.Slider(win=win, name=slider_name, ticks=(-1, 1), labels=None,
+                                            pos=slider_info["slider_position"], size=(8, 0.25),
+                                            style=['slider'], granularity=0.1, color='white',
+                                            font='HelveticaBold', lineColor='white', fillColor='white',
+                                            borderColor='white', markerColor='white')
+        sliders.append(slider_info['slider'])
 
+    # Inicializa la ventana gráfica
     win.flip()
 
-    # Get key response
-    key, rt = event.waitKeys(keyList=basic_emotions.keys(),
-                                timeStamped=core.Clock())[0]
-    practice_trials.addData('emotion_key', key)
-    practice_trials.addData('emotion_rt', rt)
+    # Define las posiciones de las casillas de verificación en la parte inferior de la pantalla
+    checkbox_positions = [(x, -9) for x in range(-7, 8, 2)]  # Genera posiciones a lo largo del eje x con un espaciado de 2
 
-    # Get correct/incorrect response
-    if str(key) == str(trial['correct_response']):
-        response = 'correct'
-    else:
-        response = 'incorrect'
-    practice_trials.addData('response', response)
+    # Define las emociones básicas y su estado inicial (no seleccionado)
+    basic_emotions = ['Neutral', 'Disgust', 'Happiness', 'Surprise', 'Anger', 'Fear', 'Sadness', 'Other']
+    emotion_states = {emotion: False for emotion in basic_emotions}
 
-    # Inter Trial Interval(ITI) with blank screen
+    # Crea rectángulos y etiquetas para las casillas de verificación
+    checkbox_rects = []
+    checkbox_labels = []
+    for pos, emotion in zip(checkbox_positions, basic_emotions):
+        rect = visual.Rect(win, width=0.5, height=0.5, pos=pos, lineColor='white', fillColor=None)
+        checkbox_rects.append(rect)
+        label = visual.TextStim(win, text=emotion, pos=(pos[0], pos[1] - 0.7), height=0.5)
+        checkbox_labels.append(label)
+
+    # Crear un slider_thumb para cada slider antes del bucle
+    for slider_info in sliders_dict.values():
+        slider_y = slider_info['slider_position'][1]
+        slider_info['slider_thumb'] = visual.Circle(win, radius=0.30, fillColor='white', lineColor='black', edges=32, pos=(0, slider_y))
+
+    # Iniciar el bucle de evento para la interacción del usuario
+    mouse = event.Mouse(win=win)
+    event.clearEvents()
+
+    user_interacting = True  # Una nueva variable para controlar la interacción del usuario
+
+    while user_interacting:
+        # Obtener la posición actual del ratón en cada iteración del bucle
+        mouse_x, mouse_y = mouse.getPos()
+
+        # Dibujar sliders, pulgares e imágenes asociadas
+        for slider_info in sliders_dict.values():
+            slider = slider_info['slider']
+            slider_thumb = slider_info['slider_thumb']
+            slider_x, slider_y = slider.pos
+            slider_width, slider_height = slider.size
+            slider_start = slider_x - slider_width / 2
+            slider_end = slider_x + slider_width / 2
+
+            # Dibujar el slider y sus imágenes asociadas
+            slider.draw()
+            unhappy_image.pos = (-5, slider_y)
+            happy_image.pos = (5, slider_y)
+            intensity_cue_image.pos = (0, slider_y - 0.4)
+            unhappy_image.draw()
+            happy_image.draw()
+            intensity_cue_image.draw()
+
+            # Dibujar el thumb del slider
+            slider_thumb.draw()
+
+            if mouse.getPressed()[0]:
+                #mouse_x, mouse_y = mouse.getPos()
+                # Comprobar si el ratón está sobre el slider o su thumb
+                if slider_x - slider_width / 2 <= mouse_x <= slider_x + slider_width / 2 and \
+                slider_y - slider_height / 2 <= mouse_y <= slider_y + slider_height / 2:
+                    if mouse.getPressed()[0]:  # Si se presiona el botón izquierdo del ratón
+                        norm_pos = (mouse_x - slider_start) / slider_width
+                        slider_value = norm_pos * (slider.ticks[-1] - slider.ticks[0]) + slider.ticks[0]
+                        slider.markerPos = slider_value
+                        # Asegurarse de que la posición del thumb refleje la posición del marcador
+                        thumb_pos_x = (slider.markerPos - slider.ticks[0]) / (slider.ticks[-1] - slider.ticks[0]) * slider_width + slider_start
+                        slider_thumb.setPos((thumb_pos_x, slider_y))
+
+        # Dibujar las casillas de verificación y sus etiquetas
+        for rect, label in zip(checkbox_rects, checkbox_labels):
+            rect.draw()   
+            label.draw()
+        
+        # Detectar clics del ratón
+        if mouse.getPressed()[0]:  # Verifica si el botón izquierdo del ratón está presionado
+            mouse_click_position = mouse.getPos()
+            for i, rect in enumerate(checkbox_rects):
+                if rect.contains(mouse_click_position):
+                    emotion = basic_emotions[i]
+                    emotion_states[emotion] = not emotion_states[emotion]  # Cambia el estado de la emoción
+                    rect.fillColor = 'grey' if emotion_states[emotion] else None  # Retroalimentación visual
+                    break  # Procesar un solo clic a la vez
+
+            # Reinicia el estado del clic del ratón para evitar detecciones múltiples del mismo clic
+            while any(mouse.getPressed()):
+                pass  # Espera hasta que todos los botones del ratón se liberen
+
+
+        # Asegurarse de actualizar la ventana para reflejar los cambios
+        win.flip()
+
+        # Verificar si se presiona una tecla para finalizar la interacción del usuario
+        keys = event.getKeys()
+        if keys:
+            user_interacting = False  # El usuario ha terminado de interactuar
+    
+    # Una vez finalizada la interacción del usuario, recoger y guardar los datos
+    for slider_name, slider_info in sliders_dict.items():
+        slider_value = slider_info['slider'].getRating()
+        exp.addData(f'{slider_name}_value', slider_value)
+
+    # Guardar los estados de las casillas de verificación
+    for emotion, rect in zip(basic_emotions, checkbox_rects):
+        exp.addData(f'checkbox_{emotion}', emotion_states[emotion])
+
+    # Inter Trial Interval(ITI) con pantalla en blanco
     win.flip()
     core.wait(params['iti'])
 
-    scr_idlog += 1
-    trial_idlog += 1
+    # Avanzar al siguiente registro de datos
     exp.nextEntry()
 
 
@@ -431,8 +530,7 @@ for trial in trials:
     # Inter Trial Interval(ITI) with blank screen
     win.flip()
     core.wait(params['iti'])
-    scr_idlog += 1
-    trial_idlog += 1
+
     exp.nextEntry()
 
 #pg.log('Annotation', txt='Test Block ended')
