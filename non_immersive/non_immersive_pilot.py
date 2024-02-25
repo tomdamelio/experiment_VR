@@ -518,6 +518,8 @@ for trial in practice_trials:
     # Avanzar al siguiente registro de datos
     exp.nextEntry()
 
+    ###### END SCALES ######
+
 
 ##########################################################################
 ########                        TEST BLOCK                        ########
