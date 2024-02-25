@@ -1,7 +1,6 @@
 # Experiment VR: Non Immersive Task
 # Author: Tomas D'Amelio
 
-
 from psychopy import core, visual, data, event, constants
 from psychopy.hardware import keyboard
 
@@ -72,14 +71,52 @@ exp = data.ExperimentHandler(name=params['exp_name'],
                                 dataFileName=subject_folder + file_name)
 
 ##########################################################################
-# Set stimuli
-# Basic emotion names
-basic_emotions = {'1': '1. Anger', '2': '2. Fear', '3': '3. Disgust',
-                    '4': '4. Joy', '5': '5. Sadness', '6': '6. Surprise'}
 
-# Basic emotion positions
-pos_basic_emotions = [(-7.0, 4.0), (0.0, 4.0), (7.0, 4.0),
-                        (-7.0, -4.0), (0.0, -4.0), (7.0, -4.0)]
+# Diccionario para definir los sliders y su configuración
+sliders_dict = {
+    "Valencia": {
+        "slider_position": (0, 7),
+        "left_image_path": './images_scale/valence_left.png',
+        "right_image_path": './images_scale/valence_right.png',
+        "left_text": '',
+        "right_text": '' 
+    },
+    "Arousal": {
+        "slider_position": (0, 4),
+        "left_image_path": './images_scale/arousal_left.png',
+        "right_image_path": './images_scale/arousal_right.png',
+        "left_text": '',
+        "right_text": '' 
+    },
+    "Preferencia": {
+        "slider_position": (0, 1),
+        "left_image_path": './images_scale/preference_left.png',
+        "right_image_path": './images_scale/preference_right.png',
+        "left_text": "Completo desagrado",
+        "right_text": "Completo agrado",
+    },
+    "Engagement": {
+        "slider_position": (0, -2),
+        "left_image_path": None,
+        "right_image_path": None,
+        "left_text": "No presté atención",
+        "right_text": "Presté completa atención",
+    },
+    "Familiaridad": {
+        "slider_position": (0, -5),
+        "left_image_path": None,
+        "right_image_path": None,
+        "left_text": "Nunca habia visto este video antes",
+        "right_text": "Conozco este video muy bien",
+    },
+    "Luminancia": {
+        "slider_position": None,
+        "left_image_path": './images_scale/non_bright_left.png',
+        "right_image_path": './images_scale/bright_right.png',
+        "left_text": '',
+        "right_text": '',}
+}
+
 
 ##########################################################################
 # Create a window
@@ -115,7 +152,7 @@ kb = keyboard.Keyboard()
 ##########################################################################
 
 # Create practice instructions ('text' visual stimuli)
-for _, value in sorted(instructions.non_immersive_instructions_text.items())[:3]:
+for _, value in list(instructions.non_immersive_instructions_text.items())[:1]:
     instruction_practice = visual.TextStim(win,
                                             height=params['text_height'],
                                             pos=[0, 0],
@@ -139,18 +176,16 @@ for _, value in sorted(instructions.non_immersive_instructions_text.items())[:3]
 # Create trial handler
 practice_trials = data.TrialHandler(
     trialList=data.importConditions('non_immersive_practice_conditions.csv'),
-    originPath=-1, nReps=1, method='random', name='practice')
+    originPath=-1, nReps=1, method='sequential', name='practice')
 
 exp.addLoop(practice_trials)
 
 # Cargar imágenes para los extremos y el marcador del slider
-unhappy_image = visual.ImageStim(win, image='./images_scale/AS_unhappy_final.png', pos=(-5, -8.4), size=1.3)
-happy_image = visual.ImageStim(win, image='./images_scale/AS_happy_final.png', pos=(5, -8.4), size=1.3)
 intensity_cue_image = visual.ImageStim(win, image='./images_scale/AS_intensity_cue.png', pos=(0, -8.7), size=(8, 0.6))
 
 # Initialize the slider
-valence_slider = visual.Slider(win=win, name='valence', ticks=(-1, 1), labels=None, pos=(0, -8.1), size=(8, 0.25),
-                            style=['slider'], granularity=0.1, color='white', font='HelveticaBold',
+dimension_slider = visual.Slider(win=win, name='dimension', ticks=(-1, 1), labels=None, pos=(0, -8.1), size=(8, 0.25),
+                            style=['slider'], granularity=0.1, color='white', font='Helvetica',
                             lineColor='white', fillColor='white', borderColor='white', markerColor='white')
 
 # Create a custom white circle as the slider thumb
@@ -160,9 +195,27 @@ green_screen_variation = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.007361504771
 
 # Loop over trials handler
 for trial in practice_trials:
-    # Inicializar lista para almacenar anotaciones continuas para este ensayo
-    mouse_annotation = []
-    
+    practice_value = trial['Dimension'] + "_practice_instructions_text"
+    instruction_practice = visual.TextStim(win,
+                                            height=params['text_height'],
+                                            pos=[0, 0],
+                                            text=instructions.non_immersive_instructions_text[practice_value],
+                                            wrapWidth=80)
+    instruction_practice.draw()
+    # Flip the front and back buffers
+    win.flip()
+
+    # To begin the Experimetn with Spacebar or RightMouse Click
+    press_button = True
+    while press_button:
+        keys = event.getKeys(keyList=['space'])
+
+        mouse = event.Mouse(visible=False, win=win)
+        mouse_click = mouse.getPressed()
+
+        if 'space' in keys or 1 in mouse_click:
+            press_button = False
+
     # Crear cruz de fijación
     fixation = visual.GratingStim(win, color=1, colorSpace='rgb', tex=None, mask='cross', size=2)
     fixation.draw()
@@ -173,20 +226,41 @@ for trial in practice_trials:
     kb.clearEvents()
     kb.clock.reset()
 
+    # Usar 'Dimension' del trial para determinar las rutas de las imágenes
+    if trial['Dimension'] in sliders_dict:
+        slider_info = sliders_dict[trial['Dimension']]
+        
+        # Verificar si hay rutas de imagen definidas y crear los estímulos de imagen correspondientes
+        if slider_info['left_image_path'] is not None:
+            left_image = visual.ImageStim(win, image=slider_info['left_image_path'], pos=(-5, -8.4), size=1.3)
+            left_image.draw()
+        if slider_info['right_image_path'] is not None:
+            right_image = visual.ImageStim(win, image=slider_info['right_image_path'], pos=(5, -8.4), size=1.3)
+            right_image.draw()
+    else:
+        print("La dimensión del trial no está definida en sliders_dict:", trial['Dimension'])
+        continue  #
+
+    # Inicializar lista para almacenar anotaciones continuas para este ensayo
+    mouse_annotation = []
+    
     # Restablecer el deslizador de valencia para el nuevo ensayo
-    valence_slider.reset()
-    valence_slider.markerPos = 0  # Establecer la posición inicial del marcador
+    dimension_slider.reset()
+    dimension_slider.markerPos = 0  # Establecer la posición inicial del marcador
 
     # Obtener objeto del ratón y hacerlo visible
     mouse = event.Mouse(visible=True, win=win)
-    mouse.setPos(newPos=(0, valence_slider.pos[1]))
+    mouse.setPos(newPos=(0, dimension_slider.pos[1]))
 
     # Calculate the range in pixels for the slider
-    slider_start = valence_slider.pos[0] - (valence_slider.size[0] / 2)
-    slider_end = valence_slider.pos[0] + (valence_slider.size[0] / 2)
+    slider_start = dimension_slider.pos[0] - (dimension_slider.size[0] / 2)
+    slider_end = dimension_slider.pos[0] + (dimension_slider.size[0] / 20)
+
+    dimension_slider.name = trial['Dimension']
 
     # Si el ensayo es el especial para mostrar la pantalla verde
     if trial['movie_path'] == 'green_screen':
+        
         # Tiempo de inicio para el ensayo de pantalla verde
         green_screen_start_time = core.getTime()
 
@@ -208,45 +282,49 @@ for trial in practice_trials:
             if mouse.getPressed()[0]:  # Si se presiona el botón izquierdo del ratón
                 mouse_x, _ = mouse.getPos()
                 if slider_start <= mouse_x <= slider_end:  # Si la posición del ratón está dentro del rango del deslizador
-                    norm_pos = (mouse_x - slider_start) / valence_slider.size[0]
-                    slider_value = norm_pos * (valence_slider.ticks[-1] - valence_slider.ticks[0]) + valence_slider.ticks[0]
-                    valence_slider.markerPos = round(slider_value, 2)
+                    norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
+                    slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
+                    dimension_slider.markerPos = round(slider_value, 2)
                     mouse_annotation.append([slider_value, core.getTime() - green_screen_start_time])  # Añadir valor al registro de anotaciones junto con el timestamp
 
-            unhappy_image.draw()
-            happy_image.draw()
+            left_image.draw()
+            right_image.draw()
             intensity_cue_image.draw()
-            valence_slider.draw()
+            dimension_slider.draw()
             slider_thumb.draw()
 
             # Actualizar posición del pulgar en el deslizador
-            thumb_pos_x = (valence_slider.markerPos - valence_slider.ticks[0]) / (valence_slider.ticks[-1] - valence_slider.ticks[0]) * valence_slider.size[0] - (valence_slider.size[0] / 2)
-            slider_thumb.setPos([thumb_pos_x, valence_slider.pos[1]])
+            thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
+            slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
 
         # Restablecer el color de fondo a negro al final del ensayo
         win.setColor('black')
         win.flip()
+        # Añadir anotaciones continuas al final del ensayo
+        practice_trials.addData('continuous_annotation', mouse_annotation)
+        continue
     else:
+        video_start_time = core.getTime()
         # Procesamiento para ensayos que involucran la presentación de un video
         mov = visual.MovieStim3(win=win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=True)
         while mov.status != constants.FINISHED:
             mov.draw()
-            unhappy_image.draw()
-            happy_image.draw()
+            left_image.draw()
+            right_image.draw()
             intensity_cue_image.draw()
-            valence_slider.draw()
+            dimension_slider.draw()
             slider_thumb.draw()
 
             if mouse.getPressed()[0]:
                 mouse_x, _ = mouse.getPos()
                 if slider_start <= mouse_x <= slider_end:
-                    norm_pos = (mouse_x - slider_start) / valence_slider.size[0]
-                    slider_value = norm_pos * (valence_slider.ticks[-1] - valence_slider.ticks[0]) + valence_slider.ticks[0]
-                    valence_slider.markerPos = round(slider_value, 2)
-                    mouse_annotation.append(slider_value)
+                    norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
+                    slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
+                    dimension_slider.markerPos = round(slider_value, 2)
+                    mouse_annotation.append([slider_value, core.getTime() - video_start_time])
 
-            thumb_pos_x = (valence_slider.markerPos - valence_slider.ticks[0]) / (valence_slider.ticks[-1] - valence_slider.ticks[0]) * valence_slider.size[0] - (valence_slider.size[0] / 2)
-            slider_thumb.setPos([thumb_pos_x, valence_slider.pos[1]])
+            thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
+            slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
             win.flip()
 
             # Manejar la salida anticipada
@@ -255,38 +333,51 @@ for trial in practice_trials:
                 win.close()
                 core.quit()
 
+        # Añadir anotaciones continuas al final del ensayo
+        practice_trials.addData('continuous_annotation', mouse_annotation)
+
+    win.flip()
+
     ############### SCALES ################
     # Añadir anotaciones continuas al final del ensayo
-    # Diccionario para definir los sliders y su configuración
-    sliders_dict = {
-        "Valencia": {"slider_position": (0, 5)},
-        "Arousal": {"slider_position": (0, 2)},
-        "Preferencia": {"slider_position": (0, -1)},
-        "Engagement": {"slider_position": (0, -4)},
-        "Familiaridad": {"slider_position": (0, -7)},
-    }
-
     # Lista para mantener los objetos de los sliders
     sliders = []
 
     # Crear y dibujar los sliders y las imágenes asociadas
     for slider_name, slider_info in sliders_dict.items():
-        # Crea el slider
-        slider_info['slider'] = visual.Slider(win=win, name=slider_name, ticks=(-1, 1), labels=None,
+        if slider_name == "Luminancia":
+            continue
+        #print(slider_name)
+        #print(slider_info)
+        # Crear el slider
+        slider_info['slider'] = visual.Slider(win=win, name=slider_name, ticks=(-1, 1), 
                                             pos=slider_info["slider_position"], size=(8, 0.25),
+                                            labels = [slider_info["left_text"],' ', slider_info["right_text"]],
+                                            labelHeight = 0.5,
                                             style=['slider'], granularity=0.1, color='white',
                                             font='HelveticaBold', lineColor='white', fillColor='white',
                                             borderColor='white', markerColor='white')
         sliders.append(slider_info['slider'])
 
+        #print(slider_info["left_image_path"])
+        #print(slider_info["slider_position"][1])
+
+        # Determinar si se debe cargar una imagen o usar texto para cada lado
+        slider_info['left_image'] = visual.ImageStim(win, image=slider_info["left_image_path"],
+                                                        pos=(-5, slider_info["slider_position"][1]), size=1.3)
+
+        slider_info['right_image'] = visual.ImageStim(win, image=slider_info["right_image_path"],
+                                                        pos=(-5, slider_info["slider_position"][1]), size=1.3)
+
+
     # Inicializa la ventana gráfica
     win.flip()
 
     # Define las posiciones de las casillas de verificación en la parte inferior de la pantalla
-    checkbox_positions = [(x, -9) for x in range(-7, 8, 2)]  # Genera posiciones a lo largo del eje x con un espaciado de 2
+    checkbox_positions = [(x, -9) for x in range(-10, 10, 3)]  # Genera posiciones a lo largo del eje x con un espaciado de 3
 
     # Define las emociones básicas y su estado inicial (no seleccionado)
-    basic_emotions = ['Neutral', 'Disgust', 'Happiness', 'Surprise', 'Anger', 'Fear', 'Sadness', 'Other']
+    basic_emotions = ['Neutral', 'Asco', 'Felicidad', 'Sorpresa', 'Ira', 'Miedo', 'Tristeza']
     emotion_states = {emotion: False for emotion in basic_emotions}
 
     # Crea rectángulos y etiquetas para las casillas de verificación
@@ -299,7 +390,11 @@ for trial in practice_trials:
         checkbox_labels.append(label)
 
     # Crear un slider_thumb para cada slider antes del bucle
-    for slider_info in sliders_dict.values():
+    for slider_name, slider_info in sliders_dict.items():
+        if slider_name == "Luminancia":
+            continue
+        slider_info['left_image'] = visual.ImageStim(win, image=slider_info["left_image_path"], pos=(-5, slider_info["slider_position"][1]+0.5), size=1.3)
+        slider_info['right_image'] = visual.ImageStim(win, image=slider_info["right_image_path"], pos=(5, slider_info["slider_position"][1]+0.5), size=1.3)
         slider_y = slider_info['slider_position'][1]
         slider_info['slider_thumb'] = visual.Circle(win, radius=0.30, fillColor='white', lineColor='black', edges=32, pos=(0, slider_y))
 
@@ -307,29 +402,53 @@ for trial in practice_trials:
     mouse = event.Mouse(win=win)
     event.clearEvents()
 
+    win.flip()
+
     user_interacting = True  # Una nueva variable para controlar la interacción del usuario
 
     while user_interacting:
         # Obtener la posición actual del ratón en cada iteración del bucle
         mouse_x, mouse_y = mouse.getPos()
+        iteration_counter = 0  # Inicializa el contador
 
-        # Dibujar sliders, pulgares e imágenes asociadas
-        for slider_info in sliders_dict.values():
+        for slider_name, slider_info in sliders_dict.items():
+            if slider_name == "Luminancia":
+                continue
             slider = slider_info['slider']
+            slider.draw()
             slider_thumb = slider_info['slider_thumb']
             slider_x, slider_y = slider.pos
             slider_width, slider_height = slider.size
             slider_start = slider_x - slider_width / 2
             slider_end = slider_x + slider_width / 2
 
+            # Condición para dibujar intensity_cue_image solo en las dos primeras iteraciones
+            if iteration_counter < 2:
+                intensity_cue_image_scale = visual.ImageStim(win, image='./images_scale/AS_intensity_cue.png', pos=(0, -8.7), size=(8, 0.6))
+                intensity_cue_image_scale.pos = (0, slider_y - 1.0)
+                intensity_cue_image_scale.draw()
+
+            # Dibujar la imagen o el texto izquierdo
+            if "left_image" in slider_info:
+                slider_info['left_image'].draw()
+            else:
+                slider_info['left_text'].draw()
+
+            # Dibujar la imagen o el texto derecho
+            if "right_image" in slider_info:
+                slider_info['right_image'].draw()
+            else:
+                slider_info['right_text'].draw()
+            
+            iteration_counter += 1
+
             # Dibujar el slider y sus imágenes asociadas
-            slider.draw()
-            unhappy_image.pos = (-5, slider_y)
-            happy_image.pos = (5, slider_y)
-            intensity_cue_image.pos = (0, slider_y - 0.4)
-            unhappy_image.draw()
-            happy_image.draw()
-            intensity_cue_image.draw()
+            #slider.draw()
+            #unhappy_image.pos = (-5, slider_y)
+            #happy_image.pos = (5, slider_y)
+            
+            #unhappy_image.draw()
+            #happy_image.draw()
 
             # Dibujar el thumb del slider
             slider_thumb.draw()
@@ -346,6 +465,12 @@ for trial in practice_trials:
                         # Asegurarse de que la posición del thumb refleje la posición del marcador
                         thumb_pos_x = (slider.markerPos - slider.ticks[0]) / (slider.ticks[-1] - slider.ticks[0]) * slider_width + slider_start
                         slider_thumb.setPos((thumb_pos_x, slider_y))
+
+        mensaje = "Por favor indicá cómo te sentiste al ver este video"
+        text_stim = visual.TextStim(win, text=mensaje, height= 0.6, pos=(0,10), alignHoriz='center', alignVert='top')
+
+        # Para dibujar el estímulo de texto
+        text_stim.draw()
 
         # Dibujar las casillas de verificación y sus etiquetas
         for rect, label in zip(checkbox_rects, checkbox_labels):
@@ -377,6 +502,8 @@ for trial in practice_trials:
     
     # Una vez finalizada la interacción del usuario, recoger y guardar los datos
     for slider_name, slider_info in sliders_dict.items():
+        if slider_name == "Luminancia":
+            continue
         slider_value = slider_info['slider'].getRating()
         exp.addData(f'{slider_name}_value', slider_value)
 
@@ -400,7 +527,7 @@ for trial in practice_trials:
 instruction_test = visual.TextStim(win,
                                     height=params['text_height'],
                                     pos=[0, 0],
-                                    text=instructions.non_immersive_instructions_text['4_test_text'],
+                                    text=instructions.non_immersive_instructions_text['initial_relaxation_video_text'],
                                     wrapWidth=80)
 
 # Draw test instructions
@@ -461,7 +588,7 @@ for trial in trials:
 
     # Clock reset
     kb.clock.reset()
-    valence_slider.reset()
+    dimension_slider.reset()
 
     # log information of the stimuli to the eytracker BDF file
     #pg.log("ScreenIn", screenname=f"{trial['movie_path']}: {scr_idlog}", screenid=scr_idlog,
@@ -469,14 +596,14 @@ for trial in trials:
     #       duration=params['stim_time'], trialname=f'trial_{trial_idlog}',
     #       stims=[[trial['movie_path'], [int(mov.size[0]), int(mov.size[1])], [int(mov.pos[0]), int(mov.pos[1])]]])
 
-    valence_slider.markerPos = 5
+    dimension_slider.markerPos = 5
 
     while mov.status != constants.FINISHED:
         # Dibuja el video
         mov.draw()
 
         # Dibuja el slider
-        valence_slider.draw()
+        dimension_slider.draw()
 
         # Actualiza la ventana
         win.flip()
@@ -486,10 +613,10 @@ for trial in trials:
         for key in keys:
             if key.name == 'left':
                 # Disminuye la valencia
-                valence_slider.markerPos = max(1, valence_slider.markerPos - 0.25)
+                dimension_slider.markerPos = max(1, dimension_slider.markerPos - 0.25)
             elif key.name == 'right':
                 # Aumenta la valencia
-                valence_slider.markerPos = min(9, valence_slider.markerPos + 0.25)
+                dimension_slider.markerPos = min(9, dimension_slider.markerPos + 0.25)
             elif key.name == 'escape':
                 # Termina el experimento si se presiona 'escape'
                 win.close()
@@ -525,7 +652,7 @@ for trial in trials:
     else:
         response = 'incorrect'
     trials.addData('response', response)
-    trials.addData('final_valence_rating', valence_slider.markerPos)
+    trials.addData('final_dimension_slider_rating', dimension_slider.markerPos)
 
     # Inter Trial Interval(ITI) with blank screen
     win.flip()

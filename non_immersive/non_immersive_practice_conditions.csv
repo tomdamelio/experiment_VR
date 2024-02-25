@@ -1,4 +1,4 @@
-"movie_path","emotion",stim_gender,correct_response
-"./amsterdam_dynamic_facial_expression_set/F03-Fear-Face Forward.mp4","Fear",female,2
-"./amsterdam_dynamic_facial_expression_set/M02-Surprise-Face Forward.mp4","Suprise",male,6
-"green_screen",,,
+"movie_path","Dimension"
+"green_screen","Luminancia"
+"./amsterdam_dynamic_facial_expression_set/F03-Fear-Face Forward.mp4","Arousal"
+"./amsterdam_dynamic_facial_expression_set/M02-Surprise-Face Forward.mp4","Valencia"
