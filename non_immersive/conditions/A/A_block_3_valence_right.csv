@@ -1,0 +1,5 @@
+﻿movie_path,dimension,hand,stimulus_type,order_emojis_slider
+./amsterdam_dynamic_facial_expression_set/F03-Anger-Face Forward.mp4,valence,right,HV-HA,direct 
+./amsterdam_dynamic_facial_expression_set/F03-Disgust-Face Forward.mp4,valence,right,HV-LA,inverse
+./amsterdam_dynamic_facial_expression_set/F03-Fear-Face Forward.mp4,valence,right,LV-HA,direct
+./amsterdam_dynamic_facial_expression_set/F03-Joy-Face Forward.mp4,valence,right,LV-LA,inverse

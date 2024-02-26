@@ -4,6 +4,7 @@
 from psychopy import core, visual, data, event, constants
 from psychopy.hardware import keyboard
 
+import random
 import os
 import time
 
@@ -247,7 +248,7 @@ def mostrar_sliders_y_recoger_respuestas(win, sliders_dict, exp, params):
                         slider_thumb.setPos((thumb_pos_x, slider_y))
 
         mensaje = "Por favor indicá cómo te sentiste al ver este video"
-        text_stim = visual.TextStim(win, text=mensaje, height= 0.6, pos=(0,10), alignHoriz='center', alignVert='top')
+        text_stim = visual.TextStim(win, text=mensaje, height= 0.6, pos=(0,10))
 
         # Para dibujar el estímulo de texto
         text_stim.draw()
@@ -327,317 +328,387 @@ kb = keyboard.Keyboard()
 ########                    PRACTICE BLOCK                        ########
 ##########################################################################
 
-# Create practice instructions ('text' visual stimuli)
-for _, value in list(instructions.non_immersive_instructions_text.items())[:1]:
-    instruction_practice = visual.TextStim(win,
-                                            height=params['text_height'],
-                                            pos=[0, 0],
-                                            text=value,
-                                            wrapWidth=80)
-    instruction_practice.draw()
-    # Flip the front and back buffers
-    win.flip()
-
-    # To begin the Experimetn with Spacebar or RightMouse Click
-    press_button = True
-    while press_button:
-        keys = event.getKeys(keyList=['space'])
-
-        mouse = event.Mouse(visible=False, win=win)
-        mouse_click = mouse.getPressed()
-
-        if 'space' in keys or 1 in mouse_click:
-            press_button = False
-
-# Create trial handler
-practice_trials = data.TrialHandler(
-    trialList=data.importConditions('non_immersive_practice_conditions.csv'),
-    originPath=-1, nReps=1, method='sequential', name='practice')
-
-exp.addLoop(practice_trials)
-
+## Create practice instructions ('text' visual stimuli)
+#for _, value in list(instructions.non_immersive_instructions_text.items())[:1]:
+#    instruction_practice = visual.TextStim(win,
+#                                            height=params['text_height'],
+#                                            pos=[0, 0],
+#                                            text=value,
+#                                            wrapWidth=80)
+#    instruction_practice.draw()
+#    # Flip the front and back buffers
+#    win.flip()
+#
+#    # To begin the Experimetn with Spacebar or RightMouse Click
+#    press_button = True
+#    while press_button:
+#        keys = event.getKeys(keyList=['space'])
+#
+#        mouse = event.Mouse(visible=False, win=win)
+#        mouse_click = mouse.getPressed()
+#
+#        if 'space' in keys or 1 in mouse_click:
+#            press_button = False
+#
+## Create trial handler
+#practice_trials = data.TrialHandler(
+#    trialList=data.importConditions('./conditions/non_immersive_practice_conditions.csv'),
+#    originPath=-1, nReps=1, method='sequential', name='practice')
+#
+#exp.addLoop(practice_trials)
+#
 # Cargar imágenes para los extremos y el marcador del slider
 intensity_cue_image = visual.ImageStim(win, image='./images_scale/AS_intensity_cue.png', pos=(0, -8.7), size=(8, 0.6))
 
-# Initialize the slider
+## Initialize the slider
 dimension_slider = visual.Slider(win=win, name='dimension', ticks=(-1, 1), labels=None, pos=(0, -8.1), size=(8, 0.25),
                             style=['slider'], granularity=0.1, color='white', font='Helvetica',
                             lineColor='white', fillColor='white', borderColor='white', markerColor='white')
 
-# Create a custom white circle as the slider thumb
+## Create a custom white circle as the slider thumb
 slider_thumb = visual.Circle(win, radius=0.30, fillColor='white', lineColor='black', edges=32)
 
 green_screen_variation = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.0073615047716684145, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.014723009543337051, 0.029446019086674102, 0.029446019086674102, 0.03680752385834252, 0.03680752385834252, 0.03680752385834252, 0.03680752385834252, 0.05153053340167957, 0.05889203817334798, 0.05889203817334798, 0.05889203817334798, 0.05889203817334798, 0.05889203817334798, 0.05889203817334798, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.07361504771668503, 0.06625354294501662, 0.05889203817334798, 0.0073615047716684145, -0.04416902863001104, -0.06625354294501651, -0.10306106680335902, -0.161953104976707, -0.18403761929171258, -0.21348363837838658, -0.23556815269339204, -0.2576526670083975, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.27237567655173445, -0.279737181323403, -0.29446019086674, -0.30182169563840844, -0.30182169563840844, -0.30182169563840844, -0.30182169563840844, -0.30182169563840844, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3165447051817455, -0.3239062099534139, -0.3239062099534139, -0.3239062099534139, -0.3239062099534139, -0.3239062099534139, -0.3239062099534139, -0.33862921949675096, -0.3459907242684195, -0.3459907242684195, -0.3459907242684195, -0.3459907242684195, -0.3459907242684195, -0.3607137338117564, -0.3607137338117564, -0.3607137338117564, -0.3607137338117564, -0.3607137338117564, -0.3607137338117564, -0.3607137338117564, -0.36807523858342495, -0.36807523858342495, -0.36807523858342495, -0.36807523858342495, -0.36807523858342495, -0.36807523858342495, -0.36807523858342495, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347, -0.37543674335509347]
 
-# Loop over trials handler
-for trial in practice_trials:
-    practice_value = trial['Dimension'] + "_practice_instructions_text"
-    instruction_practice = visual.TextStim(win,
-                                            height=params['text_height'],
-                                            pos=[0, 0],
-                                            text=instructions.non_immersive_instructions_text[practice_value],
-                                            wrapWidth=80)
-    instruction_practice.draw()
-    # Flip the front and back buffers
-    win.flip()
+## Loop over trials handler
+#for trial in practice_trials:
+#    practice_value = trial['dimension'] + "_practice_instructions_text"
+#    instruction_practice = visual.TextStim(win,
+#                                            height=params['text_height'],
+#                                            pos=[0, 0],
+#                                            text=instructions.non_immersive_instructions_text[practice_value],
+#                                            wrapWidth=80)
+#    instruction_practice.draw()
+#    # Flip the front and back buffers
+#    win.flip()
+#
+#    # To begin the Experimetn with Spacebar or RightMouse Click
+#    press_button = True
+#    while press_button:
+#        keys = event.getKeys(keyList=['space'])
+#
+#        mouse = event.Mouse(visible=False, win=win)
+#        mouse_click = mouse.getPressed()
+#
+#        if 'space' in keys or 1 in mouse_click:
+#            press_button = False
+#
+#    # Crear cruz de fijación
+#    fixation = visual.GratingStim(win, color=1, colorSpace='rgb', tex=None, mask='cross', size=2)
+#    fixation.draw()
+#    win.flip()
+#    core.wait(params['fixation_time'])
+#
+#    # Limpiar buffers y reloj
+#    kb.clearEvents()
+#    kb.clock.reset()
+#
+#    # Usar 'Dimension' del trial para determinar las rutas de las imágenes
+#    if trial['Dimension'] in sliders_dict:
+#        slider_info = sliders_dict[trial['Dimension']]
+#        
+#        # Verificar si hay rutas de imagen definidas y crear los estímulos de imagen correspondientes
+#        if slider_info['left_image_path'] is not None:
+#            left_image = visual.ImageStim(win, image=slider_info['left_image_path'], pos=(-5, -8.4), size=1.3)
+#            left_image.draw()
+#        if slider_info['right_image_path'] is not None:
+#            right_image = visual.ImageStim(win, image=slider_info['right_image_path'], pos=(5, -8.4), size=1.3)
+#            right_image.draw()
+#    else:
+#        print("La dimensión del trial no está definida en sliders_dict:", trial['Dimension'])
+#        continue  #
+#
+#    # Inicializar lista para almacenar anotaciones continuas para este ensayo
+#    mouse_annotation = []
+#    
+#    # Restablecer el deslizador de valencia para el nuevo ensayo
+#    dimension_slider.reset()
+#    dimension_slider.markerPos = 0  # Establecer la posición inicial del marcador
+#
+#    # Obtener objeto del ratón y hacerlo visible
+#    mouse = event.Mouse(visible=True, win=win)
+#    mouse.setPos(newPos=(0, dimension_slider.pos[1]))
+#
+#    # Calculate the range in pixels for the slider
+#    slider_start = dimension_slider.pos[0] - (dimension_slider.size[0] / 2)
+#    slider_end = dimension_slider.pos[0] + (dimension_slider.size[0] / 20)
+#
+#    dimension_slider.name = trial['Dimension']
+#
+#    # Si el ensayo es el especial para mostrar la pantalla verde
+#    if trial['movie_path'] == 'green_screen':
+       
+#        # Tiempo de inicio para el ensayo de pantalla verde
+#        green_screen_start_time = core.getTime()
 
-    # To begin the Experimetn with Spacebar or RightMouse Click
-    press_button = True
-    while press_button:
-        keys = event.getKeys(keyList=['space'])
+#        # Calcular el número total de frames basado en la duración y el frame rate de la ventana
+#        num_frames = len(green_screen_variation)
 
-        mouse = event.Mouse(visible=False, win=win)
-        mouse_click = mouse.getPressed()
+#        for frame in range(num_frames):
+#            # Calcular el valor de intensidad verde para el frame actual
+#            # Ajustando el rango de -1 a 1 para mapearlo a 25 a 255
+#            green_intensity = ((green_screen_variation[frame] + 1) / 2) * (255 - 25) + 25
+           
+#            # Establecer el color de la ventana usando el valor calculado (manteniendo rojo y azul constantes)
+#            win.setColor([20, green_intensity, 12], 'rgb255')
+#            
+#            # Dibujar todo lo necesario en este frame
+#            win.flip()
+#            
+#            # Manejar interacción con el deslizador en cada frame
+#            if mouse.getPressed()[0]:  # Si se presiona el botón izquierdo del ratón
+#                mouse_x, _ = mouse.getPos()
+#                if slider_start <= mouse_x <= slider_end:  # Si la posición del ratón está dentro del rango del deslizador
+#                    norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
+#                    slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
+#                    dimension_slider.markerPos = round(slider_value, 2)
+#                    mouse_annotation.append([slider_value, core.getTime() - green_screen_start_time])  # Añadir valor al registro de anotaciones junto con el timestamp
+#
+#            left_image.draw()
+#            right_image.draw()
+#            intensity_cue_image.draw()
+#            dimension_slider.draw()
+#            slider_thumb.draw()
+#
+#            # Actualizar posición del pulgar en el deslizador
+#            thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
+#            slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
+#
+#        # Restablecer el color de fondo a negro al final del ensayo
+#        win.setColor('black')
+#        win.flip()
+#        # Añadir anotaciones continuas al final del ensayo
+#        practice_trials.addData('continuous_annotation', mouse_annotation)
+#        continue
+#    else:
+#        video_start_time = core.getTime()
+#        # Procesamiento para ensayos que involucran la presentación de un video
+#        mov = visual.MovieStim3(win=win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=True)
+#        while mov.status != constants.FINISHED:
+#            mov.draw()
+#            left_image.draw()
+#            right_image.draw()
+#            intensity_cue_image.draw()
+#            dimension_slider.draw()
+#            slider_thumb.draw()
+#
+#            if mouse.getPressed()[0]:
+#                mouse_x, _ = mouse.getPos()
+#                if slider_start <= mouse_x <= slider_end:
+#                    norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
+#                    slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
+#                    dimension_slider.markerPos = round(slider_value, 2)
+#                    mouse_annotation.append([slider_value, core.getTime() - video_start_time])
+#
+#            thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
+#            slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
+#            win.flip()
+#
+#            # Manejar la salida anticipada
+#            keys = event.getKeys()  
+#            if 'escape' in keys:
+#                win.close()
+#                core.quit()
+#
+#        # Añadir anotaciones continuas al final del ensayo
+#        practice_trials.addData('continuous_annotation', mouse_annotation)
+#
+#    win.flip()
+#
+#    ############### SCALES ################
+#    mostrar_sliders_y_recoger_respuestas(win, sliders_dict, exp, params)
+#
+#    # Siguiente entrada del registro de datos
+#    core.wait(params['iti'])
+#    exp.nextEntry()
 
-        if 'space' in keys or 1 in mouse_click:
-            press_button = False
-
-    # Crear cruz de fijación
-    fixation = visual.GratingStim(win, color=1, colorSpace='rgb', tex=None, mask='cross', size=2)
-    fixation.draw()
-    win.flip()
-    core.wait(params['fixation_time'])
-
-    # Limpiar buffers y reloj
-    kb.clearEvents()
-    kb.clock.reset()
-
-    # Usar 'Dimension' del trial para determinar las rutas de las imágenes
-    if trial['Dimension'] in sliders_dict:
-        slider_info = sliders_dict[trial['Dimension']]
-        
-        # Verificar si hay rutas de imagen definidas y crear los estímulos de imagen correspondientes
-        if slider_info['left_image_path'] is not None:
-            left_image = visual.ImageStim(win, image=slider_info['left_image_path'], pos=(-5, -8.4), size=1.3)
-            left_image.draw()
-        if slider_info['right_image_path'] is not None:
-            right_image = visual.ImageStim(win, image=slider_info['right_image_path'], pos=(5, -8.4), size=1.3)
-            right_image.draw()
-    else:
-        print("La dimensión del trial no está definida en sliders_dict:", trial['Dimension'])
-        continue  #
-
-    # Inicializar lista para almacenar anotaciones continuas para este ensayo
-    mouse_annotation = []
-    
-    # Restablecer el deslizador de valencia para el nuevo ensayo
-    dimension_slider.reset()
-    dimension_slider.markerPos = 0  # Establecer la posición inicial del marcador
-
-    # Obtener objeto del ratón y hacerlo visible
-    mouse = event.Mouse(visible=True, win=win)
-    mouse.setPos(newPos=(0, dimension_slider.pos[1]))
-
-    # Calculate the range in pixels for the slider
-    slider_start = dimension_slider.pos[0] - (dimension_slider.size[0] / 2)
-    slider_end = dimension_slider.pos[0] + (dimension_slider.size[0] / 20)
-
-    dimension_slider.name = trial['Dimension']
-
-    # Si el ensayo es el especial para mostrar la pantalla verde
-    if trial['movie_path'] == 'green_screen':
-        
-        # Tiempo de inicio para el ensayo de pantalla verde
-        green_screen_start_time = core.getTime()
-
-        # Calcular el número total de frames basado en la duración y el frame rate de la ventana
-        num_frames = len(green_screen_variation)
-
-        for frame in range(num_frames):
-            # Calcular el valor de intensidad verde para el frame actual
-            # Ajustando el rango de -1 a 1 para mapearlo a 25 a 255
-            green_intensity = ((green_screen_variation[frame] + 1) / 2) * (255 - 25) + 25
-            
-            # Establecer el color de la ventana usando el valor calculado (manteniendo rojo y azul constantes)
-            win.setColor([20, green_intensity, 12], 'rgb255')
-            
-            # Dibujar todo lo necesario en este frame
-            win.flip()
-            
-            # Manejar interacción con el deslizador en cada frame
-            if mouse.getPressed()[0]:  # Si se presiona el botón izquierdo del ratón
-                mouse_x, _ = mouse.getPos()
-                if slider_start <= mouse_x <= slider_end:  # Si la posición del ratón está dentro del rango del deslizador
-                    norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
-                    slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
-                    dimension_slider.markerPos = round(slider_value, 2)
-                    mouse_annotation.append([slider_value, core.getTime() - green_screen_start_time])  # Añadir valor al registro de anotaciones junto con el timestamp
-
-            left_image.draw()
-            right_image.draw()
-            intensity_cue_image.draw()
-            dimension_slider.draw()
-            slider_thumb.draw()
-
-            # Actualizar posición del pulgar en el deslizador
-            thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
-            slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
-
-        # Restablecer el color de fondo a negro al final del ensayo
-        win.setColor('black')
-        win.flip()
-        # Añadir anotaciones continuas al final del ensayo
-        practice_trials.addData('continuous_annotation', mouse_annotation)
-        continue
-    else:
-        video_start_time = core.getTime()
-        # Procesamiento para ensayos que involucran la presentación de un video
-        mov = visual.MovieStim3(win=win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=True)
-        while mov.status != constants.FINISHED:
-            mov.draw()
-            left_image.draw()
-            right_image.draw()
-            intensity_cue_image.draw()
-            dimension_slider.draw()
-            slider_thumb.draw()
-
-            if mouse.getPressed()[0]:
-                mouse_x, _ = mouse.getPos()
-                if slider_start <= mouse_x <= slider_end:
-                    norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
-                    slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
-                    dimension_slider.markerPos = round(slider_value, 2)
-                    mouse_annotation.append([slider_value, core.getTime() - video_start_time])
-
-            thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
-            slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
-            win.flip()
-
-            # Manejar la salida anticipada
-            keys = event.getKeys()  
-            if 'escape' in keys:
-                win.close()
-                core.quit()
-
-        # Añadir anotaciones continuas al final del ensayo
-        practice_trials.addData('continuous_annotation', mouse_annotation)
-
-    win.flip()
-
-    ############### SCALES ################
-    mostrar_sliders_y_recoger_respuestas(win, sliders_dict, exp, params)
-
-    # Siguiente entrada del registro de datos
-    core.wait(params['iti'])
-    exp.nextEntry()
-
-##########################################################################
+###########################################################################
 ########                        TEST BLOCK                        ########
 ##########################################################################
 
-# Create test instructions ('text' visual stimulus)
-instruction_test = visual.TextStim(win,
-                                    height=params['text_height'],
-                                    pos=[0, 0],
-                                    text=instructions.non_immersive_instructions_text['initial_relaxation_video_text'],
-                                    wrapWidth=80)
+# Función para cargar los bloques desde un archivo CSV
+def cargar_bloques(nombre_archivo):
+    return data.importConditions(nombre_archivo)
 
-# Draw test instructions
-instruction_test.draw()
+# Función para ejecutar los trials de un bloque específico
+def ejecutar_trials(win, archivo_bloque):
+    condiciones = data.importConditions(archivo_bloque)
+    print(condiciones)
+    trials = data.TrialHandler(trialList=condiciones, nReps=1, method='random')
+    for trial in trials:
+        # Mostrar el video
+        print(trial['movie_path'])
+        mov = visual.MovieStim3(win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=True)
+        while mov.status != constants.FINISHED:
+            mov.draw()
+            win.flip()
+        
+        mostrar_sliders_y_recoger_respuestas(win, sliders_dict, exp, params)
 
-# Flip the front and back buffers
-win.flip()
+        # Aquí iría la lógica para recoger las respuestas del participante
+        event.waitKeys(keyList=['space'])
 
-# To begin the Experimetn with Spacebar or LeftMouse Click
-press_button = True
-while press_button:
-    keys = event.getKeys(keyList=['space'])
 
-    mouse = event.Mouse(visible=False, win=win)
-    mouse_click = mouse.getPressed()
+# Asignar bloque inicial basado en alguna condición externa
+bloque_inicial = 'B'  # o 'A'
 
-    if 'space' in keys or 1 in mouse_click:
-        press_button = False
+# Cargar los subbloques de cada suprabloque
+subbloques_A = cargar_bloques('./conditions/Blocks_A.csv')
+subbloques_B = cargar_bloques('./conditions/Blocks_B.csv')
 
-# Wait until 'space' is pressed
-# event.waitKeys(keyList=['space',], timeStamped=False)
+# Determinar el orden de ejecución de los suprabloques
+orden_bloques = [subbloques_A, subbloques_B] if bloque_inicial == 'A' else [subbloques_B, subbloques_A]
 
-# Create trial handler
-trials = data.TrialHandler(
-    trialList=data.importConditions('./non_immersive_conditions.csv'),
-    originPath=-1, nReps=1, method='random', name='test')
+print(orden_bloques)
 
-exp.addLoop(trials)
+# Ejecutar los suprabloques en el orden determinado
+for subbloques in orden_bloques:
+    # Seleccionar aleatoriamente un subbloque y ejecutarlo
+    subbloque_seleccionado = random.choice(subbloques)['condsFile']  
+    print(subbloque_seleccionado)
+    ruta_subbloque = subbloque_seleccionado  
+    ejecutar_trials(win, ruta_subbloque)
 
-# Loop over trials handler
-for trial in trials:
-    
-    # Create fixation cross 2
-    fixation = visual.GratingStim(win, color=1, colorSpace='rgb',
-                                    tex=None, mask='cross', size=2)
+win.close()
 
-    # Create visual stimulus for emotional faces
-    mov = visual.MovieStim3(win=win, filename=trial['movie_path'], size=(
-        1024, 768), pos=[0, 0], noAudio=True)
 
-    fixation.draw()
-    win.flip()
-    core.wait(params['fixation_time'])
+# # Cargar todas las condiciones del experimento desde el archivo CSV
+# all_conditions = data.importConditions('non_immersive_conditions_trial.csv')
 
-    # Flush the buffers
-    kb.clearEvents()
+# # Organizar las condiciones en subconjuntos por bloque
+# blocks = {}
+# for condition in all_conditions:
+#     block_number = condition['block']
+#     if block_number not in blocks:
+#         blocks[block_number] = []
+#     blocks[block_number].append(condition)
 
-    # Clock reset
-    kb.clock.reset()
-    dimension_slider.reset()
+# # Bucle principal para iterar a través de cada bloque
+# for block_number in sorted(blocks.keys()):
+#     # Mostrar instrucciones iniciales para el bloque actual
+#     instruction_test = visual.TextStim(win,
+#                                         height=params['text_height'],
+#                                         pos=[0, 0],
+#                                         text=instructions.non_immersive_instructions_text['initial_relaxation_video_text'],
+#                                         wrapWidth=80)
+#     instruction_test.draw()
+#     win.flip()
 
-    dimension_slider.markerPos = 5
+#     press_button = True
+#     while press_button:
+#         keys = event.getKeys(keyList=['space'])
+#         mouse = event.Mouse(visible=False, win=win)
+#         mouse_click = mouse.getPressed()
+#         if 'space' in keys or 1 in mouse_click:
+#             press_button = False
 
-    while mov.status != constants.FINISHED:
-        # Dibuja el video
-        mov.draw()
+#     # Crear TrialHandler para el bloque actual
+#     trials = data.TrialHandler(
+#         trialList=blocks[block_number],
+#         nReps=1, method='random', name=f'test_block_{block_number}')
+#     exp.addLoop(trials)  # Informar al ExperimentHandler sobre el nuevo loop
 
-        # Dibuja el slider
-        dimension_slider.draw()
+#     for trial in trials:
 
-        # Actualiza la ventana
-        win.flip()
+#         # To begin the Experimetn with Spacebar or RightMouse Click
+#         press_button = True
+#         while press_button:
+#             keys = event.getKeys(keyList=['space'])
 
-        # Revisa las teclas presionadas
-        keys = kb.getKeys(['left', 'right', 'escape'], waitRelease=False)
-        for key in keys:
-            if key.name == 'left':
-                # Disminuye la valencia
-                dimension_slider.markerPos = max(1, dimension_slider.markerPos - 0.25)
-            elif key.name == 'right':
-                # Aumenta la valencia
-                dimension_slider.markerPos = min(9, dimension_slider.markerPos + 0.25)
-            elif key.name == 'escape':
-                # Termina el experimento si se presiona 'escape'
-                win.close()
-                core.quit()
+#             mouse = event.Mouse(visible=False, win=win)
+#             mouse_click = mouse.getPressed()
 
-        # Limpia el buffer de teclas que ya se han procesado
-        kb.clearEvents()
+#             if 'space' in keys or 1 in mouse_click:
+#                 press_button = False
 
-    for emotion, position in zip(basic_emotions.values(), pos_basic_emotions):
-        emotion_response = visual.TextStim(
-            win, text=str(emotion), height=params['text_height'],
-            pos=position)
-        emotion_response.draw()
+#         # Crear cruz de fijación
+#         fixation = visual.GratingStim(win, color=1, colorSpace='rgb', tex=None, mask='cross', size=2)
+#         fixation.draw()
+#         win.flip()
+#         core.wait(params['fixation_time'])
 
-    win.flip()
+#         # Limpiar buffers y reloj
+#         kb.clearEvents()
+#         kb.clock.reset()
 
-    # Get key response
-    key, rt = event.waitKeys(keyList=basic_emotions.keys(),
-                                timeStamped=core.Clock())[0]
+#         # Usar 'Dimension' del trial para determinar las rutas de las imágenes
+#         if trial['dimension'] in sliders_dict:
+#             slider_info = sliders_dict[trial['dimension']]
+            
+#             # Verificar si hay rutas de imagen definidas y crear los estímulos de imagen correspondientes
+#             if slider_info['left_image_path'] is not None:
+#                 left_image = visual.ImageStim(win, image=slider_info['left_image_path'], pos=(-5, -8.4), size=1.3)
+#                 left_image.draw()
+#             if slider_info['right_image_path'] is not None:
+#                 right_image = visual.ImageStim(win, image=slider_info['right_image_path'], pos=(5, -8.4), size=1.3)
+#                 right_image.draw()
+#         else:
+#             print("La dimensión del trial no está definida en sliders_dict:", trial['dimension'])
+#             continue  #
 
-    trials.addData('emotion_key', key)
-    trials.addData('emotion_rt', rt)
+#         # Inicializar lista para almacenar anotaciones continuas para este ensayo
+#         mouse_annotation = []
+        
+#         # Restablecer el deslizador de valencia para el nuevo ensayo
+#         dimension_slider.reset()
+#         dimension_slider.markerPos = 0  # Establecer la posición inicial del marcador
 
-    # Get correct/incorrect response
-    if str(key) == str(trial['correct_response']):
-        response = 'correct'
-    else:
-        response = 'incorrect'
-    trials.addData('response', response)
-    trials.addData('final_dimension_slider_rating', dimension_slider.markerPos)
+#         # Obtener objeto del ratón y hacerlo visible
+#         mouse = event.Mouse(visible=True, win=win)
+#         mouse.setPos(newPos=(0, dimension_slider.pos[1]))
 
-    # Inter Trial Interval(ITI) with blank screen
-    win.flip()
-    core.wait(params['iti'])
+#         # Calculate the range in pixels for the slider
+#         slider_start = dimension_slider.pos[0] - (dimension_slider.size[0] / 2)
+#         slider_end = dimension_slider.pos[0] + (dimension_slider.size[0] / 20)
 
-    exp.nextEntry()
+#         dimension_slider.name = trial['dimension']
+
+#         fixation = visual.GratingStim(win, color=1, colorSpace='rgb',
+#                                       tex=None, mask='cross', size=2)
+        
+#         video_start_time = core.getTime()
+                
+#         # Procesamiento para ensayos que involucran la presentación de un video
+#         mov = visual.MovieStim3(win=win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=True)
+#         while mov.status != constants.FINISHED:
+#             mov.draw()
+#             left_image.draw()
+#             right_image.draw()
+#             intensity_cue_image.draw()
+#             dimension_slider.draw()
+#             slider_thumb.draw()
+
+#             if mouse.getPressed()[0]:
+#                 mouse_x, _ = mouse.getPos()
+#                 if slider_start <= mouse_x <= slider_end:
+#                     norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
+#                     slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
+#                     dimension_slider.markerPos = round(slider_value, 2)
+#                     mouse_annotation.append([slider_value, core.getTime() - video_start_time])
+
+#             thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
+#             slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
+#             win.flip()
+
+#             # Manejar la salida anticipada
+#             keys = event.getKeys()  
+#             if 'escape' in keys:
+#                 win.close()
+#                 core.quit()
+
+#         # Añadir anotaciones continuas al final del ensayo
+#         trials.addData('continuous_annotation', mouse_annotation)
+
+#     win.flip()
+
+#     ############### SCALES ################
+#     mostrar_sliders_y_recoger_respuestas(win, sliders_dict, exp, params)
+
+#     # Siguiente entrada del registro de datos
+#     core.wait(params['iti'])
+
+#     exp.nextEntry()  # Finalizar la entrada actual y prepararse para la siguiente
+
 
 
 ##########################################################################

@@ -35,8 +35,10 @@ non_immersive_instructions_text = {
                                         "familiaridad indica si el estímulo te resultó conocido;\n\n"
                                         "y emociones básicas son aquellas emociones primarias como \n\n"
                                         "alegría, tristeza, ira, etc., que pudiste haber sentido.",
-    'initial_relaxation_video_text': "Antes de comenzar con las tareas principales, te vamos a mostrar un vídeo relajante para prepararte para la experiencia.\n\n"
-                                     "Durante este vídeo, simplemente relájate y enfócate en el contenido. No es necesario realizar ningún reporte con el mouse.",
+    'initial_relaxation_video_text': "Antes de comenzar con las tareas principales, te vamos a mostrar \n\n"
+                                    "un vídeo relajante para prepararte para la experiencia.\n\n"
+                                     "Durante este vídeo, simplemente relájate y enfócate en el contenido. \n\n"
+                                     "No es necesario realizar ningún reporte con el mouse.",
     'final_relaxation_video_text': "¡Ya estamos terminando con el experimento!\n\n"
                                    "Para terminar, te vamos a mostrar otro vídeo relajante. Como antes, simplemente relájate y disfruta del vídeo sin realizar autorreportes.",
     'motion_sickness_report_text': "Por favor, evaluá tu nivel de mareo por movimiento utilizando la escala de 1 (sin síntomas) a 9 (síntomas extremadamente severos).\n\n"

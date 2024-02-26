@@ -1,0 +1,5 @@
+﻿condsFile,dimension,hand
+./conditions/B/B_block_5_valence_right.csv,valence,right
+./conditions/B/B_block_6_valence_left.csv,valence,left
+./conditions/B/B_block_7_arousal_left.csv,arousal,left
+./conditions/B/B_block_8_arousal_right.csv,arousal,right
