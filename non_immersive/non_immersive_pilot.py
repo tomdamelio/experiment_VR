@@ -75,42 +75,42 @@ exp = data.ExperimentHandler(name=params['exp_name'],
 
 # Diccionario para definir los sliders y su configuración
 sliders_dict = {
-    "Valencia": {
+    "valence": {
         "slider_position": (0, 7),
         "left_image_path": './images_scale/valence_left.png',
         "right_image_path": './images_scale/valence_right.png',
         "left_text": '',
         "right_text": '' 
     },
-    "Arousal": {
+    "arousal": {
         "slider_position": (0, 4),
         "left_image_path": './images_scale/arousal_left.png',
         "right_image_path": './images_scale/arousal_right.png',
         "left_text": '',
         "right_text": '' 
     },
-    "Preferencia": {
+    "preference": {
         "slider_position": (0, 1),
         "left_image_path": './images_scale/preference_left.png',
         "right_image_path": './images_scale/preference_right.png',
         "left_text": "Completo desagrado",
         "right_text": "Completo agrado",
     },
-    "Engagement": {
+    "engagement": {
         "slider_position": (0, -2),
         "left_image_path": None,
         "right_image_path": None,
         "left_text": "No presté atención",
         "right_text": "Presté completa atención",
     },
-    "Familiaridad": {
+    "familiarity": {
         "slider_position": (0, -5),
         "left_image_path": None,
         "right_image_path": None,
         "left_text": "Nunca habia visto este video antes",
         "right_text": "Conozco este video muy bien",
     },
-    "Luminancia": {
+    "luminance": {
         "slider_position": None,
         "left_image_path": './images_scale/non_bright_left.png',
         "right_image_path": './images_scale/bright_right.png',
@@ -126,7 +126,7 @@ def mostrar_sliders_y_recoger_respuestas(win, sliders_dict, exp, params):
 
     # Crear y dibujar los sliders y las imágenes asociadas
     for slider_name, slider_info in sliders_dict.items():
-        if slider_name == "Luminancia":
+        if slider_name == "luminance":
             continue
         #print(slider_name)
         #print(slider_info)
@@ -172,7 +172,7 @@ def mostrar_sliders_y_recoger_respuestas(win, sliders_dict, exp, params):
 
     # Crear un slider_thumb para cada slider antes del bucle
     for slider_name, slider_info in sliders_dict.items():
-        if slider_name == "Luminancia":
+        if slider_name == "luminance":
             continue
         slider_info['left_image'] = visual.ImageStim(win, image=slider_info["left_image_path"], pos=(-5, slider_info["slider_position"][1]+0.5), size=1.3)
         slider_info['right_image'] = visual.ImageStim(win, image=slider_info["right_image_path"], pos=(5, slider_info["slider_position"][1]+0.5), size=1.3)
@@ -193,7 +193,7 @@ def mostrar_sliders_y_recoger_respuestas(win, sliders_dict, exp, params):
         iteration_counter = 0  # Inicializa el contador
 
         for slider_name, slider_info in sliders_dict.items():
-            if slider_name == "Luminancia":
+            if slider_name == "luminance":
                 continue
             slider = slider_info['slider']
             slider.draw()
@@ -283,7 +283,7 @@ def mostrar_sliders_y_recoger_respuestas(win, sliders_dict, exp, params):
     
     # Una vez finalizada la interacción del usuario, recoger y guardar los datos
     for slider_name, slider_info in sliders_dict.items():
-        if slider_name == "Luminancia":
+        if slider_name == "luminance":
             continue
         slider_value = slider_info['slider'].getRating()
         exp.addData(f'{slider_name}_value', slider_value)
@@ -481,37 +481,37 @@ green_screen_variation = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.007361504771
 #        practice_trials.addData('continuous_annotation', mouse_annotation)
 #        continue
 #    else:
-#        video_start_time = core.getTime()
-#        # Procesamiento para ensayos que involucran la presentación de un video
-#        mov = visual.MovieStim3(win=win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=True)
-#        while mov.status != constants.FINISHED:
-#            mov.draw()
-#            left_image.draw()
-#            right_image.draw()
-#            intensity_cue_image.draw()
-#            dimension_slider.draw()
-#            slider_thumb.draw()
-#
-#            if mouse.getPressed()[0]:
-#                mouse_x, _ = mouse.getPos()
-#                if slider_start <= mouse_x <= slider_end:
-#                    norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
-#                    slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
-#                    dimension_slider.markerPos = round(slider_value, 2)
-#                    mouse_annotation.append([slider_value, core.getTime() - video_start_time])
-#
-#            thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
-#            slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
-#            win.flip()
-#
-#            # Manejar la salida anticipada
-#            keys = event.getKeys()  
-#            if 'escape' in keys:
-#                win.close()
-#                core.quit()
-#
-#        # Añadir anotaciones continuas al final del ensayo
-#        practice_trials.addData('continuous_annotation', mouse_annotation)
+    #    video_start_time = core.getTime()
+    #    # Procesamiento para ensayos que involucran la presentación de un video
+    #    mov = visual.MovieStim3(win=win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=True)
+    #    while mov.status != constants.FINISHED:
+    #        mov.draw()
+    #        left_image.draw()
+    #        right_image.draw()
+    #        intensity_cue_image.draw()
+    #        dimension_slider.draw()
+    #        slider_thumb.draw()
+
+    #        if mouse.getPressed()[0]:
+    #            mouse_x, _ = mouse.getPos()
+    #            if slider_start <= mouse_x <= slider_end:
+    #                norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
+    #                slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
+    #                dimension_slider.markerPos = round(slider_value, 2)
+    #                mouse_annotation.append([slider_value, core.getTime() - video_start_time])
+
+    #        thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
+    #        slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
+    #        win.flip()
+
+    #        # Manejar la salida anticipada
+    #        keys = event.getKeys()  
+    #        if 'escape' in keys:
+    #            win.close()
+    #            core.quit()
+
+    #    # Añadir anotaciones continuas al final del ensayo
+    #    practice_trials.addData('continuous_annotation', mouse_annotation)
 #
 #    win.flip()
 #
@@ -531,22 +531,102 @@ def cargar_bloques(nombre_archivo):
     return data.importConditions(nombre_archivo)
 
 # Función para ejecutar los trials de un bloque específico
-def ejecutar_trials(win, archivo_bloque):
+def ejecutar_trials(win, archivo_bloque, sliders_dict):
+
+    # Cargar imágenes para los extremos y el marcador del slider
+    intensity_cue_image = visual.ImageStim(win, image='./images_scale/AS_intensity_cue.png', pos=(0, -8.7), size=(8, 0.6))
+
+    ## Initialize the slider
+    dimension_slider = visual.Slider(win=win, name='dimension', ticks=(-1, 1), labels=None, pos=(0, -8.1), size=(8, 0.25),
+                                style=['slider'], granularity=0.1, color='white', font='Helvetica',
+                                lineColor='white', fillColor='white', borderColor='white', markerColor='white')
+
+    ## Create a custom white circle as the slider thumb
+    slider_thumb = visual.Circle(win, radius=0.30, fillColor='white', lineColor='black', edges=32)
+
     condiciones = data.importConditions(archivo_bloque)
     print(archivo_bloque)
     trials = data.TrialHandler(trialList=condiciones, nReps=1, method='random')
     for trial in trials:
+
+        # Usar 'Dimension' del trial para determinar las rutas de las imágenes
+        if trial['dimension'] in sliders_dict:
+            slider_info = sliders_dict[trial['dimension']]
+        
+        # Verificar si hay rutas de imagen definidas y crear los estímulos de imagen correspondientes
+        if slider_info['left_image_path'] is not None:
+            left_image = visual.ImageStim(win, image=slider_info['left_image_path'], pos=(-5, -8.4), size=1.3)
+            left_image.draw()
+        if slider_info['right_image_path'] is not None:
+            right_image = visual.ImageStim(win, image=slider_info['right_image_path'], pos=(5, -8.4), size=1.3)
+            right_image.draw()
+        else:
+            print("La dimensión del trial no está definida en sliders_dict:", trial['dimension'])
+            continue  #
+
+        # Inicializar lista para almacenar anotaciones continuas para este ensayo
+        mouse_annotation = []
+
+        # Restablecer el deslizador de valencia para el nuevo ensayo
+        dimension_slider.reset()
+        dimension_slider.markerPos = 0  # Establecer la posición inicial del marcador
+
+        # Obtener objeto del ratón y hacerlo visible
+        mouse = event.Mouse(visible=True, win=win)
+        mouse.setPos(newPos=(0, dimension_slider.pos[1]))
+
+        # Calculate the range in pixels for the slider
+        slider_start = dimension_slider.pos[0] - (dimension_slider.size[0] / 2)
+        slider_end = dimension_slider.pos[0] + (dimension_slider.size[0] / 2)
+
+        dimension_slider.name = trial['dimension']
+
+        left_image.draw()
+        right_image.draw()
+        intensity_cue_image.draw()
+        dimension_slider.draw()
+        slider_thumb.draw()
+
         print(trial['movie_path'])
-        # Mostrar el video
-        mov = visual.MovieStim3(win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=True)
+
+        video_start_time = core.getTime()
+        
+        # Procesamiento para ensayos que involucran la presentación de un video
+        mov = visual.MovieStim3(win=win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=True)
         while mov.status != constants.FINISHED:
             mov.draw()
+            left_image.draw()
+            right_image.draw()
+            intensity_cue_image.draw()
+            dimension_slider.draw()
+            slider_thumb.draw()
+
+            if mouse.getPressed()[0]:
+                mouse_x, _ = mouse.getPos()
+                if slider_start <= mouse_x <= slider_end:
+                    norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
+                    slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
+                    dimension_slider.markerPos = round(slider_value, 2)
+                    mouse_annotation.append([slider_value, core.getTime() - video_start_time])
+
+            thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
+            slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
             win.flip()
+
+            # Manejar la salida anticipada
+            keys = event.getKeys()  
+            if 'escape' in keys:
+                win.close()
+                core.quit()
+
+        # Añadir anotaciones continuas al final del ensayo
+        trials.addData('continuous_annotation', mouse_annotation)
         
         mostrar_sliders_y_recoger_respuestas(win, sliders_dict, exp, params)
         event.waitKeys(keyList=['space'])
 
 # Cargar los subbloques de cada suprabloque
+        
 subbloques_A = cargar_bloques('./conditions/Blocks_A.csv')
 subbloques_B = cargar_bloques('./conditions/Blocks_B.csv')
 
@@ -555,7 +635,7 @@ def ejecutar_suprabloque(win, subbloques):
     random.shuffle(subbloques)  # Aleatorizar el orden de los subbloques
     for subbloque in subbloques:
         ruta_subbloque = subbloque['condsFile']
-        ejecutar_trials(win, ruta_subbloque)
+        ejecutar_trials(win, ruta_subbloque, sliders_dict)
 
 # Asignar bloque inicial basado en alguna condición externa (ejemplo)
 bloque_inicial = 'B'  # o 'A'
@@ -739,7 +819,7 @@ win.flip()
 event.waitKeys(maxWait=params['stim_time'], keyList=['space'])
 
 # Task shutdown
-#pg.exit()
+#pg.exit()git
 win.close()
 #pg.exit(show_metadata=params['show_metadata'])
 
