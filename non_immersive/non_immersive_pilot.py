@@ -533,41 +533,40 @@ def cargar_bloques(nombre_archivo):
 # Función para ejecutar los trials de un bloque específico
 def ejecutar_trials(win, archivo_bloque):
     condiciones = data.importConditions(archivo_bloque)
-    print(condiciones)
+    print(archivo_bloque)
     trials = data.TrialHandler(trialList=condiciones, nReps=1, method='random')
     for trial in trials:
-        # Mostrar el video
         print(trial['movie_path'])
+        # Mostrar el video
         mov = visual.MovieStim3(win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=True)
         while mov.status != constants.FINISHED:
             mov.draw()
             win.flip()
         
         mostrar_sliders_y_recoger_respuestas(win, sliders_dict, exp, params)
-
-        # Aquí iría la lógica para recoger las respuestas del participante
         event.waitKeys(keyList=['space'])
-
-
-# Asignar bloque inicial basado en alguna condición externa
-bloque_inicial = 'B'  # o 'A'
 
 # Cargar los subbloques de cada suprabloque
 subbloques_A = cargar_bloques('./conditions/Blocks_A.csv')
 subbloques_B = cargar_bloques('./conditions/Blocks_B.csv')
 
-# Determinar el orden de ejecución de los suprabloques
-orden_bloques = [subbloques_A, subbloques_B] if bloque_inicial == 'A' else [subbloques_B, subbloques_A]
+# Función para ejecutar todos los subbloques de un suprabloque
+def ejecutar_suprabloque(win, subbloques):
+    random.shuffle(subbloques)  # Aleatorizar el orden de los subbloques
+    for subbloque in subbloques:
+        ruta_subbloque = subbloque['condsFile']
+        ejecutar_trials(win, ruta_subbloque)
 
-print(orden_bloques)
+# Asignar bloque inicial basado en alguna condición externa (ejemplo)
+bloque_inicial = 'B'  # o 'A'
 
-# Ejecutar los suprabloques en el orden determinado
-for subbloques in orden_bloques:
-    # Seleccionar aleatoriamente un subbloque y ejecutarlo
-    subbloque_seleccionado = random.choice(subbloques)['condsFile']  
-    print(subbloque_seleccionado)
-    ruta_subbloque = subbloque_seleccionado  
-    ejecutar_trials(win, ruta_subbloque)
+# Ejecutar los suprabloques en el orden determinado por bloque_inicial
+if bloque_inicial == 'A':
+    ejecutar_suprabloque(win, subbloques_A)
+    ejecutar_suprabloque(win, subbloques_B)
+else:
+    ejecutar_suprabloque(win, subbloques_B)
+    ejecutar_suprabloque(win, subbloques_A)
 
 win.close()
 
