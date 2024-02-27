@@ -5,20 +5,20 @@ non_immersive_instructions_text = {
                     "A lo largo de este experimento, te vamos a mostrar una serie de vídeos y tareas \n\n"
                      "con el objetivo de entender mejor nuestras experiencias emocionales y sensoriales.\n\n\n\n"
                     "Presioná la barra espaciadora para continuar.",
-    'Luminancia_practice_instructions_text': "Vamos a empezar con unos ensayos de práctica.\n\n\n"
+    'luminance_practice_instructions_text': "Vamos a empezar con unos ensayos de práctica.\n\n\n"
                                            "Primero, vas a ver una pantalla verde que va a cambiar su brillo \n\n"
                                            "de forma continua. Te pedimos que uses el mouse para indicar cómo \n\n"
                                            "cambia el brillo de la imagen en tiempo real.\n\n"
                                            "¿Estás listo/a?\n\n\n\n"
                                            "Presioná la barra espaciadora para empezar con el ensayo de práctica.",
-    'Arousal_practice_instructions_text': "Ahora vamos a practicar con los vídeos.\n\n\n"
+    'arousal_practice_instructions_text': "Ahora vamos a practicar con los vídeos.\n\n\n"
                                                    "Te pedimos que uses el mouse para indicar cómo cambian \n\n"
                                                    "tus emociones en tiempo real. En el primer vídeo, vas a tener \n\n"
                                                    "que indicar continuamente cómo te sentís en términos de arousal, \n\n"
                                                    "que refiere a tu nivel de activación o excitación, desde muy calmado \n\n"
                                                    "(izquierda) hasta muy excitado (derecha).\n\n\n\n"
                                                    "Presioná la barra espaciadora para empezar con el ensayo de práctica.",
-    'Valencia_practice_instructions_text': "En este ensayo, tendrás que indicar continuamente cómo te sentis \n\n"
+    'valence_practice_instructions_text': "En este ensayo, tendrás que indicar continuamente cómo te sentis \n\n"
                                                     "en términos de valencia, que refiere a la positividad o negatividad \n\n"
                                                     "de tus emociones, desde muy negativo (izquierda) hasta muy positivo (derecha).\n\n\n"
                                                      "Presioná la barra espaciadora para empezar con el ensayo de práctica.",

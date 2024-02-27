@@ -1,4 +1,4 @@
 movie_path,dimension
-green_screen,luminancia
+green_screen,luminance
 ./amsterdam_dynamic_facial_expression_set/F03-Fear-Face Forward.mp4,arousal
-./amsterdam_dynamic_facial_expression_set/M02-Surprise-Face Forward.mp4,valencia
+./amsterdam_dynamic_facial_expression_set/M02-Surprise-Face Forward.mp4,valence
