@@ -1,4 +1,4 @@
-movie_path,dimension
-green_screen,luminance
-./amsterdam_dynamic_facial_expression_set/F03-Fear-Face Forward.mp4,arousal
-./amsterdam_dynamic_facial_expression_set/M02-Surprise-Face Forward.mp4,valence
+movie_path,dimension,hand,stimulus_type,order_emojis_slider
+green_screen,luminance,right,HV-HA,direct
+./amsterdam_dynamic_facial_expression_set/F03-Fear-Face Forward.mp4,arousal,right,HV-HA,direct
+./amsterdam_dynamic_facial_expression_set/M02-Surprise-Face Forward.mp4,valence,right,HV-HA,direct
