@@ -1,5 +1,5 @@
-﻿movie_path,dimension,hand,stimulus_type,order_emojis_slider
-./amsterdam_dynamic_facial_expression_set/F01-Sadness-Face Forward.mp4,arousal,right,HV-HA,direct 
-./amsterdam_dynamic_facial_expression_set/F01-Surprise-Face Forward.mp4,arousal,right,HV-LA,inverse
-./amsterdam_dynamic_facial_expression_set/F01-Anger-Face Forward.mp4,arousal,right,LV-HA,direct
-./amsterdam_dynamic_facial_expression_set/F01-Disgust-Face Forward.mp4,arousal,right,LV-LA,inverse
+﻿movie_path,dimension,hand,stimulus_type,order_emojis_slider,block
+./amsterdam_dynamic_facial_expression_set/F01-Sadness-Face Forward.mp4,arousal,right,HV-HA,direct ,2
+./amsterdam_dynamic_facial_expression_set/F01-Surprise-Face Forward.mp4,arousal,right,HV-LA,inverse,2
+./amsterdam_dynamic_facial_expression_set/F01-Anger-Face Forward.mp4,arousal,right,LV-HA,direct,2
+./amsterdam_dynamic_facial_expression_set/F01-Disgust-Face Forward.mp4,arousal,right,LV-LA,inverse,2
