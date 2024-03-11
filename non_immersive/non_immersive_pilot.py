@@ -673,11 +673,11 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
         slider_thumb.draw()
 
         print(trial['movie_path'])
-  
-        video_start_time = core.getTime()
         
         # Procesamiento para ensayos que involucran la presentación de un video
         mov = visual.MovieStim3(win=win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=True)
+
+        video_start_time = core.getTime()
         while mov.status != constants.FINISHED:
             mov.draw()
             left_image.draw()
@@ -686,18 +686,19 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
             dimension_slider.draw()
             slider_thumb.draw()
 
-            if mouse.getPressed()[0]:
-                mouse_x, _ = mouse.getPos()
-                if slider_start <= mouse_x <= slider_end:
-                    norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
-                    slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
-                    dimension_slider.markerPos = round(slider_value, 2)
-                    mouse_annotation.append([slider_value, core.getTime() - video_start_time])
-                    mouse_annotation_aux.append(slider_value) 
+            win.flip()
+
+            #if mouse.getPressed()[0]:
+            mouse_x, _ = mouse.getPos()
+            if slider_start <= mouse_x <= slider_end:
+                norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
+                slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
+                dimension_slider.markerPos = round(slider_value, 2)
+                mouse_annotation.append([slider_value, core.getTime() - video_start_time])
+                mouse_annotation_aux.append(slider_value) 
 
             thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
             slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
-            win.flip()
 
             # Manejar la salida anticipada
             keys = event.getKeys()  
@@ -709,6 +710,7 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
 
         # Añadir anotaciones continuas al final del ensayo
         exp.addData('continuous_annotation', mouse_annotation)
+        exp.addData('video_duration', mov.duration)
         
         mostrar_sliders_y_recoger_respuestas(win, sliders_dict, trials, params)
 
@@ -725,9 +727,6 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
 
         green_screen_variation = mouse_annotation_aux
 
-        # Tiempo de inicio para el ensayo de pantalla verde
-        green_screen_start_time = core.getTime()
-
         # Restablecer el deslizador de valencia para el nuevo ensayo
         dimension_slider.reset()
         dimension_slider.markerPos = 0  # Establecer la posición inicial del marcador
@@ -743,33 +742,40 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
         # Calcular el número total de frames basado en la duración y el frame rate de la ventana
         num_frames = len(green_screen_variation)
 
+        mouse_annotation_green = []
+
+        # Tiempo de inicio para el ensayo de pantalla verde
+        green_screen_start_time = core.getTime()
+
         for frame in range(num_frames):
             # Calcular el valor de intensidad verde para el frame actual
+
             # Ajustando el rango de -1 a 1 para mapearlo a 25 a 255
             green_intensity = ((green_screen_variation[frame] + 1) / 2) * (255 - 25) + 25
             
+            #green_intensity = green_screen_variation[frame] 
+            #green_intensity_normalized = (green_screen_variation[frame] + 1) / 2
+            
             # Establecer el color de la ventana usando el valor calculado (manteniendo rojo y azul constantes)
             win.setColor([20, green_intensity, 12], 'rgb255')
-            
-            # Dibujar todo lo necesario en este frame
-            win.flip()
-
-            mouse_annotation_aux = []
-            
-            # Manejar interacción con el deslizador en cada frame
-            if mouse.getPressed()[0]:  # Si se presiona el botón izquierdo del ratón
-                mouse_x, _ = mouse.getPos()
-                if slider_start <= mouse_x <= slider_end:  # Si la posición del ratón está dentro del rango del deslizador
-                    norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
-                    slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
-                    dimension_slider.markerPos = round(slider_value, 2)
-                    mouse_annotation_aux.append([slider_value, core.getTime() - green_screen_start_time])  # Añadir valor al registro de anotaciones junto con el timestamp
 
             left_image.draw()
             right_image.draw()
             intensity_cue_image.draw()
             dimension_slider.draw()
             slider_thumb.draw()
+            
+            # Dibujar todo lo necesario en este frame
+            win.flip()
+
+            # Manejar interacción con el deslizador en cada frame
+            #if mouse.getPressed()[0]:  # Si se presiona el botón izquierdo del ratón
+            mouse_x, _ = mouse.getPos()
+            if slider_start <= mouse_x <= slider_end:  # Si la posición del ratón está dentro del rango del deslizador
+                norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
+                slider_value_green = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
+                dimension_slider.markerPos = round(slider_value_green, 2)
+                mouse_annotation_green.append([slider_value_green, core.getTime() - green_screen_start_time])  # Añadir valor al registro de anotaciones junto con el timestamp
 
             # Actualizar posición del pulgar en el deslizador
             thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
@@ -779,7 +785,7 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
         win.setColor('black')
         win.flip()
         # Añadir anotaciones continuas al final del ensayo
-        exp.addData('continuous_annotation_lumimance', mouse_annotation)
+        exp.addData('continuous_annotation_luminance', mouse_annotation_green)
 
         exp.nextEntry()  # Finalizar la entrada actual y prepararse para la siguiente
 
@@ -789,7 +795,7 @@ subbloques_A = cargar_bloques('./conditions/Blocks_A.csv')
 subbloques_B = cargar_bloques('./conditions/Blocks_B.csv')
 
 # Función para ejecutar todos los subbloques de un suprabloque
-def ejecutar_suprabloque(win, subbloques):
+def ejecutar_suprabloque(win, subbloques):  
     random.shuffle(subbloques)  # Aleatorizar el orden de los subbloques
     for subbloque in subbloques:
         ruta_subbloque = subbloque['condsFile']
