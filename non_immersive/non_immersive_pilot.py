@@ -118,6 +118,44 @@ sliders_dict = {
         "right_text": '',}
 }
 
+def generar_interpolacion(lista_anotaciones, intervalo=0.050, precision=4):
+    """
+    Genera una interpolación de una lista de anotaciones a intervalos regulares especificados,
+    con una precisión específica para los valores interpolados.
+    
+    Parámetros:
+    - lista_anotaciones: Lista de listas, donde cada sublista contiene [valor, tiempo].
+    - intervalo: Intervalo de tiempo para la interpolación (en segundos). Por defecto es 0.050 segundos.
+    - precision: Número de decimales para los valores interpolados. Por defecto es 4.
+    
+    Retorna:
+    - Una lista de tuplas con la estructura (valor_interpolado, tiempo) interpolada a los intervalos especificados,
+      con los valores interpolados redondeados a la precisión especificada.
+    """
+    import numpy as np
+
+    # Asegurar que la lista de anotaciones esté ordenada por tiempo
+    #lista_anotaciones_ordenada = sorted(lista_anotaciones, key=lambda x: x[1])
+    
+    # Extraer valores y tiempos actuales
+    valores_actuales = [pair[0] for pair in lista_anotaciones]
+    tiempos_actuales = [pair[1] for pair in lista_anotaciones]
+    
+    # Determinar el tiempo total para calcular el rango de tiempos de interpolación
+    tiempo_total = lista_anotaciones[-1][1]
+    tiempos_interpolacion = np.arange(0, tiempo_total + intervalo, intervalo)
+    
+    # Realizar la interpolación lineal
+    valores_interpolados = np.interp(tiempos_interpolacion, tiempos_actuales, valores_actuales)
+    
+    # Redondear los valores interpolados a la precisión especificada
+    valores_interpolados_redondeados = np.round(valores_interpolados, precision)
+    
+    # Combinar los valores interpolados con los tiempos correspondientes
+    lista_interpolada = list(zip(valores_interpolados_redondeados, tiempos_interpolacion))
+    
+    return lista_interpolada
+
 def mostrar_sliders_y_recoger_respuestas(win, sliders_dict, trials, params):
 
     import params
@@ -695,7 +733,7 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
                 slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
                 dimension_slider.markerPos = round(slider_value, 2)
                 mouse_annotation.append([slider_value, core.getTime() - video_start_time])
-                mouse_annotation_aux.append(slider_value) 
+                #mouse_annotation_aux.append(slider_value) 
 
             thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
             slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
@@ -708,8 +746,11 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
             # if 'space' in keys:  # Verificar si se presionó la tecla "space"
                 # break  # Salir del bucle while, finalizando la reproducción del video
 
+        mouse_annotation_interpolated = generar_interpolacion(mouse_annotation)
+
         # Añadir anotaciones continuas al final del ensayo
         exp.addData('continuous_annotation', mouse_annotation)
+        exp.addData('continuous_annotation_interpolated', mouse_annotation_interpolated)
         exp.addData('video_duration', mov.duration)
         
         mostrar_sliders_y_recoger_respuestas(win, sliders_dict, trials, params)
@@ -725,11 +766,18 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
         right_image.pos = (5, -8.4)
         slider_thumb.pos=(0, -8.1)
 
-        green_screen_variation = mouse_annotation_aux
-
         # Restablecer el deslizador de valencia para el nuevo ensayo
         dimension_slider.reset()
         dimension_slider.markerPos = 0  # Establecer la posición inicial del marcador
+
+        # Convertir mouse_annotation_aux a una matriz de numpy para facilitar las búsquedas
+        mouse_annotation_aux_np = np.array(mouse_annotation)
+
+        # Inicialización
+        mouse_annotation_green = []
+        stim_value = []
+        stim_value_green = []
+        green_screen_start_time = core.getTime()
 
         # Obtener objeto del ratón y hacerlo visible
         mouse = event.Mouse(visible=True, win=win)
@@ -739,55 +787,52 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
         slider_start = dimension_slider.pos[0] - (dimension_slider.size[0] / 2)
         slider_end = dimension_slider.pos[0] + (dimension_slider.size[0] / 2)
 
-        # Calcular el número total de frames basado en la duración y el frame rate de la ventana
-        num_frames = len(green_screen_variation)
-
-        mouse_annotation_green = []
-
-        # Tiempo de inicio para el ensayo de pantalla verde
-        green_screen_start_time = core.getTime()
-
-        for frame in range(num_frames):
-            # Calcular el valor de intensidad verde para el frame actual
-
-            # Ajustando el rango de -1 a 1 para mapearlo a 25 a 255
-            green_intensity = ((green_screen_variation[frame] + 1) / 2) * (255 - 25) + 25
+        # Bucle hasta que el tiempo transcurrido sea mayor que la duración del video
+        while core.getTime() - green_screen_start_time <= mov.duration:
+            tiempo_actual = core.getTime() - green_screen_start_time
             
-            #green_intensity = green_screen_variation[frame] 
-            #green_intensity_normalized = (green_screen_variation[frame] + 1) / 2
+            # Encontrar el índice del valor de tiempo más cercano en mouse_annotation_aux
+            idx = np.abs(mouse_annotation_aux_np[:, 1] - tiempo_actual).argmin()
+            valor_cercano, _ = mouse_annotation_aux_np[idx]
             
-            # Establecer el color de la ventana usando el valor calculado (manteniendo rojo y azul constantes)
+            # Ajustar valor de intensidad verde según el valor más cercano encontrado
+            green_intensity = ((valor_cercano + 1) / 2) * (255 - 25) + 25
+            
+            # Establecer el color de la ventana y dibujar todos los elementos
             win.setColor([20, green_intensity, 12], 'rgb255')
-
             left_image.draw()
             right_image.draw()
             intensity_cue_image.draw()
             dimension_slider.draw()
             slider_thumb.draw()
-            
-            # Dibujar todo lo necesario en este frame
-            win.flip()
 
-            # Manejar interacción con el deslizador en cada frame
-            #if mouse.getPressed()[0]:  # Si se presiona el botón izquierdo del ratón
+            # Manejo del deslizador en tiempo real
             mouse_x, _ = mouse.getPos()
             if slider_start <= mouse_x <= slider_end:  # Si la posición del ratón está dentro del rango del deslizador
                 norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
                 slider_value_green = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
                 dimension_slider.markerPos = round(slider_value_green, 2)
-                mouse_annotation_green.append([slider_value_green, core.getTime() - green_screen_start_time])  # Añadir valor al registro de anotaciones junto con el timestamp
+                mouse_annotation_green.append([slider_value_green, tiempo_actual])
+                stim_value_green.append([green_intensity, tiempo_actual])
+                stim_value.append([valor_cercano, tiempo_actual])  
 
             # Actualizar posición del pulgar en el deslizador
             thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
             slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
 
-        # Restablecer el color de fondo a negro al final del ensayo
+            win.flip()
+
+        # Continuar con el código para restablecer el color de fondo y guardar las anotaciones
         win.setColor('black')
         win.flip()
-        # Añadir anotaciones continuas al final del ensayo
-        exp.addData('continuous_annotation_luminance', mouse_annotation_green)
 
-        exp.nextEntry()  # Finalizar la entrada actual y prepararse para la siguiente
+        # Guardar anotaciones interpoladas al final del ensayo
+        exp.addData('continuous_annotation_luminance', mouse_annotation_green)
+        exp.addData('stim_value_green', stim_value_green)
+        exp.addData('stim_value', stim_value)
+
+        exp.nextEntry()
+
 
 # Cargar los subbloques de cada suprabloque
         
