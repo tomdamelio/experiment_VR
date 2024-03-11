@@ -728,12 +728,21 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
 
             #if mouse.getPressed()[0]:
             mouse_x, _ = mouse.getPos()
-            if slider_start <= mouse_x <= slider_end:
+
+            # Verificar si mouse_x está fuera del rango a la izquierda (-4)
+            if mouse_x < -4:
+                slider_value = -1
+            # Verificar si mouse_x está fuera del rango a la derecha (4)
+            elif mouse_x > 4:
+                slider_value = 1
+            else:
+                # Calcular norm_pos dentro del rango permitido
                 norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
+                # Calcular slider_value basado en norm_pos dentro del rango permitido
                 slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
-                dimension_slider.markerPos = round(slider_value, 2)
-                mouse_annotation.append([slider_value, core.getTime() - video_start_time])
-                #mouse_annotation_aux.append(slider_value) 
+            
+            mouse_annotation.append([slider_value, core.getTime() - video_start_time])
+            #mouse_annotation_aux.append(slider_value) 
 
             thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
             slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
