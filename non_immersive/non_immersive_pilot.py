@@ -740,6 +740,7 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
                 norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
                 # Calcular slider_value basado en norm_pos dentro del rango permitido
                 slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
+                dimension_slider.markerPos = round(slider_value, 2)
             
             mouse_annotation.append([slider_value, core.getTime() - video_start_time])
             #mouse_annotation_aux.append(slider_value) 
