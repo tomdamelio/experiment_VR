@@ -118,43 +118,6 @@ sliders_dict = {
         "right_text": '',}
 }
 
-def generar_interpolacion(lista_anotaciones, intervalo=0.050, precision=4):
-    """
-    Genera una interpolación de una lista de anotaciones a intervalos regulares especificados,
-    con una precisión específica para los valores interpolados.
-    
-    Parámetros:
-    - lista_anotaciones: Lista de listas, donde cada sublista contiene [valor, tiempo].
-    - intervalo: Intervalo de tiempo para la interpolación (en segundos). Por defecto es 0.050 segundos.
-    - precision: Número de decimales para los valores interpolados. Por defecto es 4.
-    
-    Retorna:
-    - Una lista de tuplas con la estructura (valor_interpolado, tiempo) interpolada a los intervalos especificados,
-      con los valores interpolados redondeados a la precisión especificada.
-    """
-    import numpy as np
-
-    # Asegurar que la lista de anotaciones esté ordenada por tiempo
-    #lista_anotaciones_ordenada = sorted(lista_anotaciones, key=lambda x: x[1])
-    
-    # Extraer valores y tiempos actuales
-    valores_actuales = [pair[0] for pair in lista_anotaciones]
-    tiempos_actuales = [pair[1] for pair in lista_anotaciones]
-    
-    # Determinar el tiempo total para calcular el rango de tiempos de interpolación
-    tiempo_total = lista_anotaciones[-1][1]
-    tiempos_interpolacion = np.arange(0, tiempo_total + intervalo, intervalo)
-    
-    # Realizar la interpolación lineal
-    valores_interpolados = np.interp(tiempos_interpolacion, tiempos_actuales, valores_actuales)
-    
-    # Redondear los valores interpolados a la precisión especificada
-    valores_interpolados_redondeados = np.round(valores_interpolados, precision)
-    
-    # Combinar los valores interpolados con los tiempos correspondientes
-    lista_interpolada = list(zip(valores_interpolados_redondeados, tiempos_interpolacion))
-    
-    return lista_interpolada
 
 def mostrar_sliders_y_recoger_respuestas(win, sliders_dict, trials, params):
 
@@ -743,7 +706,6 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
                 dimension_slider.markerPos = round(slider_value, 2)
             
             mouse_annotation.append([slider_value, core.getTime() - video_start_time])
-            #mouse_annotation_aux.append(slider_value) 
 
             thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
             slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
@@ -756,11 +718,8 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
             # if 'space' in keys:  # Verificar si se presionó la tecla "space"
                 # break  # Salir del bucle while, finalizando la reproducción del video
 
-        mouse_annotation_interpolated = generar_interpolacion(mouse_annotation)
-
         # Añadir anotaciones continuas al final del ensayo
         exp.addData('continuous_annotation', mouse_annotation)
-        exp.addData('continuous_annotation_interpolated', mouse_annotation_interpolated)
         exp.addData('video_duration', mov.duration)
         
         mostrar_sliders_y_recoger_respuestas(win, sliders_dict, trials, params)
@@ -805,6 +764,9 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
             idx = np.abs(mouse_annotation_aux_np[:, 1] - tiempo_actual).argmin()
             valor_cercano, _ = mouse_annotation_aux_np[idx]
             
+            if trial['order_emojis_slider'] == "inverse":
+                valor_cercano = -valor_cercano
+
             # Ajustar valor de intensidad verde según el valor más cercano encontrado
             green_intensity = ((valor_cercano + 1) / 2) * (255 - 25) + 25
             
@@ -815,18 +777,26 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict):
             intensity_cue_image.draw()
             dimension_slider.draw()
             slider_thumb.draw()
-
-            # Manejo del deslizador en tiempo real
+            
             mouse_x, _ = mouse.getPos()
-            if slider_start <= mouse_x <= slider_end:  # Si la posición del ratón está dentro del rango del deslizador
+
+            # Verificar si mouse_x está fuera del rango a la izquierda (-4)
+            if mouse_x < -4:
+                slider_value_green = -1
+            # Verificar si mouse_x está fuera del rango a la derecha (4)
+            elif mouse_x > 4:
+                slider_value_green = 1
+            else:
+                # Calcular norm_pos dentro del rango permitido
                 norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
+                # Calcular slider_value basado en norm_pos dentro del rango permitido
                 slider_value_green = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
                 dimension_slider.markerPos = round(slider_value_green, 2)
-                mouse_annotation_green.append([slider_value_green, tiempo_actual])
-                stim_value_green.append([green_intensity, tiempo_actual])
-                stim_value.append([valor_cercano, tiempo_actual])  
+            
+            mouse_annotation_green.append([slider_value_green, core.getTime() - video_start_time])
+            stim_value_green.append([green_intensity, tiempo_actual])
+            stim_value.append([valor_cercano, tiempo_actual])  
 
-            # Actualizar posición del pulgar en el deslizador
             thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
             slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
 
