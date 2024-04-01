@@ -1,70 +1,44 @@
 #%%
 import pandas as pd
 import os
+import subprocess
 from pytube import YouTube
+from pytube.exceptions import AgeRestrictedError
 
-# read the Excel file into a DataFrame
-df = pd.read_excel('df_with_validity_checks_2024_Tomi.xlsx')
+
+# Cargar el DataFrame desde un archivo Excel
+df = pd.read_excel('df_with_validity_checks_2024_Tomi_selected.xlsx')
 
 #%%
-def download_videos(df):
+
+def download_and_encode_videos(df):
     base_dir = os.path.dirname(os.path.abspath(__file__))
     output_dir = os.path.join(base_dir, 'vr_videos')
     os.makedirs(output_dir, exist_ok=True)
 
     for index, row in df.iterrows():
         if row['Selected'] == 'yes':
-            yt = YouTube(row['link'])
+            yt = YouTube(row['link'], use_oauth=True, allow_oauth_cache=True)
+            print(f"Downloading {row['Title']} with id {row['id']}...")
             # Download entire video
-            stream = yt.streams.get_highest_resolution()
-            if stream is not None:
-                output_file = os.path.join(output_dir, f"{row['id']}_{row['Title']}.mp4")
-                stream.download(filename=output_file)
-                print(f"Downloaded {row['Title']}.")
-
+            for n, stream in enumerate(yt.streams):
+                file_extension = stream.mime_type.split('/')[1]
+                raw_output_file = os.path.join(output_dir, f"{row['id']}_{row['Title']}-{n}_raw.{file_extension}")
+                encoded_output_file = os.path.join(output_dir, f"{row['id']}_{row['Title']}-{n}.{file_extension}")
+                stream.download(filename=raw_output_file)
+                # Re-encode the video using FFmpeg
+                try:
+                    subprocess.run([
+                        'ffmpeg', '-i', raw_output_file, 
+                        '-c:v', 'libx264', '-preset', 'medium', 
+                        '-c:a', 'aac', '-strict', 'experimental', 
+                        '-b:a', '192k', '-y', 
+                        encoded_output_file
+                    ], check=True)
+                    os.remove(raw_output_file)  # Remove the original download if re-encoding is successful
+                except subprocess.CalledProcessError:
+                    print(f"Error re-encoding {row['Title']}.")
+                print(f"Downloaded and re-encoded {row['Title']}.")
 
 #%%
-# Check if function works
-# Define a test DataFrame with one row
-#df = pd.DataFrame({
-#    'link': ['https://www.youtube.com/watch?v=dvQZH5xYg0Y'],
-#    'valid_video': ['yes'],
-#    'start_time': [0],
-#    'end_time': [0],
-#    'Title': ['Test_video']
-#})
-#%%
-# Call the download_videos function with the first row of df
-download_videos(df)
-
-# %%
-# SEGUIR DESDE ACA -> MODIFICAR ESTA FUNCION PARA CORTAR LOS VIDEOS
-# DESPUES, BUSCAR ALGUNA FORMA PARA DESCARGAR LOS VIDEOS EN FORMATO 360, VR
-from moviepy.video.io.VideoFileClip import VideoFileClip
-
-def crop_videos(df):
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    output_dir_cropped = os.path.join(base_dir, 'vr_videos_cropped')
-    os.makedirs(output_dir, exist_ok=True)
-
-    for index, row in df.iterrows():
-        if row['Selected'] == 'yes':
-            video_path = row['link']
-            start_time = row['start_time']
-            end_time = row['end_time']
-            title = row['Title']
-
-            # Load video clip
-            video = VideoFileClip(video_path)
-
-            # Crop video clip based on start and end times
-            if start_time == 0 and end_time == 0:
-                cropped_video = video
-            else:
-                cropped_video = video.subclip(start_time, end_time)
-
-            # Save cropped video clip to output directory
-            output_file = os.path.join(output_dir, f"{title}.mp4")
-            cropped_video.write_videofile(output_file)
-
-            print(f"Cropped {title} video.")
+#download_and_encode_videos(df)
