@@ -5,10 +5,10 @@ from psychopy import core, visual, data, event, constants
 from psychopy.hardware import keyboard
 
 from psychopy import prefs
-prefs.general['audioLib'] = ['PTB'] 
+#prefs.general['audioLib'] = ['PTB'] 
 
 # Now, import the sound and microphone modules
-from psychopy.sound import Microphone
+#from psychopy.sound import Microphone
 
 import csv
 import random
@@ -279,7 +279,32 @@ def mostrar_sliders_y_recoger_respuestas(win, sliders_dict, trials, params):
         keys = event.getKeys()
         if keys:
             user_interacting = False  # El usuario ha terminado de interactuar
-    
+        
+        #
+#        # Antes de finalizar la interacción del usuario, comprueba que se cumplan las condiciones
+#        all_sliders_rated = all(slider.getRating() is not None for slider in sliders)  # Verifica si todos los sliders tienen una valoración
+#        any_emotion_checked = any(emotion_states.values())  # Verifica si al menos una emoción está marcada
+#
+#        if all_sliders_rated and any_emotion_checked:
+#            user_interacting = False  # El usuario ha completado la interacción requerida
+#
+#        # Verificar si se presiona una tecla para finalizar la interacción del usuario
+#        keys = event.getKeys()
+#        
+#        if not all_sliders_rated:
+#            print("Por favor, proporciona una valoración para cada dimensión.")
+#        elif not any_emotion_checked:
+#            print("Por favor, selecciona al menos una emoción.")
+#        else:
+#            user_interacting = False 
+#    
+#    # To begin the Experimetn with Spacebar or RightMouse Click
+#    press_space = True
+#    while press_space:
+#        keys = event.getKeys(keyList=['space'])
+#        if 'space' in keys:
+#            press_space = False
+
     # Una vez finalizada la interacción del usuario, recoger y guardar los datos
     for slider_name, slider_info in sliders_dict.items():
         if slider_name == "luminance":
@@ -294,7 +319,7 @@ def mostrar_sliders_y_recoger_respuestas(win, sliders_dict, trials, params):
     # Inter Trial Interval(ITI) con pantalla en blanco
     win.flip()
 
-def presentar_instrucciones(dimension, hand, win, params, sliders_dict, order_emojis_slider="normal"):
+def show_instructions_relative_trial(dimension, hand, win, params, sliders_dict, order_emojis_slider="normal"):
     """
     Presenta las instrucciones al participante basadas en la dimensión, la mano usada, y muestra la escala correspondiente.
     
@@ -354,6 +379,16 @@ def presentar_instrucciones(dimension, hand, win, params, sliders_dict, order_em
     intensity_cue_image = visual.ImageStim(win, image='./images_scale/AS_intensity_cue.png', pos=(0, -8.7), size=(8, 0.6))
     intensity_cue_image.draw()
 
+    second_word = dimension_traducida.split()[1] if len(dimension_traducida.split()) > 1 else dimension_traducida
+    dimension_text = visual.TextStim(win, height=params['text_height'],
+                                    pos=[0, -9.4], text=second_word, wrapWidth=50)
+    dimension_text.draw()
+
+    hand_image_path = './images_scale/right_hand.png' if hand == 'right' else './images_scale/left_hand.png'
+    hand_image_pos = (10, -10) if hand == 'right' else (-10, -10)  # Cambiar el '5' por el valor que se ajuste a tu pantalla
+    hand_image = visual.ImageStim(win, image=hand_image_path, pos=hand_image_pos, size=(5, 5))
+    hand_image.draw()
+
     # Flip the front and back buffers para mostrar las instrucciones y las imágenes
     win.flip()
 
@@ -370,6 +405,75 @@ def presentar_instrucciones(dimension, hand, win, params, sliders_dict, order_em
     
     return left_image, right_image
 
+def show_instructions_absolute(value='valence_practice_instructions_text', params=params, dimension=None):
+    """
+    Displays instructions on the screen and waits for the user to press the spacebar
+    to continue.
+
+    Parameters:
+    - win: The window object where the instructions will be displayed.
+    - params: A dictionary containing parameters like text height.
+    - value: indicates the text to be desplayed.
+    """
+
+    # Traducir "left" y "right" a "izquierda" y "derecha"
+    if dimension == "valence":
+        dimension_traducida = "tu valencia"
+    elif dimension == "arousal":
+        dimension_traducida = "tu activación"
+    elif dimension == "luminance":
+        dimension_traducida = "el brillo"
+
+    # Access the specific instruction text for verbal reports
+    instruction_text = instructions.non_immersive_instructions_text[value]
+
+    # Create a text stimulus for the verbal report instructions
+    instructions_txt = visual.TextStim(win,
+                                                 height=params['text_height'],
+                                                 pos=[0, 2],
+                                                 text=instruction_text,
+                                                 wrapWidth=80)
+    
+    # Draw the text on the window
+    instructions_txt.draw()
+
+    if dimension is not None:
+        # Determinar las rutas de las imágenes basadas en la 'dimension'
+        slider_info = sliders_dict.get(dimension, {})
+        
+        left_image_path = slider_info.get('left_image_path')
+        right_image_path = slider_info.get('right_image_path')
+        
+        if left_image_path and right_image_path:  # Asegurar que ambas rutas estén definidas
+            left_image = visual.ImageStim(win, image=left_image_path, pos=(-5, -8.4), size=1.3)
+            right_image = visual.ImageStim(win, image=right_image_path, pos=(5, -8.4), size=1.3)
+            left_image.draw()
+            right_image.draw()
+
+        dimension_slider = visual.Slider(win=win, name='dimension', ticks=(-1, 1), labels=None, pos=(0, -8.1), size=(8, 0.25),
+                            style=['slider'], granularity=0.1, color='white', font='Helvetica',
+                            lineColor='white', fillColor='white', borderColor='white', markerColor='white')
+        
+        dimension_slider.draw()
+ 
+        ## Create a custom white circle as the slider thumb
+        slider_thumb = visual.Circle(win, pos=(0, -8.1), radius=0.30, fillColor='white', lineColor='black', edges=32)
+        slider_thumb.draw()
+
+        intensity_cue_image = visual.ImageStim(win, image='./images_scale/AS_intensity_cue.png', pos=(0, -8.7), size=(8, 0.6))
+        intensity_cue_image.draw()
+
+        second_word = dimension_traducida.split()[1] if len(dimension_traducida.split()) > 1 else dimension_traducida
+        dimension_text = visual.TextStim(win, height=params['text_height'],
+                                        pos=[0, -9.4], text=second_word, wrapWidth=50)
+        dimension_text.draw()
+
+    
+    # Update the display to show the drawn text
+    win.flip()
+
+    # Wait for the user to press the spacebar
+    event.waitKeys(keyList=['space'])
 
 
 
@@ -407,26 +511,7 @@ kb = keyboard.Keyboard()
 ##########################################################################
 
 # Create practice instructions ('text' visual stimuli)
-for _, value in list(instructions.non_immersive_instructions_text.items())[:1]:
-    instruction_practice = visual.TextStim(win,
-                                            height=params['text_height'],
-                                            pos=[0, 0],
-                                            text=value,
-                                            wrapWidth=80)
-    instruction_practice.draw()
-    # Flip the front and back buffers
-    win.flip()
-
-    # To begin the Experimetn with Spacebar or RightMouse Click
-    press_button = True
-    while press_button:
-        keys = event.getKeys(keyList=['space'])
-
-        mouse = event.Mouse(visible=False, win=win)
-        mouse_click = mouse.getPressed()
-
-        if 'space' in keys or 1 in mouse_click:
-            press_button = False
+show_instructions_absolute("welcome_text")
 
 # Cargar imágenes para los extremos y el marcador del slider
 intensity_cue_image = visual.ImageStim(win, image='./images_scale/AS_intensity_cue.png', pos=(0, -8.7), size=(8, 0.6))
@@ -454,7 +539,11 @@ exp.addLoop(practice_trials)
 practice_trial_number = 1
 
 for trial in practice_trials:
-    left_image, right_image = presentar_instrucciones(trial['dimension'], trial['hand'], win, params, sliders_dict,
+    if practice_trial_number == 1:
+        show_instructions_absolute("valence_practice_instructions_text", dimension=trial['dimension'])
+    elif practice_trial_number == 2:
+        show_instructions_absolute("arousal_practice_instructions_text", dimension=trial['dimension'])
+    left_image, right_image = show_instructions_relative_trial(trial['dimension'], trial['hand'], win, params, sliders_dict,
                                                         order_emojis_slider=trial['order_emojis_slider'])
     
     # Usar 'Dimension' del trial para determinar las rutas de las imágenes
@@ -552,21 +641,27 @@ for trial in practice_trials:
         if 'escape' in keys:
             win.close()
             core.quit()
-        # if 'space' in keys:  # Verificar si se presionó la tecla "space"
-            # break  # Salir del bucle while, finalizando la reproducción del video
+        if 'p' in keys:  # Verificar si se presionó la tecla "p"
+            break  # Salir del bucle while, finalizando la reproducción del video
 
     # Añadir anotaciones continuas al final del ensayo
     exp.addData('continuous_annotation', mouse_annotation)
     exp.addData('video_duration', mov.duration)
     
     if practice_trial_number <= 3:
+        if practice_trial_number == 1:
+            show_instructions_absolute("post_stimulus_self_report_text_1")
+            #show_instructions_absolute("post_stimulus_self_report_text_2")
+
         mostrar_sliders_y_recoger_respuestas(win, sliders_dict, practice_trials, params)
 
         # Siguiente entrada del registro de datos
         core.wait(params['iti'])
         
-        # Instrucciones luminancia
-        left_image, right_image = presentar_instrucciones('luminance', trial['hand'], win, params, sliders_dict,
+        if practice_trial_number == 1:
+            show_instructions_absolute("luminance_practice_instructions_text", dimension='luminance')
+
+        left_image, right_image = show_instructions_relative_trial('luminance', trial['hand'], win, params, sliders_dict,
                                                             order_emojis_slider=trial['order_emojis_slider'])
         # Cambiar las posiciones a (0, 1)
         left_image.pos = (-5, -8.4)
@@ -650,15 +745,8 @@ for trial in practice_trials:
         exp.addData('stim_value', stim_value)
 
     elif practice_trial_number == 4:
-        verbal_report_instructions = visual.TextStim(win,
-                                        height=params['text_height'],
-                                        pos=[0, -6],
-                                        text=instructions.non_immersive_instructions_text['post_stimulus_verbal_report'],
-                                        wrapWidth=80)
-        verbal_report_instructions.draw()
-        win.flip()
-        # # Wait until 'return' is pressed
-        event.waitKeys(keyList=['space'])
+        #how_instructions_absolute("post_stimulus_verbal_report_practice")
+        show_instructions_absolute("post_stimulus_verbal_report")
 
         # COMENTO ESTA PARTE DEL MICROFONO PARA QUE NO SE ROMPA. DESPUES CHEUQEAR CON PC EXPERIMENTAL,
 
@@ -674,21 +762,11 @@ for trial in practice_trials:
 
         # # Flush the buffers
         # event.clearEvents()
-        stop_verbal_report_instructions = visual.TextStim(win,
-                            height=params['text_height'],
-                            pos=[0, -6],
-                            text=instructions.non_immersive_instructions_text['post_stimulus_stop_verbal_report'],
-                            wrapWidth=80)
-        stop_verbal_report_instructions.draw()
-        win.flip()
-
-        # # Wait until 'return' is pressed
-        event.waitKeys(keyList=['space'])
-        # exp.addData('recording_duration', rt)
-        win.flip()
+        #show_instructions_absolute("post_stimulus_stop_verbal_report")
         core.wait(0.5)  # Buffer for stopping the recording
         # DESCOMENTAR CUANDO ARREGLE LA PARTE DEL MICROFONO
-
+        show_instructions_absolute("end_practice")
+        print("Termino la practica")
 
     practice_trial_number += 1
 
@@ -699,11 +777,37 @@ for trial in practice_trials:
 ###########################################################################
 ########                        TEST BLOCK                        ########
 ##########################################################################
+def ejecutar_calm_video(win=win, path_video='./amsterdam_dynamic_facial_expression_set/F01-Disgust-Face Forward.mp4',
+                        instruction_txt_calm= None):
+    """
+    Reproduce un video tranquilo en pantalla completa y espera hasta que el video termine
+    o el usuario cierre el experimento presionando 'escape'.
+
+    Parameters:
+    - win: La ventana de PsychoPy donde se reproducirá el video.
+    - path_video: El camino hacia el archivo de video que se va a reproducir.
+    """
+
+    show_instructions_absolute(instruction_txt_calm)
+
+    mov = visual.MovieStim3(win=win, filename=path_video, size=(1024, 768), pos=[0, 0], noAudio=True)
+
+    while mov.status != constants.FINISHED:
+        mov.draw()
+        win.flip()
+        
+        # Manejar la salida anticipada
+        keys = event.getKeys()  
+        if 'escape' in keys:
+            win.close()
+            core.quit()
+        if 'p' in keys:  # Verificar si se presionó la tecla "p"
+            break  # Salir del bucle while, finalizando la reproducción del video
+
 
 # Función para cargar los bloques desde un archivo CSV
 def cargar_bloques(nombre_archivo):
     return data.importConditions(nombre_archivo)
-
 
 # Función para ejecutar los trials de un bloque específico
 def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
@@ -723,7 +827,7 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
     exp.addLoop(trials)
 
     for trial in trials:
-        left_image, right_image = presentar_instrucciones(trial['dimension'], trial['hand'], win, params, sliders_dict,
+        left_image, right_image = show_instructions_relative_trial(trial['dimension'], trial['hand'], win, params, sliders_dict,
                                                             order_emojis_slider=trial['order_emojis_slider'])
         
         # Usar 'Dimension' del trial para determinar las rutas de las imágenes
@@ -821,8 +925,8 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
             if 'escape' in keys:
                 win.close()
                 core.quit()
-            # if 'space' in keys:  # Verificar si se presionó la tecla "space"
-                # break  # Salir del bucle while, finalizando la reproducción del video
+            if 'p' in keys:  # Verificar si se presionó la tecla "p"
+                break  # Salir del bucle while, finalizando la reproducción del video
 
         # Añadir anotaciones continuas al final del ensayo
         exp.addData('continuous_annotation', mouse_annotation)
@@ -835,7 +939,7 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
             core.wait(params['iti'])
             
             # Instrucciones luminancia
-            left_image, right_image = presentar_instrucciones('luminance', trial['hand'], win, params, sliders_dict,
+            left_image, right_image = show_instructions_relative_trial('luminance', trial['hand'], win, params, sliders_dict,
                                                                 order_emojis_slider=trial['order_emojis_slider'])
             # Cambiar las posiciones a (0, 1)
             left_image.pos = (-5, -8.4)
@@ -919,16 +1023,7 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
             exp.addData('stim_value', stim_value)
 
         elif  subbloque_number > 4:
-            verbal_report_instructions = visual.TextStim(win,
-                                            height=params['text_height'],
-                                            pos=[0, -6],
-                                            text=instructions.non_immersive_instructions_text['post_stimulus_verbal_report'],
-                                            wrapWidth=80)
-            verbal_report_instructions.draw()
-
-            win.flip()
-            # Wait until 'return' is pressed
-            event.waitKeys(keyList=['space'])
+            show_instructions_absolute('post_stimulus_verbal_report')
 
             # COMENTO ESTA PARTE DEL MICROFONO PARA QUE NO SE ROMPA. DESPUES CHEUQEAR CON PC EXPERIMENTAL,
 
@@ -944,31 +1039,26 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
 
             # # Flush the buffers
             # event.clearEvents()
-            stop_verbal_report_instructions = visual.TextStim(win,
-                                height=params['text_height'],
-                                pos=[0, -6],
-                                text=instructions.non_immersive_instructions_text['post_stimulus_stop_verbal_report'],
-                                wrapWidth=80)
-            stop_verbal_report_instructions.draw()
-            win.flip()
 
-            # # Wait until 'return' is pressed
-            event.waitKeys(keyList=['space'])
-            # exp.addData('recording_duration', rt)
-            win.flip()
+            show_instructions_absolute('post_stimulus_stop_verbal_report')
+
             core.wait(0.5)  # Buffer for stopping the recording
             # DESCOMENTAR CUANDO ARREGLE LA PARTE DEL MIC
 
 
         exp.nextEntry()
 
+ejecutar_calm_video(path_video='./amsterdam_dynamic_facial_expression_set/F01-Disgust-Face Forward.mp4',
+                    instruction_txt_calm = 'initial_relaxation_video_text')
+
+print("por enrtar al subbloque A")
 
 # Cargar los subbloques de cada suprabloque
         
 subbloques_A = cargar_bloques('./conditions/Blocks_A.csv')
 subbloques_B = cargar_bloques('./conditions/Blocks_B.csv')
 
-subbloque_number = 1
+subbloque_number = 1  
 
 # Función para ejecutar todos los subbloques de un suprabloque
 def ejecutar_suprabloque(win, subbloques, subbloque_number):  
@@ -983,40 +1073,19 @@ bloque_inicial = 'B'  # o 'A'
 
 # Ejecutar los suprabloques en el orden determinado por bloque_inicial
 if bloque_inicial == 'A':
-    ejecutar_suprabloque(win, subbloques_A)
-    ejecutar_suprabloque(win, subbloques_B)
+    ejecutar_suprabloque(win, subbloques_A, subbloque_number)
+    ejecutar_suprabloque(win, subbloques_B, subbloque_number)
 else:
-    ejecutar_suprabloque(win, subbloques_B)
-    ejecutar_suprabloque(win, subbloques_A)
+    ejecutar_suprabloque(win, subbloques_B, subbloque_number)
+    ejecutar_suprabloque(win, subbloques_A, subbloque_number)
 
-win.close()
-
+ejecutar_calm_video(path_video='./amsterdam_dynamic_facial_expression_set/F01-Disgust-Face Forward.mp4',
+                    instruction_txt_calm = 'final_relaxation_video_text')
 
 ##########################################################################
 ###################### Feedback + Goodbye message ######################## 
 kb.clearEvents()
-n_corr = np.count_nonzero(trials.data['response'] == 'correct')
-if n_corr == 1:
-    msg_trial = 'trial'
-else:
-    msg_trial = 'trials'
-msg = "You got %i %s correct!" % (n_corr, msg_trial)
-
-feedback_msg = visual.TextStim(win,
-                                height=params['text_height'],
-                                pos=[0, +6],
-                                text=msg,
-                                wrapWidth=80)
-
-goodbye_msg = visual.TextStim(win,
-                                height=params['text_height'],
-                                pos=[0, -6],
-                                text=instructions.non_immersive_instructions_text['5_goodbye_text'],
-                                wrapWidth=80)
-
-feedback_msg.draw()
-goodbye_msg.draw()
-win.flip()
+show_instructions_absolute("experiment_end_text")
 
 event.waitKeys(maxWait=params['stim_time'], keyList=['space'])
 
