@@ -1,0 +1,5 @@
+﻿id,movie_path,dimension,hand,stimulus_type,order_emojis_slider,block
+119,../stimuli/exp_videos/2D/119.0_Video 360 - Red Bull Valparaíso Cerro Abajo 2023 con Tomáš Slavík-1-2d_cropped.mp4,valence,right,HV-HA,direct ,3
+54,../stimuli/exp_videos/2D/54.0_As It Is-1-2d_cropped.mp4,valence,right,HV-LA,inverse,3
+110,../stimuli/exp_videos/2D/110.0_Blood Manors Extreme Horror 360 Experience The Cannibal-1-2d_cropped.mp4,valence,right,LV-HA,direct,3
+106,../stimuli/exp_videos/2D/106.0_Dunkerque - 360° Vidéo Expérience - Gardez Votre Souffle-1-2d_cropped.mp4,valence,right,LV-LA,inverse,3

@@ -522,7 +522,7 @@ dimension_slider = visual.Slider(win=win, name='dimension', ticks=(-1, 1), label
                             lineColor='white', fillColor='white', borderColor='white', markerColor='white')
 
 # Check if the file exists
-file_path = './conditions/non_immersive_practice_conditions.csv'
+file_path = '../conditions/non_immersive_practice_conditions.csv'
 
 try:
     with open(file_path, mode='r', encoding='utf-8-sig') as csvfile:
@@ -600,9 +600,11 @@ for trial in practice_trials:
     slider_thumb.draw()
 
     print(trial['movie_path'])
+
+    event.clearEvents()
     
     # Procesamiento para ensayos que involucran la presentación de un video
-    mov = visual.MovieStim3(win=win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=True)
+    mov = visual.MovieStim3(win=win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=False)
 
     video_start_time = core.getTime()
     while mov.status != constants.FINISHED:
@@ -642,6 +644,7 @@ for trial in practice_trials:
             win.close()
             core.quit()
         if 'p' in keys:  # Verificar si se presionó la tecla "p"
+            mov.stop() 
             break  # Salir del bucle while, finalizando la reproducción del video
 
     # Añadir anotaciones continuas al final del ensayo
@@ -652,6 +655,18 @@ for trial in practice_trials:
         if practice_trial_number == 1:
             show_instructions_absolute("post_stimulus_self_report_text_1")
             #show_instructions_absolute("post_stimulus_self_report_text_2")
+        
+        # Crear el estímulo de texto para el mensaje de carga
+        loading_text_stim = visual.TextStim(win, text="Cargando escalas...", height=params['text_height'], pos=[0, 0])
+
+        # Dibujar el estímulo de texto en la ventana
+        loading_text_stim.draw()
+
+        # Mostrar la ventana con el mensaje de carga
+        win.flip()
+
+        # Mantener el mensaje en pantalla por 0.5 segundos
+        core.wait(0.5)
 
         mostrar_sliders_y_recoger_respuestas(win, sliders_dict, practice_trials, params)
 
@@ -689,6 +704,8 @@ for trial in practice_trials:
         slider_start = dimension_slider.pos[0] - (dimension_slider.size[0] / 2)
         slider_end = dimension_slider.pos[0] + (dimension_slider.size[0] / 2)
 
+        event.clearEvents()
+
         # Bucle hasta que el tiempo transcurrido sea mayor que la duración del video
         while core.getTime() - green_screen_start_time <= mov.duration:
             tiempo_actual = core.getTime() - green_screen_start_time
@@ -725,6 +742,14 @@ for trial in practice_trials:
                 # Calcular slider_value basado en norm_pos dentro del rango permitido
                 slider_value_green = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
                 dimension_slider.markerPos = round(slider_value_green, 2)
+            
+            # Manejar la salida anticipada
+            keys = event.getKeys()  
+            if 'escape' in keys:
+                win.close()
+                core.quit()
+            if 'p' in keys:  # Verificar si se presionó la tecla "p"
+                break  # Salir del bucle while, finalizando la reproducción del video
             
             mouse_annotation_green.append([slider_value_green, core.getTime() - video_start_time])
             stim_value_green.append([green_intensity, tiempo_actual])
@@ -777,8 +802,8 @@ for trial in practice_trials:
 ###########################################################################
 ########                        TEST BLOCK                        ########
 ##########################################################################
-def ejecutar_calm_video(win=win, path_video='./amsterdam_dynamic_facial_expression_set/F01-Disgust-Face Forward.mp4',
-                        instruction_txt_calm= None):
+def ejecutar_calm_video(win, path_video='../stimuli/calm_videos/2D/28.0_Maldives beach and resort-1-2d_cropped.mp4',
+                        instruction_txt_calm=None):
     """
     Reproduce un video tranquilo en pantalla completa y espera hasta que el video termine
     o el usuario cierre el experimento presionando 'escape'.
@@ -787,22 +812,28 @@ def ejecutar_calm_video(win=win, path_video='./amsterdam_dynamic_facial_expressi
     - win: La ventana de PsychoPy donde se reproducirá el video.
     - path_video: El camino hacia el archivo de video que se va a reproducir.
     """
-
     show_instructions_absolute(instruction_txt_calm)
 
-    mov = visual.MovieStim3(win=win, filename=path_video, size=(1024, 768), pos=[0, 0], noAudio=True)
+    event.clearEvents()
+    
+    mov = visual.MovieStim3(win=win, filename=path_video, size=(1024, 768), pos=[0, 0], noAudio=False)
+    continue_playing = True  # Variable de control para continuar la reproducción
 
-    while mov.status != constants.FINISHED:
+    while mov.status != constants.FINISHED and continue_playing:
         mov.draw()
         win.flip()
         
-        # Manejar la salida anticipada
-        keys = event.getKeys()  
-        if 'escape' in keys:
-            win.close()
-            core.quit()
-        if 'p' in keys:  # Verificar si se presionó la tecla "p"
-            break  # Salir del bucle while, finalizando la reproducción del video
+        keys = event.getKeys()
+        #if 'escape' in keys:
+        #    break  # Salir del bucle y luego cerrar la ventana y finalizar el experimento.
+        if 'p' in keys:
+            mov.stop() 
+            continue_playing = False  # Detener la reproducción de manera controlada
+
+    #if 'escape' in keys:  # Si la salida fue por 'escape', limpiar y cerrar.
+    #    win.close()
+    #    core.quit()
+    # Si no, el programa continuará sin cerrar la ventana ni finalizar el experimento.
 
 
 # Función para cargar los bloques desde un archivo CSV
@@ -884,9 +915,11 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
         slider_thumb.draw()
 
         print(trial['movie_path'])
+
+        event.clearEvents()
         
         # Procesamiento para ensayos que involucran la presentación de un video
-        mov = visual.MovieStim3(win=win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=True)
+        mov = visual.MovieStim3(win=win, filename=trial['movie_path'], size=(1024, 768), pos=[0, 0], noAudio=False)
 
         video_start_time = core.getTime()
         while mov.status != constants.FINISHED:
@@ -926,6 +959,7 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
                 win.close()
                 core.quit()
             if 'p' in keys:  # Verificar si se presionó la tecla "p"
+                mov.stop() 
                 break  # Salir del bucle while, finalizando la reproducción del video
 
         # Añadir anotaciones continuas al final del ensayo
@@ -933,6 +967,19 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
         exp.addData('video_duration', mov.duration)
         
         if subbloque_number <= 4:
+
+            # Crear el estímulo de texto para el mensaje de carga
+            loading_text_stim = visual.TextStim(win, text="Cargando escalas...", height=params['text_height'], pos=[0, 0])
+
+            # Dibujar el estímulo de texto en la ventana
+            loading_text_stim.draw()
+
+            # Mostrar la ventana con el mensaje de carga
+            win.flip()
+
+            # Mantener el mensaje en pantalla por 0.5 segundos
+            core.wait(0.5)
+
             mostrar_sliders_y_recoger_respuestas(win, sliders_dict, trials, params)
 
             # Siguiente entrada del registro de datos
@@ -966,6 +1013,8 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
             # Calculate the range in pixels for the slider
             slider_start = dimension_slider.pos[0] - (dimension_slider.size[0] / 2)
             slider_end = dimension_slider.pos[0] + (dimension_slider.size[0] / 2)
+
+            event.clearEvents()
 
             # Bucle hasta que el tiempo transcurrido sea mayor que la duración del video
             while core.getTime() - green_screen_start_time <= mov.duration:
@@ -1003,6 +1052,14 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
                     # Calcular slider_value basado en norm_pos dentro del rango permitido
                     slider_value_green = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
                     dimension_slider.markerPos = round(slider_value_green, 2)
+
+                # Manejar la salida anticipada
+                keys = event.getKeys()  
+                if 'escape' in keys:
+                    win.close()
+                    core.quit()
+                if 'p' in keys:  # Verificar si se presionó la tecla "p"
+                    break  # Salir del bucle while, finalizando la reproducción del video
                 
                 mouse_annotation_green.append([slider_value_green, core.getTime() - video_start_time])
                 stim_value_green.append([green_intensity, tiempo_actual])
@@ -1048,15 +1105,15 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
 
         exp.nextEntry()
 
-ejecutar_calm_video(path_video='./amsterdam_dynamic_facial_expression_set/F01-Disgust-Face Forward.mp4',
+ejecutar_calm_video(win=win, path_video='../stimuli/calm_videos/2D/28.0_Maldives beach and resort-1-2d_cropped.mp4',
                     instruction_txt_calm = 'initial_relaxation_video_text')
 
-print("por enrtar al subbloque A")
+print("por entrar al subbloque A")
 
 # Cargar los subbloques de cada suprabloque
         
-subbloques_A = cargar_bloques('./conditions/Blocks_A.csv')
-subbloques_B = cargar_bloques('./conditions/Blocks_B.csv')
+subbloques_A = cargar_bloques('../conditions/Blocks_A.csv')
+subbloques_B = cargar_bloques('../conditions/Blocks_B.csv')
 
 subbloque_number = 1  
 
@@ -1079,8 +1136,8 @@ else:
     ejecutar_suprabloque(win, subbloques_B, subbloque_number)
     ejecutar_suprabloque(win, subbloques_A, subbloque_number)
 
-ejecutar_calm_video(path_video='./amsterdam_dynamic_facial_expression_set/F01-Disgust-Face Forward.mp4',
-                    instruction_txt_calm = 'final_relaxation_video_text')
+#ejecutar_calm_video(win=win, path_video='../stimuli/calm_videos/2D/70.0_Tahiti Surf-1-2d_crp opped.mp4',
+#                    instruction_txt_calm = 'final_relaxation_video_text')
 
 ##########################################################################
 ###################### Feedback + Goodbye message ######################## 
