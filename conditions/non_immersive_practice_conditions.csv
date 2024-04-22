@@ -1,5 +1,5 @@
-movie_path,dimension,hand,stimulus_type,order_emojis_slider, block
-./amsterdam_dynamic_facial_expression_set/F01-Disgust-Face Forward.mp4,valence,right,HV-LA,direct,0
-./amsterdam_dynamic_facial_expression_set/F01-Fear-Face Forward.mp4,arousal,right,LV-HA,direct,0
-./amsterdam_dynamic_facial_expression_set/F01-Joy-Face Forward.mp4,arousal,right,LV-LA,inverse,0
-./amsterdam_dynamic_facial_expression_set/F01-Disgust-Face Forward.mp4,arousal,left,HV-LA,inverse,0
+id,movie_path,dimension,hand,stimulus_type,order_emojis_slider, block
+12,../stimuli/practice_videos/2D/12.0_The fight to save threatened species-1_2d_cropped.mp4,valence,right,HV-LA,direct,0
+53,../stimuli/practice_videos/2D/53.0_Tomorrowland 2014-1_2d_cropped.mp4,arousal,right,LV-HA,direct,0
+12.99,../stimuli/practice_videos/2D/12.99_The fight to save threatened species-1_2d_cropped.mp4,arousal,right,LV-LA,inverse,0
+66,../stimuli/practice_videos/2D/66.0_Great Hammerhead Shark Encounter-1_2d_cropped.mp4,arousal,left,HV-LA,inverse,0

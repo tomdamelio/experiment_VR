@@ -44,7 +44,7 @@ non_immersive_instructions_text = {
         "Por otro lado, abajo vas a encontrar casillas de 'emociones básicas'\n"
         "son aquellas emociones primarias como \n"
         "alegría, tristeza, ira, etc., que pudiste haber sentido.\n\n"
-        "Presioná la barra espaciadora para continuar (y aguardá unos segundos).",
+        "Presiona la barra espaciadora para comenzar.",
 
     'post_stimulus_self_report_text_2_draft': "Recordá que:\n\n"
         "'valencia' se refiere a cuán positiva o negativa fue tu experiencia emocional,\n\n"
@@ -55,13 +55,28 @@ non_immersive_instructions_text = {
         "y 'emociones básicas' son aquellas emociones primarias como \n"
         "alegría, tristeza, ira, etc., que pudiste haber sentido.\n\n",
 
-    'luminance_practice_instructions_text': "Después de cada video, vas a tener que reportar tu percepción \n"
-        "del brillo en la pantalla en tiempo real, en una dimensión \n"
+    'post_stimulus_self_report_text_3': "Para dar tu respuesta en las escalas \n"
+        "no tenés que arrastrar el círculo del slider como hacés en el resto de los ensayos \n"
+        "En lugar de eso, hacé click con el mouse en el punto exacto \n"
+        "de la escala que mejor represente tu estado afectivo después de ver el video.\n\n"
+        "¿Estás listo/a?\n\n"
+        "Presioná la barra espaciadora para continuar (y aguardá unos segundos).",
+
+    'luminance_practice_instructions_text': "Después de cada video, vas a ver una pantalla que cambia de color, \n"
+        "en un rango que va de verde sin brillo a verde brillante.\n"
+        "Tu tarea es reportar tu percepción de cómo cambia \n"
+        "el brillo en la pantalla en tiempo real, en una dimensión \n"
         "que va desde 'bajo brillo' a 'alto brillo'.\n\n"
         "Podrás representar niveles intermedios de brillo posicionándote en cualquier \n"
         "punto de la escala, de acuerdo con cómo percibas el brillo del video en tiempo real.\n\n"
         "¿Estás listo/a?\n\n"
         "Presioná la barra espaciadora para continuar con la explicación.",
+
+    'left_right_alternance_instructions_text': "Tené en cuenta que el orden de los emojis\n\n"
+        "a la izquierda y derecha de la escala cambiará en cada ensayo,\n\n"
+        "y también deberás alternar la mano con la que reportas según\n\n"
+        "se te indicará antes de cada ensayo.\n\n\n"
+        "Presioná la barra espaciadora para continuar.",
 
     'post_stimulus_verbal_report_practice': "En algunos momentos vas a tener reportar verbalmente \n"
         "las emociones que experimentaste durante el vídeo que acabas de ver.\n\n\n"

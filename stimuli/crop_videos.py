@@ -43,10 +43,12 @@ def process_video(video_id, start_time, end_time, source_dir, target_dir):
         trim_and_merge_video(video_360_path, audio_path, start_time, end_time, output_360_with_audio)
 
 # Load the data from an Excel file
-df = pd.read_excel('df_with_validity_checks_2024_Tomi_selected.xlsx')
+df = pd.read_excel('df_with_validity_checks_2024_Tomi_selected_practice.xlsx')
 
 # Filter rows where 'Selected' is 'yes'
-selected_df = df[df['Selected'] == 'yes']
+#selected_df = df[df['Selected'] == 'yes']
+selected_df = df[df['Practice_video'] == 'yes']
+
 
 # Function to convert 'mm:ss' format to total seconds
 def time_to_seconds(time_str):
@@ -55,7 +57,9 @@ def time_to_seconds(time_str):
 
 # Directory paths
 source_dir = './vr_video_selected'
+#source_dir = './practice_videos/vr_videos_selected_practice'
 target_dir = './vr_video_selected_crop'
+#target_dir = './practice_videos/vr_video_selected_practice_crop'
 
 # Ensure target directory exists
 if not os.path.exists(target_dir):

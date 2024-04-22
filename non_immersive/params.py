@@ -10,7 +10,7 @@ params = dict(
 
     results_folder='./results/',
 
-    display_size=(1980, 1024),  # in pixels,
+    display_size=(2880, 1620),  # in pixels,
 
     fullscreen=False,
 
