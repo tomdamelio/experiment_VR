@@ -1,23 +1,27 @@
 # Experiment VR: Non Immersive Task
 # Author: Tomas D'Amelio
+#%%
 
 from psychopy import core, visual, data, event, constants, gui
 from psychopy.hardware import keyboard
 
-# prefs.general['audioLib'] = ['PTB']
+from exp_params import ExperimentParameters
+ExperimentParameters = ExperimentParameters()
 
-# Now, import the sound and microphone modules
-# from psychopy.sound import Microphone
+#for lsl control
+from pylsl import StreamInfo, StreamOutlet
+import socket
 
-import csv
-import random
-import os
-import time
+from psychopy.preferences import prefs
+prefs.hardware['audioLib'] = ['PTB']
+prefs.hardware['audioLatencyMode'] = 3 
 
-from params import params
 import instructions
 
+import csv
 import numpy as np
+import os
+import random
 
 
 # Get the absolute path of the currently executing script
@@ -32,11 +36,28 @@ os.chdir(current_script_dir)
 # Confirm the current working directory has been changed
 print("Current working directory:", os.getcwd())
 
+##########################################################################
+# Set up LabStreamingLayer stream.
+##########################################################################
+info = StreamInfo(name='markers', type='Markers', channel_count=1,
+                     channel_format='string', source_id='sart-markers')
+outlet = StreamOutlet(info)  # Broadcast the stream.
+
+# This is not necessary but can be useful to keep track of markers and the
+# events they correspond to.
+
+# Send triggers to test communication.
+for _ in range(5):
+    outlet.push_sample(['test'])
+    core.wait(0.5)
+
+##########################################################################
 # GUI for subject information
-# Formulario
+##########################################################################
 info_dict = {
     "ID": "",
-    "Grupo": ["A", "B"],
+    "Sesion": ["A", "B"],
+    "Tarea": ["non_immersive", "immersive"],
     "Consumo de sustancias psicoactivas en las últimas 24 hs": ["No", "Sí"],
     "Horas de sueño la noche anterior": ""
 }
@@ -44,7 +65,7 @@ info_dict = {
 # Orden de los campos en el formulario
 order = [
     "ID", 
-    "Grupo", 
+    "Sesion", 
     "Consumo de sustancias psicoactivas en las últimas 24 hs", 
     "Horas de sueño la noche anterior"
 ]
@@ -56,29 +77,53 @@ if my_dlg.OK is False:
     core.quit()  # El usuario presionó cancelar
 
 info_dict["date"] = data.getDateStr()
+exp_name = f"Experiment_VR_{info_dict['Tarea']}"
+info_dict['exp_name'] = exp_name
 
 ##########################################################################
 # Experiment data settings
+##########################################################################
 
-# create folder to save experiment data for each subject
-subject_folder = params["results_folder"] + f"{info_dict['ID']}/"
-
+# create folder to save experiment data for each subject in BIDS format
+subject_folder = os.path.join(ExperimentParameters.results_folder, f"sub-{info_dict['ID']}")
 os.makedirs(subject_folder, exist_ok=True)
+session_folder = os.path.join(subject_folder,f"ses-{info_dict['Sesion']}")
+os.makedirs(session_folder, exist_ok=True)
+physio_folder = os.path.join(session_folder,"physio")
+os.makedirs(physio_folder, exist_ok=True)
+behavioral_folder = os.path.join(session_folder,"beh")
+os.makedirs(behavioral_folder, exist_ok=True)
+subject_audios_folder =  os.path.join(behavioral_folder, 'audios')
+os.makedirs(subject_audios_folder, exist_ok=True)
 
 # Name of .csv file to save the data
-file_name = info_dict["ID"] + "_" + params["exp_name"] + "_" + info_dict["date"]
+beh_file_name = f"sub-{info_dict['ID']}_ses-{info_dict['Sesion']}_task-{exp_name}_beh"
+physio_file_name = f"sub-{info_dict['ID']}_ses-{info_dict['Sesion']}_task-{exp_name}_physio"
+
+
+##########################################################################
+# Initialize LSL recording
+##########################################################################
+# Construct the command to send to LSL App Recorder
+# Note: You might need to adjust the path to match your exact folder structure
+modality = 'physio'
+command = f"filename {{root:C:/Users/Cocudata/experiment_VR/results/}} {{template:sub-%p/ses-%s/{modality}/{physio_file_name}.xdf}}  {{participant:{info_dict['ID']}}} {{session:{info_dict['Sesion']}}} {{task:{exp_name}}} {{modality: {modality}}}\n"
+# Send commands to LSL App Recorder
+s = socket.create_connection(("localhost", 22345))
+s.sendall(b"update\n")
+s.sendall(b"select all\n")
+s.sendall(command.encode())  # Convert the command string to bytes
+s.sendall(b"start\n")
 
 #########################################################################
 # Create experiment handler
-exp = data.ExperimentHandler(
-    name=params["exp_name"],
-    # version='0.1',
-    extraInfo=info_dict,
-    runtimeInfo=True,
-    originPath="./non_immersive_experiment.py",
-    savePickle=True,
-    saveWideText=True,
-    dataFileName=subject_folder + file_name,
+exp = data.ExperimentHandler(name= exp_name,
+                            extraInfo=info_dict,
+                            runtimeInfo=True,
+                            originPath='./',
+                            savePickle=True,
+                            saveWideText=True,
+                            dataFileName=os.path.join(behavioral_folder, beh_file_name)
 )
 
 ##########################################################################
@@ -428,7 +473,7 @@ def show_instructions_relative_trial(
     # Crear y presentar las instrucciones generales
     instruction_general = visual.TextStim(
         win,
-        height=params["text_height"],
+        height=ExperimentParameters.text_height,
         pos=[0, 0.5],
         text=instruction_trial,
         wrapWidth=80,
@@ -527,7 +572,7 @@ def show_instructions_relative_trial(
 
 
 def show_instructions_absolute(
-    value="valence_practice_instructions_text", params=params, dimension=None
+    value="valence_practice_instructions_text", params=ExperimentParameters, dimension=None
 ):
     """
     Displays instructions on the screen and waits for the user to press the spacebar
@@ -644,22 +689,22 @@ def show_instructions_absolute(
 # Create a window
 win = visual.Window(
     allowGUI=None,
-    size=params["display_size"],
+    size=ExperimentParameters.display_size,
     monitor="testMonitor",
     winType="pyglet",
     useFBO=True,
     # units='pix',Fpg
     units="deg",
-    fullscr=params["fullscreen"],
+    fullscr=ExperimentParameters["fullscreen"],
     color="black",
 )
 
 info_dict["frame_rate"] = win.getActualFrameRate()
 
 exp_info = {
-    "fullscreen": params["fullscreen"],
-    "main_screen": params["main_screen"],
-    "display_size": params["display_size"],
+    "fullscreen": ExperimentParameters.fullscreen,
+#    "main_screen": ExperimentParameters["main_screen"],
+    "display_size": ExperimentParameters.display_size,
 }
 exp_info.update(info_dict)
 
@@ -735,7 +780,7 @@ for trial in practice_trials:
         trial["dimension"],
         trial["hand"],
         win,
-        params,
+        ExperimentParameters,
         sliders_dict,
         order_emojis_slider=trial["order_emojis_slider"],
     )
@@ -880,7 +925,7 @@ for trial in practice_trials:
 
         # Crear el estímulo de texto para el mensaje de carga
         loading_text_stim = visual.TextStim(
-            win, text="Cargando escalas...", height=params["text_height"], pos=[0, 0]
+            win, text="Cargando escalas...", height=ExperimentParameters.text_height, pos=[0, 0]
         )
 
         # Dibujar el estímulo de texto en la ventana
@@ -895,7 +940,7 @@ for trial in practice_trials:
         mostrar_sliders_y_recoger_respuestas(win, sliders_dict, practice_trials)
 
         # Siguiente entrada del registro de datos
-        core.wait(params["iti"])
+        core.wait(ExperimentParameters.iti)
 
         if practice_trial_number == 1:
             show_instructions_absolute(
@@ -906,7 +951,7 @@ for trial in practice_trials:
             "luminance",
             trial["hand"],
             win,
-            params,
+            ExperimentParameters,
             sliders_dict,
             order_emojis_slider=trial["order_emojis_slider"],
         )
@@ -1123,7 +1168,7 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
             trial["dimension"],
             trial["hand"],
             win,
-            params,
+            ExperimentParameters,
             sliders_dict,
             order_emojis_slider=trial["order_emojis_slider"],
         )
@@ -1268,7 +1313,7 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
             loading_text_stim = visual.TextStim(
                 win,
                 text="Cargando escalas...",
-                height=params["text_height"],
+                height=ExperimentParameters.text_height,
                 pos=[0, 0],
             )
 
@@ -1284,14 +1329,14 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
             mostrar_sliders_y_recoger_respuestas(win, sliders_dict, trials)
 
             # Siguiente entrada del registro de datos
-            core.wait(params["iti"])
+            core.wait(ExperimentParameters.iti)
 
             # Instrucciones luminancia
             left_image, right_image = show_instructions_relative_trial(
                 "luminance",
                 trial["hand"],
                 win,
-                params,
+                ExperimentParameters,
                 sliders_dict,
                 order_emojis_slider=trial["order_emojis_slider"],
             )
@@ -1450,7 +1495,7 @@ def ejecutar_suprabloque(win, subbloques, subbloque_number):
 
 
 # Asignar bloque inicial basado en alguna condición externa (ejemplo)
-bloque_inicial = info_dict["Grupo"]
+bloque_inicial = info_dict["Sesion"]
 
 # Ejecutar los suprabloques en el orden determinado por bloque_inicial
 if bloque_inicial == "A":
@@ -1460,31 +1505,24 @@ else:
     ejecutar_suprabloque(win, subbloques_B, subbloque_number)
     ejecutar_suprabloque(win, subbloques_A, subbloque_number)
 
-# ejecutar_calm_video(win=win, path_video='../stimuli/calm_videos/2D/70.0_Tahiti Surf-1-2d_crp opped.mp4',
-#                    instruction_txt_calm = 'final_relaxation_video_text')
+ejecutar_calm_video(win=win,
+                    path_video='../stimuli/calm_videos/2D/70.0_Tahiti Surf-1-2d_crp opped.mp4',
+                    instruction_txt_calm = 'final_relaxation_video_text')
 
 ##########################################################################
 ###################### Feedback + Goodbye message ########################
 kb.clearEvents()
 show_instructions_absolute("experiment_end_text")
 
-event.waitKeys(maxWait=params["stim_time"], keyList=["space"])
+event.waitKeys(maxWait=10, keyList=["space"])
+
+#stop recording
+s.sendall(b"stop\n")
 
 # Task shutdown
-# pg.exit()git
 win.close()
-# pg.exit(show_metadata=params['show_metadata'])
-
-############ OPTIONAL: Converting BDF file to CSV #############
-# Clock to quit bdf before trying to open it
-# Some computers take more or less time in closing the file.
-# change it accordingly if error "file has already been opened"
-time.sleep(60)
-
-# ReadPurpleGaze(pg.subject_id + '.bdf', pg.subject_id, subject_folder)
-csv_file = subject_folder + info_dict["ID"] + "_.csv"
-# MakeReport(csv_file, report_path=subject_folder, subject_id=pg.subject_id)
-################################################################
 
 # Finish psychopy thread
 core.quit()
+
+#%%
