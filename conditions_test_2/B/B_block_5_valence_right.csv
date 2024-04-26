@@ -1,2 +1,4 @@
 ﻿id,movie_path,dimension,hand,stimulus_type,order_emojis_slider,block
-2,../amsterdam_dynamic_facial_expression_set/F01-Fear-Face Forward.mp4,valence,right,LV-HA,direct,0
+5,../amsterdam_dynamic_facial_expression_set/F01-Disgust-Face Forward.mp4,arousal,right,HV-LA,direct,0
+6,../amsterdam_dynamic_facial_expression_set/F01-Disgust-Face Forward.mp4,arousal,right,HV-LA,direct,0
+

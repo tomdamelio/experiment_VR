@@ -832,7 +832,6 @@ for trial in practice_trials:
 
     # Inicializar lista para almacenar anotaciones continuas para este ensayo
     mouse_annotation = []
-    mouse_annotation_aux = []
 
     # Restablecer el deslizador de valencia para el nuevo ensayo
     dimension_slider.reset()
@@ -1137,38 +1136,31 @@ def ejecutar_calm_video(
     # Si no, el programa continuará sin cerrar la ventana ni finalizar el experimento.
 
 
+
 # Función para cargar los bloques desde un archivo CSV
 def cargar_bloques(nombre_archivo):
     return data.importConditions(nombre_archivo)
 
 
-# Función para ejecutar los trials de un bloque específico
 def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
-    # Cargar imágenes para los extremos y el marcador del slider
-    intensity_cue_image = visual.ImageStim(
-        win, image="./images_scale/AS_intensity_cue.png", pos=(0, -8.7), size=(8, 0.6)
-    )
+    global mouse_x, current_time  # Asegura que estas variables son tratadas como globales
 
-    ## Initialize the slider
-    dimension_slider = visual.Slider(
-        win=win,
-        name="dimension",
-        ticks=(-1, 1),
-        labels=None,
-        pos=(0, -8.1),
-        size=(8, 0.25),
-        style=["slider"],
-        granularity=0.1,
-        color="white",
-        font="Helvetica",
-        lineColor="white",
-        fillColor="white",
-        borderColor="white",
-        markerColor="white",
-    )
+    # Define la función anidada
+    def log_mouse_and_time(video_start_time_aux, mov_aux, left_image_aux, right_image_aux,
+                           intensity_cue_image_aux, dimension_slider_aux, slider_thumb_aux):
+        global mouse_x, current_time  # Usa global aquí también
+        mov_aux.draw()
+        left_image_aux.draw()
+        right_image_aux.draw()
+        intensity_cue_image_aux.draw()
+        dimension_slider_aux.draw()
+        slider_thumb_aux.draw()
+        mouse_x, _ = mouse.getPos()
+        current_time = core.getTime() - video_start_time_aux
+        #print("Mouse X:", mouse_x, "Current Time:", current_time)  # Agregado para depuración
 
+    # Continúa con el resto de tu función ejecutar_trials
     condiciones = data.importConditions(archivo_bloque)
-    print(archivo_bloque)
     trials = data.TrialHandler(
         trialList=condiciones, nReps=1, method="random", name="trials"
     )
@@ -1262,7 +1254,7 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
 
         event.clearEvents()
 
-        # Procesamiento para ensayos que involucran la presentación de un video
+        # Inicialización de elementos visuales
         mov = visual.MovieStim3(
             win=win,
             filename=trial["movie_path"],
@@ -1270,54 +1262,45 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
             pos=[0, 0],
             noAudio=False,
         )
+        
+        # Inicializar el array de NumPy para anotaciones del ratón
+        mouse_annotation = np.empty((0, 2), dtype=float)  # Array vacío con dos columnas
 
         video_start_time = core.getTime()
+
         while mov.status != constants.FINISHED:
-            mov.draw()
-            left_image.draw()
-            right_image.draw()
-            intensity_cue_image.draw()
-            dimension_slider.draw()
-            slider_thumb.draw()
 
+            win.callOnFlip(log_mouse_and_time, video_start_time, mov, left_image, right_image,
+                           intensity_cue_image, dimension_slider, slider_thumb)
             win.flip()
-
-            # if mouse.getPressed()[0]:
-            mouse_x, _ = mouse.getPos()
-
-            # Verificar si mouse_x está fuera del rango a la izquierda (-4)
+            
+            
             if mouse_x < -4:
                 slider_value = -1
-            # Verificar si mouse_x está fuera del rango a la derecha (4)
             elif mouse_x > 4:
                 slider_value = 1
             else:
-                # Calcular norm_pos dentro del rango permitido
                 norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
-                # Calcular slider_value basado en norm_pos dentro del rango permitido
-                slider_value = (
-                    norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0])
-                    + dimension_slider.ticks[0]
-                )
+                slider_value = norm_pos * (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) + dimension_slider.ticks[0]
                 dimension_slider.markerPos = round(slider_value, 2)
+            
+            # Agregar datos al array de NumPy
+            new_data = np.array([[slider_value, current_time]])
+            mouse_annotation = np.vstack((mouse_annotation, new_data))
+            
+            last_time_reported = current_time
 
-            mouse_annotation.append([slider_value, core.getTime() - video_start_time])
-
-            thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (
-                dimension_slider.ticks[-1] - dimension_slider.ticks[0]
-            ) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
+            thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (dimension_slider.ticks[-1] - dimension_slider.ticks[0]) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
             slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
 
-            # Manejar la salida anticipada
-            keys = event.getKeys()
+            keys = event.getKeys(keyList=["escape", "p"])
             if "escape" in keys:
                 win.close()
                 core.quit()
-            if "p" in keys:  # Verificar si se presionó la tecla "p"
+            if "p" in keys:
                 mov.stop()
-                break  # Salir del bucle while, finalizando la reproducción del video
+                break  # Salir del bucle
 
-        # Añadir anotaciones continuas al final del ensayo
         exp.addData("continuous_annotation", mouse_annotation)
         exp.addData("video_duration", mov.duration)
 
@@ -1365,27 +1348,29 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
             )
 
             # Convertir mouse_annotation_aux a una matriz de numpy para facilitar las búsquedas
-            mouse_annotation_aux_np = np.array(mouse_annotation)
+            mouse_annotation_aux_np = mouse_annotation
 
             # Inicialización
-            mouse_annotation_green = []
-            stim_value = []
-            stim_value_green = []
-            green_screen_start_time = core.getTime()
-
+            mouse_annotation_green = np.empty((0, 2), dtype=float) 
+            stim_value = np.empty((0, 2), dtype=float) 
+            stim_value_green = np.empty((0, 2), dtype=float) 
+            
             # Obtener objeto del ratón y hacerlo visible
             mouse = event.Mouse(visible=True, win=win)
             mouse.setPos(newPos=(0, dimension_slider.pos[1]))
 
             # Calculate the range in pixels for the slider
             slider_start = dimension_slider.pos[0] - (dimension_slider.size[0] / 2)
-            #slider_end = dimension_slider.pos[0] + (dimension_slider.size[0] / 2)
+            slider_end = dimension_slider.pos[0] + (dimension_slider.size[0] / 2)
 
-            event.clearEvents()
-
+            event.clearEvents()                   
+                                        
+            cronometro = core.Clock()
+            green_screen_start_time = cronometro.getTime()
+            
             # Bucle hasta que el tiempo transcurrido sea mayor que la duración del video
-            while core.getTime() - green_screen_start_time <= mov.duration:
-                tiempo_actual = core.getTime() - green_screen_start_time
+            while cronometro.getTime() - green_screen_start_time <= last_time_reported:
+                tiempo_actual = cronometro.getTime() - green_screen_start_time
 
                 # Encontrar el índice del valor de tiempo más cercano en mouse_annotation_aux
                 idx = np.abs(mouse_annotation_aux_np[:, 1] - tiempo_actual).argmin()
@@ -1396,7 +1381,7 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
 
                 # Ajustar valor de intensidad verde según el valor más cercano encontrado
                 green_intensity = ((valor_cercano + 1) / 2) * (255 - 25) + 25
-
+ 
                 # Establecer el color de la ventana y dibujar todos los elementos
                 win.setColor([20, green_intensity, 12], "rgb255")
                 left_image.draw()
@@ -1431,12 +1416,18 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
                     core.quit()
                 if "p" in keys:  # Verificar si se presionó la tecla "p"
                     break  # Salir del bucle while, finalizando la reproducción del video
-
-                mouse_annotation_green.append(
-                    [slider_value_green, core.getTime() - video_start_time]
-                )
-                stim_value_green.append([green_intensity, tiempo_actual])
-                stim_value.append([valor_cercano, tiempo_actual])
+                
+                # Agregar datos al array de NumPy
+                new_data_mouse_annotation_green = np.array([[slider_value_green, tiempo_actual]])
+                mouse_annotation_green = np.vstack((mouse_annotation_green, new_data_mouse_annotation_green))
+                
+                # Agregar datos al array de NumPy
+                new_data_stim_value_green = np.array([[green_intensity, tiempo_actual]])
+                stim_value_green = np.vstack((stim_value_green, new_data_stim_value_green))
+                
+                # Agregar datos al array de NumPy
+                new_data_stim_value = np.array([[valor_cercano, tiempo_actual]])
+                stim_value = np.vstack((stim_value, new_data_stim_value))
 
                 thumb_pos_x = (
                     dimension_slider.markerPos - dimension_slider.ticks[0]
