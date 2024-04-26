@@ -12,9 +12,9 @@ ExperimentParameters = ExperimentParameters()
 from pylsl import StreamInfo, StreamOutlet
 import socket
 
-from psychopy.preferences import prefs
-prefs.hardware['audioLib'] = ['PTB']
-prefs.hardware['audioLatencyMode'] = 3 
+#from psychopy.preferences import prefs
+#prefs.hardware['audioLib'] = ['PTB']
+#prefs.hardware['audioLatencyMode'] = 3  N   
 
 import instructions
 
@@ -22,6 +22,7 @@ import csv
 import numpy as np
 import os
 import random
+import time
 
 
 # Get the absolute path of the currently executing script
@@ -109,7 +110,7 @@ physio_file_name = f"sub-{info_dict['ID']}_ses-{info_dict['Sesion']}_task-{exp_n
 modality = 'physio'
 command = f"filename {{root:C:/Users/Cocudata/experiment_VR/results/}} {{template:sub-%p/ses-%s/{modality}/{physio_file_name}.xdf}}  {{participant:{info_dict['ID']}}} {{session:{info_dict['Sesion']}}} {{task:{exp_name}}} {{modality: {modality}}}\n"
 # Send commands to LSL App Recorder
-s = socket.create_connection(("localhost", 22345))
+s = socket.create_connection(("localhost", 135))
 s.sendall(b"update\n")
 s.sendall(b"select all\n")
 s.sendall(command.encode())  # Convert the command string to bytes
@@ -120,11 +121,14 @@ s.sendall(b"start\n")
 exp = data.ExperimentHandler(name= exp_name,
                             extraInfo=info_dict,
                             runtimeInfo=True,
-                            originPath='./',
+                            originPath='./non_immersive_experiment.py',
                             savePickle=True,
                             saveWideText=True,
-                            dataFileName=os.path.join(behavioral_folder, beh_file_name)
+                            dataFileName= os.path.join(behavioral_folder, beh_file_name)
 )
+
+
+#%%
 
 ##########################################################################
 
@@ -537,7 +541,7 @@ def show_instructions_relative_trial(
         else dimension_traducida
     )
     dimension_text = visual.TextStim(
-        win, height=params["text_height"], pos=[0, -9.4], text=second_word, wrapWidth=50
+        win, height=params.text_height, pos=[0, -9.4], text=second_word, wrapWidth=50
     )
     dimension_text.draw()
 
@@ -598,7 +602,7 @@ def show_instructions_absolute(
     # Create a text stimulus for the verbal report instructions
     instructions_txt = visual.TextStim(
         win,
-        height=params["text_height"],
+        height=params.text_height,
         pos=[0, 2],
         text=instruction_text,
         wrapWidth=80,
@@ -671,7 +675,7 @@ def show_instructions_absolute(
         )
         dimension_text = visual.TextStim(
             win,
-            height=params["text_height"],
+            height=params.text_height,
             pos=[0, -9.4],
             text=second_word,
             wrapWidth=50,
@@ -695,7 +699,7 @@ win = visual.Window(
     useFBO=True,
     # units='pix',Fpg
     units="deg",
-    fullscr=ExperimentParameters["fullscreen"],
+    fullscr=ExperimentParameters.fullscreen,
     color="black",
 )
 
@@ -748,7 +752,8 @@ dimension_slider = visual.Slider(
 )
 
 # Check if the file exists
-file_path = "../conditions/non_immersive_practice_conditions.csv"
+#file_path = "../conditions/non_immersive_practice_conditions.csv"
+file_path = "../conditions_test_2/non_immersive_practice_conditions.csv"
 
 try:
     with open(file_path, mode="r", encoding="utf-8-sig") as csvfile:
@@ -898,6 +903,8 @@ for trial in practice_trials:
             dimension_slider.markerPos = round(slider_value, 2)
 
         mouse_annotation.append([slider_value, core.getTime() - video_start_time])
+        
+        last_time_reported = core.getTime() - video_start_time
 
         thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (
             dimension_slider.ticks[-1] - dimension_slider.ticks[0]
@@ -966,13 +973,15 @@ for trial in practice_trials:
 
         # Convertir mouse_annotation_aux a una matriz de numpy para facilitar las búsquedas
         mouse_annotation_aux_np = np.array(mouse_annotation)
+        
+        # Ajustar valor de intensidad verde según el valor más cercano encontrado
+        mouse_annotation_aux_np = ((mouse_annotation_aux_np + 1) / 2) * (255 - 25) + 25
 
         # Inicialización
         mouse_annotation_green = []
         stim_value = []
         stim_value_green = []
-        green_screen_start_time = core.getTime()
-
+        
         # Obtener objeto del ratón y hacerlo visible
         mouse = event.Mouse(visible=True, win=win)
         mouse.setPos(newPos=(0, dimension_slider.pos[1]))
@@ -982,20 +991,23 @@ for trial in practice_trials:
         slider_end = dimension_slider.pos[0] + (dimension_slider.size[0] / 2)
 
         event.clearEvents()
-
+        
+        cronometro = core.Clock()
+        green_screen_start_time = cronometro.getTime()
+        
         # Bucle hasta que el tiempo transcurrido sea mayor que la duración del video
-        while core.getTime() - green_screen_start_time <= mov.duration:
-            tiempo_actual = core.getTime() - green_screen_start_time
+        while cronometro.getTime() - green_screen_start_time <= last_time_reported:
+            tiempo_actual = cronometro.getTime() - green_screen_start_time
 
             # Encontrar el índice del valor de tiempo más cercano en mouse_annotation_aux
             idx = np.abs(mouse_annotation_aux_np[:, 1] - tiempo_actual).argmin()
-            valor_cercano, _ = mouse_annotation_aux_np[idx]
+            green_intensity, _ = mouse_annotation_aux_np[idx]
 
             if trial["order_emojis_slider"] == "inverse":
-                valor_cercano = -valor_cercano
+                green_intensity = -green_intensity
 
             # Ajustar valor de intensidad verde según el valor más cercano encontrado
-            green_intensity = ((valor_cercano + 1) / 2) * (255 - 25) + 25
+            #green_intensity = ((valor_cercano + 1) / 2) * (255 - 25) + 25
 
             # Establecer el color de la ventana y dibujar todos los elementos
             win.setColor([20, green_intensity, 12], "rgb255")
@@ -1023,6 +1035,12 @@ for trial in practice_trials:
                 )
                 dimension_slider.markerPos = round(slider_value_green, 2)
 
+            mouse_annotation_green.append(
+                [slider_value_green, core.getTime() - video_start_time]
+            )
+            stim_value_green.append([green_intensity, tiempo_actual])
+            stim_value.append([green_intensity, tiempo_actual])
+            
             # Manejar la salida anticipada
             keys = event.getKeys()
             if "escape" in keys:
@@ -1030,12 +1048,6 @@ for trial in practice_trials:
                 core.quit()
             if "p" in keys:  # Verificar si se presionó la tecla "p"
                 break  # Salir del bucle while, finalizando la reproducción del video
-
-            mouse_annotation_green.append(
-                [slider_value_green, core.getTime() - video_start_time]
-            )
-            stim_value_green.append([green_intensity, tiempo_actual])
-            stim_value.append([valor_cercano, tiempo_actual])
 
             thumb_pos_x = (dimension_slider.markerPos - dimension_slider.ticks[0]) / (
                 dimension_slider.ticks[-1] - dimension_slider.ticks[0]
@@ -1087,7 +1099,8 @@ for trial in practice_trials:
 ##########################################################################
 def ejecutar_calm_video(
     win,
-    path_video="../stimuli/calm_videos/2D/28.0_Maldives beach and resort-1-2d_cropped.mp4",
+    #path_video="../stimuli/calm_videos/2D/28.0_Maldives beach and resort-1-2d_cropped.mp4",
+    path_video="../amsterdam_dynamic_facial_expression_set/28.0_Maldives beach and resort-1-2d_cropped.mp4",
     instruction_txt_calm=None,
 ):
     """
@@ -1130,7 +1143,7 @@ def cargar_bloques(nombre_archivo):
 
 
 # Función para ejecutar los trials de un bloque específico
-def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
+def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
     # Cargar imágenes para los extremos y el marcador del slider
     intensity_cue_image = visual.ImageStim(
         win, image="./images_scale/AS_intensity_cue.png", pos=(0, -8.7), size=(8, 0.6)
@@ -1471,7 +1484,8 @@ def ejecutar_trials(win, archivo_bloque, sliders_dict, subbloque_number):
 
 ejecutar_calm_video(
     win=win,
-    path_video="../stimuli/calm_videos/2D/28.0_Maldives beach and resort-1-2d_cropped.mp4",
+    #path_video="../stimuli/calm_videos/2D/28.0_Maldives beach and resort-1-2d_cropped.mp4",
+    path_video="../amsterdam_dynamic_facial_expression_set/28.0_Maldives beach and resort-1-2d_cropped.mp4",
     instruction_txt_calm="initial_relaxation_video_text",
 )
 
@@ -1479,18 +1493,22 @@ print("por entrar al subbloque A")
 
 # Cargar los subbloques de cada suprabloque
 
-subbloques_A = cargar_bloques("../conditions/Blocks_A.csv")
-subbloques_B = cargar_bloques("../conditions/Blocks_B.csv")
+#subbloques_A = cargar_bloques("../conditions/Blocks_A.csv")
+subbloques_A = cargar_bloques("../conditions_test_2/Blocks_A.csv")
+
+#subbloques_B = cargar_bloques("../conditions/Blocks_B.csv")
+subbloques_B = cargar_bloques("../conditions_test_2/Blocks_B.csv")
+
 
 subbloque_number = 1
 
 
 # Función para ejecutar todos los subbloques de un suprabloque
-def ejecutar_suprabloque(win, subbloques, subbloque_number):
+def ejecutar_suprabloque(win, exp, subbloques, subbloque_number):
     random.shuffle(subbloques)  # Aleatorizar el orden de los subbloques
     for subbloque in subbloques:
         ruta_subbloque = subbloque["condsFile"]
-        ejecutar_trials(win, ruta_subbloque, sliders_dict, subbloque_number)
+        ejecutar_trials(win, exp, ruta_subbloque, sliders_dict, subbloque_number)
         subbloque_number += 1
 
 
@@ -1499,14 +1517,15 @@ bloque_inicial = info_dict["Sesion"]
 
 # Ejecutar los suprabloques en el orden determinado por bloque_inicial
 if bloque_inicial == "A":
-    ejecutar_suprabloque(win, subbloques_A, subbloque_number)
-    ejecutar_suprabloque(win, subbloques_B, subbloque_number)
+    ejecutar_suprabloque(win, exp, subbloques_A, subbloque_number)
+    ejecutar_suprabloque(win, exp, subbloques_B, subbloque_number)
 else:
-    ejecutar_suprabloque(win, subbloques_B, subbloque_number)
-    ejecutar_suprabloque(win, subbloques_A, subbloque_number)
+    ejecutar_suprabloque(win, exp, subbloques_B, subbloque_number)
+    ejecutar_suprabloque(win, exp, subbloques_A, subbloque_number)
 
 ejecutar_calm_video(win=win,
-                    path_video='../stimuli/calm_videos/2D/70.0_Tahiti Surf-1-2d_crp opped.mp4',
+                    #path_video='../stimuli/calm_videos/2D/70.0_Tahiti Surf-1-2d_crp opped.mp4',
+                    path_video="../amsterdam_dynamic_facial_expression_set/70.0_Tahiti Surf-1-2d_cropped.mp4",
                     instruction_txt_calm = 'final_relaxation_video_text')
 
 ##########################################################################
@@ -1518,6 +1537,8 @@ event.waitKeys(maxWait=10, keyList=["space"])
 
 #stop recording
 s.sendall(b"stop\n")
+
+time.sleep(3)
 
 # Task shutdown
 win.close()
