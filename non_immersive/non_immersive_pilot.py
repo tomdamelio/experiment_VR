@@ -4,6 +4,13 @@
 
 from psychopy import core, visual, data, event, constants, gui
 from psychopy.hardware import keyboard
+from psychopy.preferences import prefs
+
+import sounddevice as sd
+print(sd.query_devices())  # Esto imprimirá la lista de dispositivos de entrada y salida disponibles
+
+from scipy.io.wavfile import write
+
 
 from exp_params import ExperimentParameters
 ExperimentParameters = ExperimentParameters()
@@ -12,9 +19,10 @@ ExperimentParameters = ExperimentParameters()
 from pylsl import StreamInfo, StreamOutlet
 import socket
 
-#from psychopy.preferences import prefs
-#prefs.hardware['audioLib'] = ['PTB']
-#prefs.hardware['audioLatencyMode'] = 3  N   
+import psychtoolbox as ptb
+from psychtoolbox import audio
+prefs.hardware['audioLib'] = ['PTB']
+prefs.hardware['audioLatencyMode'] = 3 
 
 import instructions
 
@@ -94,12 +102,13 @@ physio_folder = os.path.join(session_folder,"physio")
 os.makedirs(physio_folder, exist_ok=True)
 behavioral_folder = os.path.join(session_folder,"beh")
 os.makedirs(behavioral_folder, exist_ok=True)
-subject_audios_folder =  os.path.join(behavioral_folder, 'audios')
-os.makedirs(subject_audios_folder, exist_ok=True)
+audio_folder =  os.path.join(behavioral_folder, 'audios')
+os.makedirs(audio_folder, exist_ok=True)
 
 # Name of .csv file to save the data
 beh_file_name = f"sub-{info_dict['ID']}_ses-{info_dict['Sesion']}_task-{exp_name}_beh"
 physio_file_name = f"sub-{info_dict['ID']}_ses-{info_dict['Sesion']}_task-{exp_name}_physio"
+#audio_file_name = f"sub-{info_dict['ID']}_ses-{info_dict['Sesion']}_task-{exp_name}_audio"
 
 
 ##########################################################################
@@ -923,7 +932,7 @@ for trial in practice_trials:
     exp.addData("continuous_annotation", mouse_annotation)
     exp.addData("video_duration", mov.duration)
 
-    if practice_trial_number <= 3:
+    if practice_trial_number >= 3:
         if practice_trial_number == 1:
             show_instructions_absolute("post_stimulus_self_report_text_1")
             show_instructions_absolute("post_stimulus_self_report_text_2")
@@ -1069,21 +1078,53 @@ for trial in practice_trials:
         show_instructions_absolute("post_stimulus_verbal_report")
 
         # COMENTO ESTA PARTE DEL MICROFONO PARA QUE NO SE ROMPA. DESPUES CHEUQEAR CON PC EXPERIMENTAL,
+        
+        # Wait until ' space ' is pressed
+        event.waitKeys(keyList=['space'])
+        time_resp_clock = core.Clock()
+        # mic.record(70,block=False)  # Adjust the duratio  n as needed
+        
+        samplerate=44100
+        channels=1
+        max_dur = 120
+        recording = sd.rec(int(samplerate * max_dur), samplerate=samplerate, channels=channels, dtype='float64', blocking=False)
+        
+        # Flush the buffers
+        event.clearEvents()
+        
+        mensaje_audio = "Grabando audio..."
+        text_stim_audio = visual.TextStim(win, text=mensaje_audio, height=0.6, pos=(0, 10))
 
-        # mic = Microphone(bufferSecs=10.0)  # open the microphone
-        # mic.start()  # start recording
-        # # Wait until 'return' is pressed
-        # event.waitKeys(keyList=['space'])
-        # time_resp_clock = core.Clock()
-        # mic.stop()  # stop recording
-        # audioClip = mic.getRecording()
-        # rt = audioClip.duration
-        # audioClip.save(os.path.join(subject_folder, f"sub-{info_dict['Subject_id']}+ '_' + 'report{trial['movie_path']}.wav"))  # save the recorded audio as a 'wav' file
+        # Para dibujar el estímulo de texto
+        text_stim_audio.draw()
+        win.flip()
 
-        # # Flush the buffers
-        # event.clearEvents()
-        # show_instructions_absolute("post_stimulus_stop_verbal_report")
-        core.wait(0.5)  # Buffer for stopping the recording
+        # Wait until 'space' is pressed
+        response = event.waitKeys(maxWait = max_dur, keyList=['space'], timeStamped=time_resp_clock)
+        
+        if not response:
+            recording_dur = max_dur
+        else:
+            recording_dur = response[0][1]
+        exp.addData('recording_dur', recording_dur)
+        win.flip()
+        
+        # Calculate the actual number of samples recorded based on the recording time
+        try:
+            actual_samples_recorded = int((recording_dur + 1) * samplerate)
+        except Exception as e:
+            actual_samples_recorded = int((max_dur + 1) * samplerate)
+            print(f"Error occurred during calculation of actual_samples_recorded: {e}")
+        
+        # Trim the recording to the actual size and save
+        trimmed_recording = recording[:actual_samples_recorded]
+    
+        path_movie = trial["movie_path"]
+        video_name = path_movie.split("/")[-1].split(".mp3")[0]
+        audio_file_name = os.path.join(audio_folder, f"sub-{info_dict['ID']}_ses_{info_dict['Sesion']}_task-{exp_name}_probe-{video_name}.wav")
+
+        write(audio_file_name, samplerate, np.int16(trimmed_recording * 32767))
+
         # DESCOMENTAR CUANDO ARREGLE LA PARTE DEL MICROFONO
         show_instructions_absolute("end_practice")
         print("Termino la practica")
@@ -1146,18 +1187,12 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
     global mouse_x, current_time  # Asegura que estas variables son tratadas como globales
 
     # Define la función anidada
-    def log_mouse_and_time(video_start_time_aux, mov_aux, left_image_aux, right_image_aux,
-                           intensity_cue_image_aux, dimension_slider_aux, slider_thumb_aux):
+    def log_mouse_and_time(video_start_time_aux, mov_aux):
         global mouse_x, current_time  # Usa global aquí también
         mov_aux.draw()
-        left_image_aux.draw()
-        right_image_aux.draw()
-        intensity_cue_image_aux.draw()
-        dimension_slider_aux.draw()
-        slider_thumb_aux.draw()
         mouse_x, _ = mouse.getPos()
         current_time = core.getTime() - video_start_time_aux
-        #print("Mouse X:", mouse_x, "Current Time:", current_time)  # Agregado para depuración
+        print("Mouse X:", mouse_x, "Current Time:", current_time)  # Agregado para depuración
 
     # Continúa con el resto de tu función ejecutar_trials
     condiciones = data.importConditions(archivo_bloque)
@@ -1169,6 +1204,16 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
 
     for trial in trials:
         show_instructions_absolute("left_right_alternance_instructions_text")
+        
+        # Inicialización de elementos visuales
+        mov = visual.MovieStim3(
+            win=win,
+            filename=trial["movie_path"],
+            size=(1920, 1080),
+            pos=[0, 0],
+            noAudio=False,
+        )
+        
         left_image, right_image = show_instructions_relative_trial(
             trial["dimension"],
             trial["hand"],
@@ -1253,27 +1298,37 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
         print(trial["movie_path"])
 
         event.clearEvents()
-
-        # Inicialización de elementos visuales
-        mov = visual.MovieStim3(
-            win=win,
-            filename=trial["movie_path"],
-            size=(1920, 1080),
-            pos=[0, 0],
-            noAudio=False,
-        )
         
         # Inicializar el array de NumPy para anotaciones del ratón
         mouse_annotation = np.empty((0, 2), dtype=float)  # Array vacío con dos columnas
 
         video_start_time = core.getTime()
+        
+        time_aux = 0  
+        print(f"1307 -> {video_start_time}")
 
         while mov.status != constants.FINISHED:
+            
+            current_time = core.getTime() - video_start_time
+            if time_aux == 0:
+                print(f"1313 -> {current_time}")
+            left_image.draw()
+            right_image.draw()
+            intensity_cue_image.draw()
+            dimension_slider.draw()
+            slider_thumb.draw()
+            current_time_2 = core.getTime() - video_start_time
+            if time_aux == 0:
+                print(f"1321 -> {current_time_2}")
 
-            win.callOnFlip(log_mouse_and_time, video_start_time, mov, left_image, right_image,
-                           intensity_cue_image, dimension_slider, slider_thumb)
+            win.callOnFlip(log_mouse_and_time, video_start_time, mov)
             win.flip()
             
+            current_time_3 = core.getTime() - video_start_time
+            if time_aux == 0:
+                print(f"1328 -> {current_time_3}")
+                
+            time_aux = time_aux + 1 
             
             if mouse_x < -4:
                 slider_value = -1
@@ -1306,6 +1361,7 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
 
         if subbloque_number <= 4:
             # Crear el estímulo de texto para el mensaje de carga
+            win.flip()
             loading_text_stim = visual.TextStim(
                 win,
                 text="Cargando escalas...",
