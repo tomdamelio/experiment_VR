@@ -1192,7 +1192,7 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
         mov_aux.draw()
         mouse_x, _ = mouse.getPos()
         current_time = core.getTime() - video_start_time_aux
-        print("Mouse X:", mouse_x, "Current Time:", current_time)  # Agregado para depuración
+        #print("Mouse X:", mouse_x, "Current Time:", current_time)  # Agregado para depuración
 
     # Continúa con el resto de tu función ejecutar_trials
     condiciones = data.importConditions(archivo_bloque)
@@ -1304,31 +1304,31 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
 
         video_start_time = core.getTime()
         
-        time_aux = 0  
-        print(f"1307 -> {video_start_time}")
+        #time_aux = 0  
+        #print(f"1307 -> {video_start_time}")
 
         while mov.status != constants.FINISHED:
             
             current_time = core.getTime() - video_start_time
-            if time_aux == 0:
-                print(f"1313 -> {current_time}")
+            #if time_aux == 0:
+            #    print(f"1313 -> {current_time}")
             left_image.draw()
             right_image.draw()
             intensity_cue_image.draw()
             dimension_slider.draw()
             slider_thumb.draw()
-            current_time_2 = core.getTime() - video_start_time
-            if time_aux == 0:
-                print(f"1321 -> {current_time_2}")
+            #current_time_2 = core.getTime() - video_start_time
+            #if time_aux == 0:
+            #    print(f"1321 -> {current_time_2}")
 
             win.callOnFlip(log_mouse_and_time, video_start_time, mov)
             win.flip()
             
-            current_time_3 = core.getTime() - video_start_time
-            if time_aux == 0:
-                print(f"1328 -> {current_time_3}")
-                
-            time_aux = time_aux + 1 
+            #current_time_3 = core.getTime() - video_start_time
+            #if time_aux == 0:
+            #    print(f"1328 -> {current_time_3}")
+            #    
+            #time_aux = time_aux + 1 
             
             if mouse_x < -4:
                 slider_value = -1
@@ -1355,8 +1355,10 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
             if "p" in keys:
                 mov.stop()
                 break  # Salir del bucle
-
-        exp.addData("continuous_annotation", mouse_annotation)
+        
+        # Convertir el array de NumPy a una lista de listas
+        mouse_annotation_list = mouse_annotation.tolist()
+        exp.addData("continuous_annotation", mouse_annotation_list)
         exp.addData("video_duration", mov.duration)
 
         if subbloque_number <= 4:
@@ -1499,9 +1501,13 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
             win.flip()
 
             # Guardar anotaciones interpoladas al final del ensayo
-            exp.addData("continuous_annotation_luminance", mouse_annotation_green)
-            exp.addData("stim_value_green", stim_value_green)
-            exp.addData("stim_value", stim_value)
+            # Convertir el array de NumPy a una lista de listas
+            mouse_annotation_green_list = mouse_annotation_green.tolist()
+            exp.addData("continuous_annotation_luminance", mouse_annotation_green_list)
+            stim_value_green_list = stim_value_green.tolist()
+            exp.addData("stim_value_green", stim_value_green_list)
+            stim_value_list = stim_value.tolist()
+            exp.addData("stim_value", stim_value_list)
 
         elif subbloque_number > 4:
             show_instructions_absolute("post_stimulus_verbal_report")
