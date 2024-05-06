@@ -86,7 +86,7 @@ non_immersive_instructions_text = {
         "Describí esta experiencia en orden cronológico \n"
         "y con el mayor detalle posible, haciendo foco en tus emociones.\n\n"
         "¿Estás listo/a?\n\n\n"
-        "Presioná la barra espaciadora para comenzar\n",
+        "Presioná la barra espaciadora y esperá unos segundos para comenzar\n",
 
     'post_stimulus_stop_verbal_report': "¡Listo! Ahora vamos a pasar al próximo ensayo.\n\n\n"
         "Presiona la barra espaciadora para comenzar.",
@@ -95,7 +95,7 @@ non_immersive_instructions_text = {
         "Llamá el evaluador para preguntar si ya está todo listo para comenzar",
 
     'initial_relaxation_video_text': "Antes de comenzar con las tareas principales,\n"
-        "te vamos a mostrar un vídeo relajante.\n\n"
+        "te vamos a mostrar un video relajante.\n\n"
         "Durante este vídeo, simplemente relajate y enfocate en el video. \n\n"
         "No es necesario realizar ningún reporte.",
 
