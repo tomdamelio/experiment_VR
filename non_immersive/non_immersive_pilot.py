@@ -597,6 +597,8 @@ def show_instructions_absolute(
     - value: indicates the text to be desplayed.
     """
 
+    win.flip()
+    
     # Traducir "left" y "right" a "izquierda" y "derecha"
     if dimension == "valence":
         dimension_traducida = "tu valencia"
@@ -809,7 +811,8 @@ for trial in practice_trials:
         )
     elif practice_trial_number == 3:
         show_instructions_absolute("left_right_alternance_instructions_text")
-        
+
+    
     left_image, right_image = show_instructions_relative_trial(
         trial["dimension"],
         trial["hand"],
@@ -859,8 +862,6 @@ for trial in practice_trials:
         )
         continue  #
 
-    # Inicializar lista para almacenar anotaciones continuas para este ensayo
-    mouse_annotation = []
     # Restablecer el deslizador de valencia para el nuevo ensayo
     dimension_slider.reset()
     dimension_slider.markerPos = 0  # Establecer la posición inicial del marcador
@@ -908,7 +909,7 @@ for trial in practice_trials:
         dimension_slider.draw()
         slider_thumb.draw()
         
-        win.callOnFlip(log_mouse_and_time, mov, first_iteration_aux=first_iteration)
+        win.callOnFlip(log_mouse_and_time, mov,   first_iteration_aux=first_iteration)
         win.flip()
         
         if first_iteration:
@@ -945,7 +946,7 @@ for trial in practice_trials:
     exp.addData("continuous_annotation", mouse_annotation_list)
     exp.addData("video_duration", mov.duration)
 
-    if practice_trial_number >= 3:
+    if practice_trial_number <= 3:
         if practice_trial_number == 1:
             show_instructions_absolute("post_stimulus_self_report_text_1")
             show_instructions_absolute("post_stimulus_self_report_text_2")
@@ -991,18 +992,15 @@ for trial in practice_trials:
         # Restablecer el deslizador de valencia para el nuevo ensayo
         dimension_slider.reset()
         dimension_slider.markerPos = 0  # Establecer la posición inicial del marcador
-
-        # Convertir mouse_annotation_aux a una matriz de numpy para facilitar las búsquedas
-        mouse_annotation_aux_np = np.array(mouse_annotation)
         
-        # Ajustar valor de intensidad verde según el valor más cercano encontrado
-        mouse_annotation_aux_np = ((mouse_annotation_aux_np + 1) / 2) * (255 - 25) + 25
+        # Convertir mouse_annotation_aux a una matriz de numpy para facilitar las búsquedas
+        mouse_annotation_aux_np = mouse_annotation
 
         # Inicialización
-        mouse_annotation_green = []
-        stim_value = []
-        stim_value_green = []
-        
+        mouse_annotation_green = np.empty((0, 2), dtype=float) 
+        stim_value = np.empty((0, 2), dtype=float) 
+        stim_value_green = np.empty((0, 2), dtype=float) 
+    
         # Obtener objeto del ratón y hacerlo visible
         mouse = event.Mouse(visible=True, win=win)
         mouse.setPos(newPos=(0, dimension_slider.pos[1]))
@@ -1100,9 +1098,9 @@ for trial in practice_trials:
         stim_value_list = stim_value.tolist()
         exp.addData("stim_value", stim_value_list)
 
+
     elif practice_trial_number == 4:
         # how_instructions_absolute("post_stimulus_verbal_report_practice")
-        win.flip()
         show_instructions_absolute("post_stimulus_verbal_report")
         
         # Wait until ' space ' is pressed
@@ -1151,7 +1149,7 @@ for trial in practice_trials:
     
         path_movie = trial["movie_path"]
         video_name = path_movie.split("/")[-1].split(".mp3")[0]
-        audio_file_name = os.path.join(audio_folder, f"sub-{info_dict['ID']}_ses_{info_dict['Sesion']}_task-{exp_name}_probe-{video_name}.wav")
+        audio_file_name = os.path.join(audio_folder, f"sub-{info_dict['ID']}_ses_{info_dict['Sesion']}_task-{exp_name}_probe-{video_name}_run-{practice_trial_number}.wav")
 
         write(audio_file_name, samplerate, np.int16(trimmed_recording * 32767))
 
@@ -1285,8 +1283,6 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number_aux
             )
             continue  #
 
-        # Inicializar lista para almacenar anotaciones continuas para este ensayo
-        mouse_annotation = []
         # Restablecer el deslizador de valencia para el nuevo ensayo
         dimension_slider.reset()
         dimension_slider.markerPos = 0  # Establecer la posición inicial del marcador
@@ -1571,14 +1567,14 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number_aux
         
             path_movie = trial["movie_path"]
             video_name = path_movie.split("/")[-1].split(".mp3")[0]
-            audio_file_name = os.path.join(audio_folder, f"sub-{info_dict['ID']}_ses_{info_dict['Sesion']}_task-{exp_name}_probe-{video_name}.wav")
+            audio_file_name = os.path.join(audio_folder, f"sub-{info_dict['ID']}_ses_{info_dict['Sesion']}_task-{exp_name}_probe-{video_name}_run-{subbloque_number_aux}.wav")
 
             write(audio_file_name, samplerate, np.int16(trimmed_recording * 32767))
 
             show_instructions_absolute("post_stimulus_stop_verbal_report")
 
             core.wait(0.5)  # Buffer for stopping the recording
-            # DESCOMENTAR CUANDO ARREGLE LA PARTE DEL MIC
+
 
         exp.nextEntry()
 
