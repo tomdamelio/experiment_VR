@@ -1075,15 +1075,13 @@ for trial in practice_trials:
 
     elif practice_trial_number == 4:
         # how_instructions_absolute("post_stimulus_verbal_report_practice")
+        win.flip()
         show_instructions_absolute("post_stimulus_verbal_report")
-
-        # COMENTO ESTA PARTE DEL MICROFONO PARA QUE NO SE ROMPA. DESPUES CHEUQEAR CON PC EXPERIMENTAL,
         
         # Wait until ' space ' is pressed
         event.waitKeys(keyList=['space'])
         time_resp_clock = core.Clock()
-        # mic.record(70,block=False)  # Adjust the duratio  n as needed
-        
+                
         samplerate=44100
         channels=1
         max_dur = 120
@@ -1092,11 +1090,16 @@ for trial in practice_trials:
         # Flush the buffers
         event.clearEvents()
         
-        mensaje_audio = "Grabando audio..."
-        text_stim_audio = visual.TextStim(win, text=mensaje_audio, height=0.6, pos=(0, 10))
+        win.flip()
+        grabando_audio_text = visual.TextStim(
+            win,
+            text="Grabando audio...",
+            height=ExperimentParameters.text_height,
+            pos=[0, 0],
+        )
 
         # Para dibujar el estímulo de texto
-        text_stim_audio.draw()
+        grabando_audio_text.draw()
         win.flip()
 
         # Wait until 'space' is pressed
@@ -1125,7 +1128,6 @@ for trial in practice_trials:
 
         write(audio_file_name, samplerate, np.int16(trimmed_recording * 32767))
 
-        # DESCOMENTAR CUANDO ARREGLE LA PARTE DEL MICROFONO
         show_instructions_absolute("end_practice")
         print("Termino la practica")
 
@@ -1183,16 +1185,17 @@ def cargar_bloques(nombre_archivo):
     return data.importConditions(nombre_archivo)
 
 
-def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
+def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number_aux):
     global mouse_x, current_time  # Asegura que estas variables son tratadas como globales
 
     # Define la función anidada
-    def log_mouse_and_time(video_start_time_aux, mov_aux):
-        global mouse_x, current_time  # Usa global aquí también
+    def log_mouse_and_time(video_start_time_aux, mov_aux, first_iteration_aux=False):
+        global mouse_x, current_time, video_start_time  # Usa global aquí también
         mov_aux.draw()
+        if first_iteration_aux:
+            video_start_time = core.getTime()
         mouse_x, _ = mouse.getPos()
-        current_time = core.getTime() - video_start_time_aux
-        #print("Mouse X:", mouse_x, "Current Time:", current_time)  # Agregado para depuración
+        current_time = core.getTime() - video_start_time
 
     # Continúa con el resto de tu función ejecutar_trials
     condiciones = data.importConditions(archivo_bloque)
@@ -1301,34 +1304,22 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
         
         # Inicializar el array de NumPy para anotaciones del ratón
         mouse_annotation = np.empty((0, 2), dtype=float)  # Array vacío con dos columnas
-
-        video_start_time = core.getTime()
         
-        #time_aux = 0  
-        #print(f"1307 -> {video_start_time}")
-
+        first_iteration = True
+        
         while mov.status != constants.FINISHED:
-            
-            current_time = core.getTime() - video_start_time
-            #if time_aux == 0:
-            #    print(f"1313 -> {current_time}")
+                        
             left_image.draw()
             right_image.draw()
             intensity_cue_image.draw()
             dimension_slider.draw()
             slider_thumb.draw()
-            #current_time_2 = core.getTime() - video_start_time
-            #if time_aux == 0:
-            #    print(f"1321 -> {current_time_2}")
-
-            win.callOnFlip(log_mouse_and_time, video_start_time, mov)
+            
+            win.callOnFlip(log_mouse_and_time, video_start_time, mov, first_iteration_aux=first_iteration)
             win.flip()
             
-            #current_time_3 = core.getTime() - video_start_time
-            #if time_aux == 0:
-            #    print(f"1328 -> {current_time_3}")
-            #    
-            #time_aux = time_aux + 1 
+            if first_iteration:
+                first_iteration = False
             
             if mouse_x < -4:
                 slider_value = -1
@@ -1360,8 +1351,9 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
         mouse_annotation_list = mouse_annotation.tolist()
         exp.addData("continuous_annotation", mouse_annotation_list)
         exp.addData("video_duration", mov.duration)
+        exp.addData("subbloque_number", subbloque_number_aux)
 
-        if subbloque_number <= 4:
+        if subbloque_number_aux <= 4:
             # Crear el estímulo de texto para el mensaje de carga
             win.flip()
             loading_text_stim = visual.TextStim(
@@ -1449,6 +1441,7 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
                 slider_thumb.draw()
 
                 mouse_x, _ = mouse.getPos()
+                tiempo_actual_real = cronometro.getTime() - green_screen_start_time
 
                 # Verificar si mouse_x está fuera del rango a la izquierda (-4)
                 if mouse_x < -4:
@@ -1476,15 +1469,15 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
                     break  # Salir del bucle while, finalizando la reproducción del video
                 
                 # Agregar datos al array de NumPy
-                new_data_mouse_annotation_green = np.array([[slider_value_green, tiempo_actual]])
+                new_data_mouse_annotation_green = np.array([[slider_value_green, tiempo_actual_real]])
                 mouse_annotation_green = np.vstack((mouse_annotation_green, new_data_mouse_annotation_green))
                 
                 # Agregar datos al array de NumPy
-                new_data_stim_value_green = np.array([[green_intensity, tiempo_actual]])
+                new_data_stim_value_green = np.array([[green_intensity, tiempo_actual_real]])
                 stim_value_green = np.vstack((stim_value_green, new_data_stim_value_green))
                 
                 # Agregar datos al array de NumPy
-                new_data_stim_value = np.array([[valor_cercano, tiempo_actual]])
+                new_data_stim_value = np.array([[valor_cercano, tiempo_actual_real]])
                 stim_value = np.vstack((stim_value, new_data_stim_value))
 
                 thumb_pos_x = (
@@ -1509,23 +1502,59 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number):
             stim_value_list = stim_value.tolist()
             exp.addData("stim_value", stim_value_list)
 
-        elif subbloque_number > 4:
+        elif subbloque_number_aux > 4:
+            win.flip()
             show_instructions_absolute("post_stimulus_verbal_report")
 
-            # COMENTO ESTA PARTE DEL MICROFONO PARA QUE NO SE ROMPA. DESPUES CHEUQEAR CON PC EXPERIMENTAL,
+            # Wait until ' space ' is pressed
+            event.waitKeys(keyList=['space'])
+            time_resp_clock = core.Clock()
+                    
+            samplerate=44100
+            channels=1
+            max_dur = 120
+            recording = sd.rec(int(samplerate * max_dur), samplerate=samplerate, channels=channels, dtype='float64', blocking=False)
+            
+            # Flush the buffers
+            event.clearEvents()
+            
+            win.flip()
+            grabando_audio_text = visual.TextStim(
+                win,
+                text="Grabando audio...",
+                height=ExperimentParameters.text_height,
+                pos=[0, 0],
+            )
 
-            # mic = Microphone(bufferSecs=10.0)  # open the microphone
-            # mic.start()  # start recording
-            # # Wait until 'return' is pressed
-            # event.waitKeys(keyList=['space'])
-            # time_resp_clock = core.Clock()
-            # mic.stop()  # stop recording
-            # audioClip = mic.getRecording()
-            # rt = audioClip.duration
-            # audioClip.save(os.path.join(subject_folder, f"sub-{info_dict['Subject_id']}+ '_' + 'report{trial['movie_path']}.wav"))  # save the recorded audio as a 'wav' file
+            # Para dibujar el estímulo de texto
+            grabando_audio_text.draw()
+            win.flip()
 
-            # # Flush the buffers
-            # event.clearEvents()
+            # Wait until 'space' is pressed
+            response = event.waitKeys(maxWait = max_dur, keyList=['space'], timeStamped=time_resp_clock)
+            
+            if not response:
+                recording_dur = max_dur
+            else:
+                recording_dur = response[0][1]
+            exp.addData('recording_dur', recording_dur)
+            win.flip()
+            
+            # Calculate the actual number of samples recorded based on the recording time
+            try:
+                actual_samples_recorded = int((recording_dur + 1) * samplerate)
+            except Exception as e:
+                actual_samples_recorded = int((max_dur + 1) * samplerate)
+                print(f"Error occurred during calculation of actual_samples_recorded: {e}")
+            
+            # Trim the recording to the actual size and save
+            trimmed_recording = recording[:actual_samples_recorded]
+        
+            path_movie = trial["movie_path"]
+            video_name = path_movie.split("/")[-1].split(".mp3")[0]
+            audio_file_name = os.path.join(audio_folder, f"sub-{info_dict['ID']}_ses_{info_dict['Sesion']}_task-{exp_name}_probe-{video_name}.wav")
+
+            write(audio_file_name, samplerate, np.int16(trimmed_recording * 32767))
 
             show_instructions_absolute("post_stimulus_stop_verbal_report")
 
@@ -1557,9 +1586,11 @@ subbloque_number = 1
 
 
 # Función para ejecutar todos los subbloques de un suprabloque
-def ejecutar_suprabloque(win, exp, subbloques, subbloque_number):
+def ejecutar_suprabloque(win, exp, subbloques):
+    global subbloque_number  # Declarar que vamos a usar la variable global
     random.shuffle(subbloques)  # Aleatorizar el orden de los subbloques
     for subbloque in subbloques:
+        print(subbloque)
         ruta_subbloque = subbloque["condsFile"]
         ejecutar_trials(win, exp, ruta_subbloque, sliders_dict, subbloque_number)
         subbloque_number += 1
@@ -1570,11 +1601,11 @@ bloque_inicial = info_dict["Sesion"]
 
 # Ejecutar los suprabloques en el orden determinado por bloque_inicial
 if bloque_inicial == "A":
-    ejecutar_suprabloque(win, exp, subbloques_A, subbloque_number)
-    ejecutar_suprabloque(win, exp, subbloques_B, subbloque_number)
+    ejecutar_suprabloque(win, exp, subbloques_A)
+    ejecutar_suprabloque(win, exp, subbloques_B)
 else:
-    ejecutar_suprabloque(win, exp, subbloques_B, subbloque_number)
-    ejecutar_suprabloque(win, exp, subbloques_A, subbloque_number)
+    ejecutar_suprabloque(win, exp, subbloques_B)
+    ejecutar_suprabloque(win, exp, subbloques_A)
 
 ejecutar_calm_video(win=win,
                     #path_video='../stimuli/calm_videos/2D/70.0_Tahiti Surf-1-2d_crp opped.mp4',
