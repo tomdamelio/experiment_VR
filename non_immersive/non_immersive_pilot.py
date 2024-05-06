@@ -772,8 +772,8 @@ dimension_slider = visual.Slider(
 )
 
 # Check if the file exists
-#file_path = "../conditions/non_immersive_practice_conditions.csv"
-file_path = "../conditions_test_2/non_immersive_practice_conditions.csv"
+file_path = "../conditions/non_immersive_practice_conditions.csv"
+#file_path = "../conditions_test_2/non_immersive_practice_conditions.csv"
 
 try:
     with open(file_path, mode="r", encoding="utf-8-sig") as csvfile:
@@ -952,6 +952,7 @@ for trial in practice_trials:
             show_instructions_absolute("post_stimulus_self_report_text_2")
             show_instructions_absolute("post_stimulus_self_report_text_3")
 
+        win.flip()
         # Crear el estímulo de texto para el mensaje de carga
         loading_text_stim = visual.TextStim(
             win, text="Cargando escalas...", height=ExperimentParameters.text_height, pos=[0, 0]
@@ -1586,13 +1587,15 @@ ejecutar_calm_video(
 )
 
 
+show_instructions_absolute("post_stimulus_stop_verbal_report")
+
 # Cargar los subbloques de cada suprabloque
 
-#subbloques_A = cargar_bloques("../conditions/Blocks_A.csv")
-subbloques_A = cargar_bloques("../conditions_test_2/Blocks_A.csv")
+subbloques_A = cargar_bloques("../conditions/Blocks_A.csv")
+#subbloques_A = cargar_bloques("../conditions_test_2/Blocks_A.csv")
 
-#subbloques_B = cargar_bloques("../conditions/Blocks_B.csv")
-subbloques_B = cargar_bloques("../conditions_test_2/Blocks_B.csv")
+subbloques_B = cargar_bloques("../conditions/Blocks_B.csv")
+#subbloques_B = cargar_bloques("../conditions_test_2/Blocks_B.csv")
 
 
 subbloque_number = 1

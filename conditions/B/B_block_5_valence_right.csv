@@ -1,5 +1,0 @@
-﻿id,movie_path,dimension,hand,stimulus_type,order_emojis_slider,block
-69,../stimuli/exp_videos/2D/69.0_Walk the tight rope-0-2d_cropped.mp4,valence,right,HV-HA,inverse,5
-25,../stimuli/exp_videos/2D/25.0_The Most Beautiful Place in the World-0-2d_cropped.mp4,valence,right,HV-LA,direct,5
-103,../stimuli/exp_videos/2D/103.0_The Conjuring 2-1-2d_cropped.mp4,valence,right,LV-HA,inverse,5
-14,../stimuli/exp_videos/2D/14.0_War Zone-1-2d_cropped.mp4,valence,right,LV-LA,direct ,5

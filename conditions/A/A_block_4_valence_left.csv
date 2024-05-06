@@ -1,5 +1,0 @@
-﻿id,movie_path,dimension,hand,stimulus_type,order_emojis_slider,block
-120,"../stimuli/exp_videos/2D/120.0_Supercross Virtual Reality Experience (360° Video, 4K)-1-2d_cropped.mp4",valence,left,HV-HA,direct ,4
-115,../stimuli/exp_videos/2D/115.0_Chengdu Giant Panda Base 360 virtual reality tour-0-2d_cropped.mp4,valence,left,HV-LA,inverse,4
-114,"../stimuli/exp_videos/2D/114.0_360° VR Simulation - Eaten Alive by Rats, Roaches, and Birds-0-2d_cropped.mp4",valence,left,LV-HA,direct,4
-112,../stimuli/exp_videos/2D/112.0_Experiencia 360º Tú eliges-0-2d_cropped.mp4,valence,left,LV-LA,inverse,4

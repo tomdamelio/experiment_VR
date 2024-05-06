@@ -92,7 +92,8 @@ non_immersive_instructions_text = {
         "Presiona la barra espaciadora para comenzar.",
 
     'end_practice': "¡Terminamos con los ensayos de práctica!\n\n"
-        "Llamá el evaluador para preguntar si ya está todo listo para comenzar",
+        "Llamá el evaluador para preguntar si ya está todo listo \n\n"
+        "para comenzar el experimento.\n\n",
 
     'initial_relaxation_video_text': "Antes de comenzar con las tareas principales,\n"
         "te vamos a mostrar un video relajante.\n\n"
