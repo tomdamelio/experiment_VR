@@ -1,6 +1,5 @@
 id,movie_path,dimension,hand,stimulus_type,order_emojis_slider,block
 90,../amsterdam_dynamic_facial_expression_set/F01-Fear-Face Forward.mp4,valence,right,LV-HA,direct,-1
-91,../amsterdam_dynamic_facial_expression_set/F01-Fear-Face Forward.mp4,valence,right,LV-HA,direct,-1
-92,../amsterdam_dynamic_facial_expression_set/F01-Fear-Face Forward.mp4,valence,right,LV-HA,direct,-1
-93,../amsterdam_dynamic_facial_expression_set/F01-Fear-Face Forward.mp4,valence,right,LV-HA,direct,-1
-
+91,../amsterdam_dynamic_facial_expression_set/F01-Fear-Face Forward.mp4,arousal,right,LV-HA,direct,-1
+92,../amsterdam_dynamic_facial_expression_set/F01-Fear-Face Forward.mp4,arousal,right,LV-HA,direct,-1
+93,../amsterdam_dynamic_facial_expression_set/F01-Fear-Face Forward.mp4,arousal,left,LV-HA,direct,-1

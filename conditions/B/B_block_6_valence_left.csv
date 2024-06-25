@@ -1,5 +1,5 @@
 ﻿id,movie_path,dimension,hand,stimulus_type,order_emojis_slider,block
-117,../stimuli/exp_videos/2D/117.0_Red Bull F1 VR 360° Video Experience-1-2d_cropped.mp4,valence,left,HV-HA,direct ,6
-46,../stimuli/exp_videos/2D/46.0_Explore the world with IM360-1-2d_cropped.mp4,valence,left,HV-LA,inverse,6
-104,../stimuli/exp_videos/2D/104.0_Experiencia de Accidente Automovilístico en 360°  Participa en un Accidente Automovilístico en VR-1-2d_cropped.mp4,valence,left,LV-HA,direct,6
-101,../stimuli/exp_videos/2D/101.0_Virtual Reality 360 Inside Rattlesnake Den-0-2d_cropped.mp4,valence,left,LV-LA,inverse,6
+1,../stimuli/exp_videos/2D/1.mp4,valence,left,positive,direct ,6
+5,../stimuli/exp_videos/2D/5.mp4,valence,left,positive,inverse,6
+11,../stimuli/exp_videos/2D/11.mp4,valence,left,negative,direct,6
+10,../stimuli/exp_videos/2D/10.mp4,valence,left,negative,inverse,6
