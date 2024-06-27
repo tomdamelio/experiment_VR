@@ -2,6 +2,7 @@ import subprocess
 import threading
 import os
 import time
+from pynput import mouse
 
 def execute_command(path, command):
     print(f'Executing proceess {command}')
@@ -60,6 +61,20 @@ def execute_eye_tracker_stream():
     
     process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True, cwd = path)
     output, error = process.communicate()
+
+def log_mouse_position():
+    mouse_data_file = "mouse_data.csv"
+
+    with open(mouse_data_file, "w") as file:
+        file.write("timestamp,x,y\n")
+
+        def on_move(x, y):
+            timestamp = time.time()
+            file.write(f"{timestamp},{x},{y}\n")
+            file.flush()  # Ensure the data is written to the file immediately
+
+        with mouse.Listener(on_move=on_move) as listener:
+            listener.join()
     
 
 if __name__ == "__main__":
@@ -69,13 +84,16 @@ if __name__ == "__main__":
         # SVthread = threading.Thread(target=execute_stream_viewer)
         #ETthread = threading.Thread(target=execute_eye_tracker_stream)
         BAthread = threading.Thread(target=execute_brainamp_connector, args=(["C:/Users/Cocudata/experiment_VR/mw_lsl_42chs.cfg"]))
+        MTthread = threading.Thread(target=log_mouse_position)
         
+
         # Start the threads
         #GPthread.start()
         LRthread.start()
 
         time.sleep(5)
         BAthread.start()
+        MTthread.start()  
         #ETthread.start()
         # SVthread.start()
 
