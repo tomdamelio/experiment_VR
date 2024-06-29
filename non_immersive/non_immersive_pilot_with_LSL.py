@@ -701,9 +701,26 @@ def show_instructions_absolute(
 
     # Update the display to show the drawn text
     win.flip()
+    
+    # Iniciar el bucle de evento para la interacción del usuario
+    mouse = event.Mouse(win=win)
+    event.clearEvents()
+    
+    user_interacting = (
+        True  # Una nueva variable para controlar la interacción del usuario
+    )
+
+    while user_interacting:
+        # Obtener la posición actual del ratón en cada iteración del bucle
+        mouse_x, mouse_y = mouse.getPos()
+
+        # Verificar si se presiona una tecla para finalizar la interacción del usuario
+        keys = event.getKeys(keyList=["space"])
+        if keys:
+            user_interacting = False  # El usuario ha terminado de interactuar
 
     # Wait for the user to press the spacebar
-    event.waitKeys(keyList=["space"])
+    #event.waitKeys(keyList=["space"])
     outlet.push_sample(["instruction_end"])
 
 
@@ -773,8 +790,8 @@ outlet.push_sample(['baseline_start'])
 fixation.draw()
 win.flip()  # Actualizar la ventana para mostrar la cruz
 
-# Esperar 10 segundos de manera precisa
-core.wait(3)
+# Esperar 300 segundos de manera precisa de baseline (linea de base)
+core.wait(300)
 
 # Marcar el fin de la recolección de datos
 outlet.push_sample(['baseline_end'])
@@ -1148,7 +1165,7 @@ for trial in practice_trials:
         show_instructions_absolute("post_stimulus_verbal_report")
         
         # Wait until ' space ' is pressed
-        event.waitKeys(keyList=['space'])
+        #event.waitKeys(keyList=['space'])
         time_resp_clock = core.Clock()
                 
         samplerate=44100
@@ -1445,143 +1462,145 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number_aux
 
             # Siguiente entrada del registro de datos
             core.wait(ExperimentParameters.iti)
-
-            # Instrucciones luminancia
-            left_image, right_image = show_instructions_relative_trial(
-                "luminance",
-                outlet,
-                trial["hand"],
-                win,
-                ExperimentParameters,
-                sliders_dict,
-                order_emojis_slider=trial["order_emojis_slider"],
-            )
-            # Cambiar las posiciones a (0, 1)
-            left_image.pos = (-5, -8.4)
-            right_image.pos = (5, -8.4)
-            slider_thumb.pos = (0, -8.1)
-
-            # Restablecer el deslizador de valencia para el nuevo ensayo
-            dimension_slider.reset()
-            dimension_slider.markerPos = (
-                0  # Establecer la posición inicial del marcador
-            )
-
-            # Convertir mouse_annotation_aux a una matriz de numpy para facilitar las búsquedas
-            mouse_annotation_aux_np = mouse_annotation
-
-            # Inicialización
-            mouse_annotation_green = np.empty((0, 2), dtype=float) 
-            stim_value = np.empty((0, 2), dtype=float) 
-            stim_value_green = np.empty((0, 2), dtype=float) 
             
-            # Obtener objeto del ratón y hacerlo visible
-            mouse = event.Mouse(visible=True, win=win)
-            mouse.setPos(newPos=(0, dimension_slider.pos[1]))
-
-            # Calculate the range in pixels for the slider
-            slider_start = dimension_slider.pos[0] - (dimension_slider.size[0] / 2)
-            #slider_end = dimension_slider.pos[0] + (dimension_slider.size[0] / 2)
-
-            event.clearEvents()                   
-                                        
-            cronometro = core.Clock()
-            green_screen_start_time = cronometro.getTime()
-            
-            outlet.push_sample(['luminance_start'])
-            
-            # Bucle hasta que el tiempo transcurrido sea mayor que la duración del video
-            while cronometro.getTime() - green_screen_start_time <= last_time_reported:
-                tiempo_actual = cronometro.getTime() - green_screen_start_time
-
-                # Encontrar el índice del valor de tiempo más cercano en mouse_annotation_aux
-                idx = np.abs(mouse_annotation_aux_np[:, 1] - tiempo_actual).argmin()
-                valor_cercano, _ = mouse_annotation_aux_np[idx]
-
-                if trial["order_emojis_slider"] == "inverse":
-                    valor_cercano = -valor_cercano
-
-                # Ajustar valor de intensidad verde según el valor más cercano encontrado
-                green_intensity = ((valor_cercano + 1) / 2) * (255 - 25) + 25
- 
-                # Establecer el color de la ventana y dibujar todos los elementos
-                win.setColor([20, green_intensity, 12], "rgb255")
-                left_image.draw()
-                right_image.draw()
-                intensity_cue_image.draw()
-                dimension_slider.draw()
-                slider_thumb.draw()
-
-                mouse_x, _ = mouse.getPos()
-                tiempo_actual_real = cronometro.getTime() - green_screen_start_time
-
-                # Verificar si mouse_x está fuera del rango a la izquierda (-4)
-                if mouse_x < -4:
-                    slider_value_green = -1
-                # Verificar si mouse_x está fuera del rango a la derecha (4)
-                elif mouse_x > 4:
-                    slider_value_green = 1
-                else:
-                    # Calcular norm_pos dentro del rango permitido
-                    norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
-                    # Calcular slider_value basado en norm_pos dentro del rango permitido
-                    slider_value_green = (
-                        norm_pos
-                        * (dimension_slider.ticks[-1] - dimension_slider.ticks[0])
-                        + dimension_slider.ticks[0]
-                    )
-                    dimension_slider.markerPos = round(slider_value_green, 2)
-
-                # Manejar la salida anticipada
-                keys = event.getKeys()
-                if "escape" in keys:
-                    win.close()
-                    core.quit()
-                if "p" in keys:  # Verificar si se presionó la tecla "p"
-                    break  # Salir del bucle while, finalizando la reproducción del video
+            if trial["luminance"] == "yes":
                 
-                # Agregar datos al array de NumPy
-                new_data_mouse_annotation_green = np.array([[slider_value_green, tiempo_actual_real]])
-                mouse_annotation_green = np.vstack((mouse_annotation_green, new_data_mouse_annotation_green))
-                
-                # Agregar datos al array de NumPy
-                new_data_stim_value_green = np.array([[green_intensity, tiempo_actual_real]])
-                stim_value_green = np.vstack((stim_value_green, new_data_stim_value_green))
-                
-                # Agregar datos al array de NumPy
-                new_data_stim_value = np.array([[valor_cercano, tiempo_actual_real]])
-                stim_value = np.vstack((stim_value, new_data_stim_value))
+                # Instrucciones luminancia
+                left_image, right_image = show_instructions_relative_trial(
+                    "luminance",
+                    outlet,
+                    trial["hand"],
+                    win,
+                    ExperimentParameters,
+                    sliders_dict,
+                    order_emojis_slider=trial["order_emojis_slider"],
+                )
+                # Cambiar las posiciones a (0, 1)
+                left_image.pos = (-5, -8.4)
+                right_image.pos = (5, -8.4)
+                slider_thumb.pos = (0, -8.1)
 
-                thumb_pos_x = (
-                    dimension_slider.markerPos - dimension_slider.ticks[0]
-                ) / (
-                    dimension_slider.ticks[-1] - dimension_slider.ticks[0]
-                ) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
-                slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
+                # Restablecer el deslizador de valencia para el nuevo ensayo
+                dimension_slider.reset()
+                dimension_slider.markerPos = (
+                    0  # Establecer la posición inicial del marcador
+                )
 
+                # Convertir mouse_annotation_aux a una matriz de numpy para facilitar las búsquedas
+                mouse_annotation_aux_np = mouse_annotation
+
+                # Inicialización
+                mouse_annotation_green = np.empty((0, 2), dtype=float) 
+                stim_value = np.empty((0, 2), dtype=float) 
+                stim_value_green = np.empty((0, 2), dtype=float) 
+                
+                # Obtener objeto del ratón y hacerlo visible
+                mouse = event.Mouse(visible=True, win=win)
+                mouse.setPos(newPos=(0, dimension_slider.pos[1]))
+
+                # Calculate the range in pixels for the slider
+                slider_start = dimension_slider.pos[0] - (dimension_slider.size[0] / 2)
+                #slider_end = dimension_slider.pos[0] + (dimension_slider.size[0] / 2)
+
+                event.clearEvents()                   
+                                            
+                cronometro = core.Clock()
+                green_screen_start_time = cronometro.getTime()
+                
+                outlet.push_sample(['luminance_start'])
+                
+                # Bucle hasta que el tiempo transcurrido sea mayor que la duración del video
+                while cronometro.getTime() - green_screen_start_time <= last_time_reported:
+                    tiempo_actual = cronometro.getTime() - green_screen_start_time
+
+                    # Encontrar el índice del valor de tiempo más cercano en mouse_annotation_aux
+                    idx = np.abs(mouse_annotation_aux_np[:, 1] - tiempo_actual).argmin()
+                    valor_cercano, _ = mouse_annotation_aux_np[idx]
+
+                    if trial["order_emojis_slider"] == "inverse":
+                        valor_cercano = -valor_cercano
+
+                    # Ajustar valor de intensidad verde según el valor más cercano encontrado
+                    green_intensity = ((valor_cercano + 1) / 2) * (255 - 25) + 25
+    
+                    # Establecer el color de la ventana y dibujar todos los elementos
+                    win.setColor([20, green_intensity, 12], "rgb255")
+                    left_image.draw()
+                    right_image.draw()
+                    intensity_cue_image.draw()
+                    dimension_slider.draw()
+                    slider_thumb.draw()
+
+                    mouse_x, _ = mouse.getPos()
+                    tiempo_actual_real = cronometro.getTime() - green_screen_start_time
+
+                    # Verificar si mouse_x está fuera del rango a la izquierda (-4)
+                    if mouse_x < -4:
+                        slider_value_green = -1
+                    # Verificar si mouse_x está fuera del rango a la derecha (4)
+                    elif mouse_x > 4:
+                        slider_value_green = 1
+                    else:
+                        # Calcular norm_pos dentro del rango permitido
+                        norm_pos = (mouse_x - slider_start) / dimension_slider.size[0]
+                        # Calcular slider_value basado en norm_pos dentro del rango permitido
+                        slider_value_green = (
+                            norm_pos
+                            * (dimension_slider.ticks[-1] - dimension_slider.ticks[0])
+                            + dimension_slider.ticks[0]
+                        )
+                        dimension_slider.markerPos = round(slider_value_green, 2)
+
+                    # Manejar la salida anticipada
+                    keys = event.getKeys()
+                    if "escape" in keys:
+                        win.close()
+                        core.quit()
+                    if "p" in keys:  # Verificar si se presionó la tecla "p"
+                        break  # Salir del bucle while, finalizando la reproducción del video
+                    
+                    # Agregar datos al array de NumPy
+                    new_data_mouse_annotation_green = np.array([[slider_value_green, tiempo_actual_real]])
+                    mouse_annotation_green = np.vstack((mouse_annotation_green, new_data_mouse_annotation_green))
+                    
+                    # Agregar datos al array de NumPy
+                    new_data_stim_value_green = np.array([[green_intensity, tiempo_actual_real]])
+                    stim_value_green = np.vstack((stim_value_green, new_data_stim_value_green))
+                    
+                    # Agregar datos al array de NumPy
+                    new_data_stim_value = np.array([[valor_cercano, tiempo_actual_real]])
+                    stim_value = np.vstack((stim_value, new_data_stim_value))
+
+                    thumb_pos_x = (
+                        dimension_slider.markerPos - dimension_slider.ticks[0]
+                    ) / (
+                        dimension_slider.ticks[-1] - dimension_slider.ticks[0]
+                    ) * dimension_slider.size[0] - (dimension_slider.size[0] / 2)
+                    slider_thumb.setPos([thumb_pos_x, dimension_slider.pos[1]])
+
+                    win.flip()
+
+                outlet.push_sample(['luminance_end'])
+                
+                # Continuar con el código para restablecer el color de fondo y guardar las anotaciones
+                win.setColor("black")
                 win.flip()
 
-            outlet.push_sample(['luminance_end'])
-            
-            # Continuar con el código para restablecer el color de fondo y guardar las anotaciones
-            win.setColor("black")
-            win.flip()
-
-            # Guardar anotaciones interpoladas al final del ensayo
-            # Convertir el array de NumPy a una lista de listas
-            mouse_annotation_green_list = mouse_annotation_green.tolist()
-            exp.addData("continuous_annotation_luminance", mouse_annotation_green_list)
-            stim_value_green_list = stim_value_green.tolist()
-            exp.addData("stim_value_green", stim_value_green_list)
-            stim_value_list = stim_value.tolist()
-            exp.addData("stim_value", stim_value_list)
+                # Guardar anotaciones interpoladas al final del ensayo
+                # Convertir el array de NumPy a una lista de listas
+                mouse_annotation_green_list = mouse_annotation_green.tolist()
+                exp.addData("continuous_annotation_luminance", mouse_annotation_green_list)
+                stim_value_green_list = stim_value_green.tolist()
+                exp.addData("stim_value_green", stim_value_green_list)
+                stim_value_list = stim_value.tolist()
+                exp.addData("stim_value", stim_value_list)
 
         elif subbloque_number_aux > 4:
             win.flip()
             show_instructions_absolute("post_stimulus_verbal_report")
 
             # Wait until ' space ' is pressed
-            event.waitKeys(keyList=['space'])
+            #event.waitKeys(keyList=['space'])
             time_resp_clock = core.Clock()
                     
             samplerate=44100

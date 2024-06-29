@@ -1,4 +1,4 @@
-﻿id,movie_path,dimension,hand,stimulus_type,order_emojis_slider,block
-2,"../stimuli/exp_videos/2D/2.mp4",arousal,left,positive,direct ,8
-3,../stimuli/exp_videos/2D/3.mp4,arousal,left,positive,inverse,8
-12,"../stimuli/exp_videos/2D/12.mp4",arousal,left,negative,direct,8
+﻿id,movie_path,dimension,hand,stimulus_type,order_emojis_slider,block,luminance
+2,"../stimuli/exp_videos/2D/2.mp4",arousal,left,positive,direct ,8,no
+3,../stimuli/exp_videos/2D/3.mp4,arousal,left,positive,inverse,8,no
+12,"../stimuli/exp_videos/2D/12.mp4",arousal,left,negative,direct,8,no

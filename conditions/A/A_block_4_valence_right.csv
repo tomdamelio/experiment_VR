@@ -1,5 +1,5 @@
-﻿id,movie_path,dimension,hand,stimulus_type,order_emojis_slider,block
-2,"../stimuli/exp_videos/2D/2.mp4",valence,right,positive,direct ,4
-3,../stimuli/exp_videos/2D/3.mp4,valence,right,positive,inverse,4
-12,"../stimuli/exp_videos/2D/12.mp4",valence,right,negative,direct,4
+﻿id,movie_path,dimension,hand,stimulus_type,order_emojis_slider,block,luminance
+2,"../stimuli/exp_videos/2D/2.mp4",valence,right,positive,direct ,4,no
+3,../stimuli/exp_videos/2D/3.mp4,valence,right,positive,inverse,4,yes
+12,"../stimuli/exp_videos/2D/12.mp4",valence,right,negative,direct,4,no
 

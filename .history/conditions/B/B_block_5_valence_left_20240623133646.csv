@@ -1,0 +1,5 @@
+﻿id,movie_path,dimension,hand,stimulus_type,order_emojis_slider,block
+7,../stimuli/exp_videos/2D/7.mp4,valence,left,positive,inverse,5
+4,../stimuli/exp_videos/2D/4.mp4,valence,left,positive,direct,5
+9,../stimuli/exp_videos/2D/9.mp4,valence,left,negative,inverse,5
+8,../stimuli/exp_videos/2D/8.mp4,valence,left,negative,direct ,5
