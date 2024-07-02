@@ -1,0 +1,5 @@
+id,movie_path,dimension,hand,stimulus_type,order_emojis_slider, block
+991,../stimuli/practice_videos/VR/991.mp4,valence,right,negative,direct,0
+992,../stimuli/practice_videos/VR/992.mp4,arousal,right,negative,direct,0
+993,../stimuli/practice_videos/VR/993.mp4,arousal,right,negative,inverse,0
+994,../stimuli/practice_videos/VR/994.mp4,arousal,right,negative,inverse,0
