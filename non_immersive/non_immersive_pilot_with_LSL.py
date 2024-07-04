@@ -40,17 +40,21 @@ print("Current working directory:", os.getcwd())
 ##########################################################################
 # Set up LabStreamingLayer stream.
 ##########################################################################
-info = StreamInfo(name='markers', type='Markers', channel_count=1,
-                     channel_format='string', source_id='vr-markers')
-outlet = StreamOutlet(info)  # Broadcast the stream.
+if ExperimentParameters.test:
+    outlet = 'test' 
 
-# This is not necessary but can be useful to keep track of markers and the
-# events they correspond to.
+if not ExperimentParameters.test:
+    info = StreamInfo(name='markers', type='Markers', channel_count=1,
+                      channel_format='string', source_id='vr-markers')
+    outlet = StreamOutlet(info)  # Broadcast the stream.
 
-# Send triggers to test communication.
-for _ in range(5):
-    outlet.push_sample(['test'])
-    core.wait(0.5)
+    # This is not necessary but can be useful to keep track of markers and the
+    # events they correspond to.
+
+    # Send triggers to test communication.
+    for _ in range(5):
+        outlet.push_sample(['test'])
+        core.wait(0.5)
 
 ##########################################################################
 # GUI for subject information
@@ -109,14 +113,13 @@ physio_file_name = f"sub-{info_dict['ID']}_ses-{info_dict['Sesion']}_task-{exp_n
 # Construct the command to send to LSL App Recorder
 # Note: You might need to adjust the path to match your exact folder structure
 modality = 'physio'
-command = f"filename {{root:C:/Users/Cocudata/experiment_VR/results/}} {{template:sub-%p/ses-%s/{modality}/{physio_file_name}.xdf}}  {{participant:{info_dict['ID']}}} {{session:{info_dict['Sesion']}}} {{task:{exp_name}}} {{modality: {modality}}}\n"
-# Send commands to LSL App Recorder
-#s = socket.create_connection(("localhost", 135))
-s = socket.create_connection(("localhost", 22345))
-s.sendall(b"update\n")
-s.sendall(b"select all\n")
-s.sendall(command.encode())  # Convert the command string to bytes
-s.sendall(b"start\n")
+if not ExperimentParameters.test:
+    command = f"filename {{root:C:/Users/Cocudata/experiment_VR/results/}} {{template:sub-%p/ses-%s/{modality}/{physio_file_name}.xdf}}  {{participant:{info_dict['ID']}}} {{session:{info_dict['Sesion']}}} {{task:{exp_name}}} {{modality: {modality}}}\n"
+    s = socket.create_connection(("localhost", 22345))
+    s.sendall(b"update\n")
+    s.sendall(b"select all\n")
+    s.sendall(command.encode())  # Convert the command string to bytes
+    s.sendall(b"start\n")
 
 #########################################################################
 # Create experiment handler
@@ -299,7 +302,9 @@ def mostrar_sliders_y_recoger_respuestas(win, outlet, sliders_dict, trials):
     event.clearEvents()
 
     win.flip()
-    outlet.push_sample(["self_report_post_start"])
+    
+    if not ExperimentParameters.test:
+        outlet.push_sample(["self_report_post_start"])
 
     user_interacting = (
         True  # Una nueva variable para controlar la interacción del usuario
@@ -452,7 +457,9 @@ def mostrar_sliders_y_recoger_respuestas(win, outlet, sliders_dict, trials):
 
     # Inter Trial Interval(ITI) con pantalla en blanco
     win.flip()
-    outlet.push_sample(["self_report_post_end"])
+    
+    if not ExperimentParameters.test:
+        outlet.push_sample(["self_report_post_end"])
 
 
 def show_instructions_relative_trial(
@@ -571,7 +578,9 @@ def show_instructions_relative_trial(
 
     # Flip the front and back buffers para mostrar las instrucciones y las imágenes
     win.flip()
-    outlet.push_sample(["instruction_start"])
+    
+    if not ExperimentParameters.test:
+        outlet.push_sample(["instruction_start"])
 
     # To begin the Experimetn with Spacebar or RightMouse Click
     press_button = True
@@ -583,7 +592,8 @@ def show_instructions_relative_trial(
 
         if "space" in keys or 1 in mouse_click:
             press_button = False
-            outlet.push_sample(["instruction_end"])
+            if not ExperimentParameters.test:
+                outlet.push_sample(["instruction_end"])
             
 
     return left_image, right_image
@@ -626,7 +636,9 @@ def show_instructions_absolute(
 
     # Draw the text on the window
     instructions_txt.draw()
-    outlet.push_sample(["instruction_start"])
+    
+    if not ExperimentParameters.test:
+        outlet.push_sample(["instruction_start"])
 
     if dimension is not None:
         # Determinar las rutas de las imágenes basadas en la 'dimension'
@@ -721,7 +733,8 @@ def show_instructions_absolute(
 
     # Wait for the user to press the spacebar
     #event.waitKeys(keyList=["space"])
-    outlet.push_sample(["instruction_end"])
+    if not ExperimentParameters.test:
+        outlet.push_sample(["instruction_end"])
 
 
 ##########################################################################
@@ -765,7 +778,8 @@ def log_mouse_and_time(mov, outlet=outlet ,first_iteration_aux=False):
     mov.draw()  # Asegúrate de que mov es un objeto que se pueda dibujar
     if first_iteration_aux:
         video_start_time = core.getTime()
-        outlet.push_sample(['video_start'])  # Marca el inicio del video
+        if not ExperimentParameters.test:
+            outlet.push_sample(['video_start'])  # Marca el inicio del video
     mouse_x, _ = mouse.getPos()
     current_time = core.getTime() - video_start_time
 
@@ -784,17 +798,19 @@ fixation = visual.TextStim(win, text='+', pos=(0, 0), color='white')
 event.clearEvents()
 
 # Marcar el inicio de la recolección de datos
-outlet.push_sample(['baseline_start'])
+if not ExperimentParameters.test:
+    outlet.push_sample(['baseline_start'])
 
 # Mostrar la cruz de fijación y comenzar el período de baseline
 fixation.draw()
 win.flip()  # Actualizar la ventana para mostrar la cruz
 
 # Esperar 300 segundos de manera precisa de baseline (linea de base)
-core.wait(300)
+core.wait(3)
 
-# Marcar el fin de la recolección de datos
-outlet.push_sample(['baseline_end'])
+if not ExperimentParameters.test:
+    # Marcar el fin de la recolección de datos
+    outlet.push_sample(['baseline_end'])
 
 # Limpiar la pantalla (opcional, dependiendo de lo que necesites a continuación)
 win.flip()
@@ -993,8 +1009,10 @@ for trial in practice_trials:
         if "p" in keys:
             mov.stop()
             break  # Salir del bucle
+        
+    if not ExperimentParameters.test:
+        outlet.push_sample(['video_end'])
     
-    outlet.push_sample(['video_end'])
     core.wait(0.5)
     # Convertir el array de NumPy a una lista de listas
     mouse_annotation_list = mouse_annotation.tolist()
@@ -1071,7 +1089,8 @@ for trial in practice_trials:
         cronometro = core.Clock()
         green_screen_start_time = cronometro.getTime()
         
-        outlet.push_sample(['luminance_start'])
+        if not ExperimentParameters.test:
+            outlet.push_sample(['luminance_start'])
         
         # Bucle hasta que el tiempo transcurrido sea mayor que la duración del video
         while cronometro.getTime() - green_screen_start_time <= last_time_reported:
@@ -1144,7 +1163,8 @@ for trial in practice_trials:
 
             win.flip()
 
-        outlet.push_sample(['luminance_end'])
+        if not ExperimentParameters.test:
+            outlet.push_sample(['luminance_end'])
         
         # Continuar con el código para restablecer el color de fondo y guardar las anotaciones
         win.setColor("black")
@@ -1172,7 +1192,8 @@ for trial in practice_trials:
         channels=1
         max_dur = 120
         
-        outlet.push_sample(['audio_response_start'])
+        if not ExperimentParameters.test:
+            outlet.push_sample(['audio_response_start'])
         recording = sd.rec(int(samplerate * max_dur), samplerate=samplerate, channels=channels, dtype='float64', blocking=False)
         
         # Flush the buffers
@@ -1193,7 +1214,9 @@ for trial in practice_trials:
 
         # Wait until 'space' is pressed
         response = event.waitKeys(maxWait = max_dur, keyList=['space'], timeStamped=time_resp_clock)
-        outlet.push_sample(['audio_response_end'])
+        
+        if not ExperimentParameters.test:
+            outlet.push_sample(['audio_response_end'])
         
         if not response:
             recording_dur = max_dur
@@ -1255,7 +1278,8 @@ def ejecutar_calm_video(
     )
     continue_playing = True  # Variable de control para continuar la reproducción
     
-    outlet.push_sample(['calm_video_start'])
+    if not ExperimentParameters.test:
+        outlet.push_sample(['calm_video_start'])
     
     while mov.status != constants.FINISHED and continue_playing:
         mov.draw()
@@ -1267,8 +1291,9 @@ def ejecutar_calm_video(
         if "p" in keys:
             mov.stop()
             continue_playing = False  # Detener la reproducción de manera controlada
-
-    outlet.push_sample(['calm_video_end'])
+            
+    if not ExperimentParameters.test:
+        outlet.push_sample(['calm_video_end'])
     
     # if 'escape' in keys:  # Si la salida fue por 'escape', limpiar y cerrar.
     #    win.close()
@@ -1431,8 +1456,9 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number_aux
             if "p" in keys:
                 mov.stop()
                 break  # Salir del bucle
-        
-        outlet.push_sample(['video_end'])
+        if not ExperimentParameters.test:
+            outlet.push_sample(['video_end'])
+            
         # Convertir el array de NumPy a una lista de listas
         mouse_annotation_list = mouse_annotation.tolist()
         exp.addData("continuous_annotation", mouse_annotation_list)
@@ -1507,7 +1533,8 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number_aux
                 cronometro = core.Clock()
                 green_screen_start_time = cronometro.getTime()
                 
-                outlet.push_sample(['luminance_start'])
+                if not ExperimentParameters.test:
+                    outlet.push_sample(['luminance_start'])
                 
                 # Bucle hasta que el tiempo transcurrido sea mayor que la duración del video
                 while cronometro.getTime() - green_screen_start_time <= last_time_reported:
@@ -1580,7 +1607,8 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number_aux
 
                     win.flip()
 
-                outlet.push_sample(['luminance_end'])
+                if not ExperimentParameters.test:
+                    outlet.push_sample(['luminance_end'])
                 
                 # Continuar con el código para restablecer el color de fondo y guardar las anotaciones
                 win.setColor("black")
@@ -1607,7 +1635,8 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number_aux
             channels=1
             max_dur = 120
             
-            outlet.push_sample(['audio_response_start'])
+            if not ExperimentParameters.test:
+                outlet.push_sample(['audio_response_start'])
             recording = sd.rec(int(samplerate * max_dur), samplerate=samplerate, channels=channels, dtype='float64', blocking=False)
             
             # Flush the buffers
@@ -1629,7 +1658,9 @@ def ejecutar_trials(win, exp, archivo_bloque, sliders_dict, subbloque_number_aux
 
             # Wait until 'space' is pressed
             response = event.waitKeys(maxWait = max_dur, keyList=['space'], timeStamped=time_resp_clock)
-            outlet.push_sample(['audio_response_end'])
+            
+            if not ExperimentParameters.test:
+                outlet.push_sample(['audio_response_end'])
             
             if not response:
                 recording_dur = max_dur

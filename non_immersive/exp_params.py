@@ -22,12 +22,15 @@ class ExperimentParameters:
         # self.display_size= (1920, 1080) # in pixels
         self.window_units = 'cm'
         self.background_color = '#282828'
+        self.test=True
 
         self.fullscreen=True
         if not self.fullscreen:
             self.allowGUI = True
         else:
             self.allowGUI = False
+            
+
 
 
 
