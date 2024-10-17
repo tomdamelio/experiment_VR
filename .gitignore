@@ -5,3 +5,9 @@
 *.pdf
 *.xdf
 *.rar
+
+# Ignore all content within the analysis/figures directory
+*.png
+*.gif
+*.wav
+*.fif
