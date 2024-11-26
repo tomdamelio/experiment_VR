@@ -9,4 +9,6 @@
 *.csv
 *.wav
 *.fif
-*gif__pycache__/
+*gif
+.history/
+__pycache__/
