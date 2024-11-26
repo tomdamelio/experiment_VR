@@ -10,4 +10,5 @@
 *.wav
 *.fif
 *gif
+.history/
 __pycache__/

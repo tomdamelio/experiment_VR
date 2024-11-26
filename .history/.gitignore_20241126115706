@@ -10,4 +10,3 @@
 *.wav
 *.fif
 *gif
-__pycache__/
