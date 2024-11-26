@@ -1,11 +1,8 @@
 *.mp3
 *.mp4
 *.zip
-*.psydat
+*.psyadt
 *.pdf
 *.xdf
 *.rar
 *.png
-*.csv
-*.wav
-*.fif

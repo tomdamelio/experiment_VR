@@ -12,7 +12,7 @@ import time
 import instructions
 import numpy as np
 import sounddevice as sd
-from exp_params import ExperimentParameters
+from exp_params_without_stim import ExperimentParameters
 from psychopy import constants, core, data, event, gui, visual
 from psychopy.hardware import keyboard
 from psychopy.preferences import prefs
