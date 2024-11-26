@@ -9,3 +9,4 @@
 *.csv
 *.wav
 *.fif
+*gif__pycache__/
