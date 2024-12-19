@@ -63,7 +63,7 @@ def create_flicker_screen_video(duration_sec, output_file, fps=30, width=640, he
     white_frame = np.ones((height, width, 3), dtype=np.uint8) * 255
     
     # Calcular cuántos frames por medio ciclo
-    cycles_per_second = 2
+    cycles_per_second = 3
     frames_per_cycle = fps // cycles_per_second  # en este caso 30/5 = 6
     
     # Cada ciclo: mitad negro, mitad blanco
@@ -80,7 +80,6 @@ def create_flicker_screen_video(duration_sec, output_file, fps=30, width=640, he
             out.write(white_frame)
     
     out.release()
-
 
 
 # Create black screen video of 1 second duration
@@ -158,10 +157,10 @@ def process_videos_in_folder(folder_path):
             black_30_clip = VideoFileClip("black_screen_30_sec.mp4")
 
             final_clip = concatenate_videoclips([flicker_1_clip, original_clip, flicker_1_final_clip, black_30_clip])
-            final_clip.write_videofile(f'final_videos_2D/{filename}', codec='libx264', audio_codec='aac', fps=30)
+            final_clip.write_videofile(f'final_videos_flicker_VR/{filename}', codec='libx264', audio_codec='aac', fps=30)
 
 #%%
-folder_path = "videos_2D"
+folder_path = "videos_prueba"
 process_videos_in_folder(folder_path)
 
 #os.mkdir("final_videos")

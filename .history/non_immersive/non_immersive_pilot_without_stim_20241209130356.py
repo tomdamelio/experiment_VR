@@ -41,6 +41,8 @@ print("Current working directory:", os.getcwd())
 ##########################################################################
 # Set up LabStreamingLayer stream.
 ##########################################################################
+if ExperimentParameters.test:
+    outlet = 'test'
 
 if ExperimentParameters.use_lsl:
     info = StreamInfo(name='markers', type='Markers', channel_count=1,

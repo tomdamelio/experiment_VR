@@ -1,0 +1,13 @@
+*.mp3
+*.mp4
+*.zip
+*.psydat
+*.pdf
+*.xdf
+*.rar
+*.png
+*.csv
+*.wav
+*.fif
+*gif
+__pycache__/

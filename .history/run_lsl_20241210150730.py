@@ -2,7 +2,6 @@ import subprocess
 import threading
 import os
 import time
-from pynput import mouse
 
 def execute_command(path, command):
     print(f'Executing proceess {command}')
@@ -48,6 +47,14 @@ def execute_brainamp_connector(config_file=None):
     if config_file:
         command += f" -c {config_file}"
     execute_command("C:/Users/Cocudata/BrainAmpSeries/bin/", command)
+    
+    
+def execute_game_controller():
+    # Kill any running instances of GameController
+    os.system("taskkill /IM GameController.exe /F")
+
+    # Start GameController
+    execute_command("C:/Users/Cocudata/GameController", "GameController.exe")
 
 
 def execute_eye_tracker_stream():
@@ -61,41 +68,20 @@ def execute_eye_tracker_stream():
     
     process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True, cwd = path)
     output, error = process.communicate()
-
-def log_mouse_position():
-    mouse_data_file = "mouse_data.csv"
-
-    with open(mouse_data_file, "w") as file:
-        file.write("timestamp,x,y\n")
-
-        def on_move(x, y):
-            timestamp = time.time()
-            file.write(f"{timestamp},{x},{y}\n")
-            file.flush()  # Ensure the data is written to the file immediately
-
-        with mouse.Listener(on_move=on_move) as listener:
-            listener.join()
     
 
-if __name__ == "__main__":
+if __name__ == "__main__": 
     try:
         #GPthread = threading.Thread(target=execute_gazepoint)
-        LRthread = threading.Thread(target=execute_lab_recorder, args=("LabRecorder - Copy.cfg",))
-        # SVthread = threading.Thread(target=execute_stream_viewer)
-        #ETthread = threading.Thread(target=execute_eye_tracker_stream)
+        LRthread = threading.Thread(target=execute_lab_recorder, args=("LabRecorder - Copy.cfg"))
+        GCthread = threading.Thread(target=execute_game_controller, args=("gamecontroller_config.cfg"))
         BAthread = threading.Thread(target=execute_brainamp_connector, args=(["C:/Users/Cocudata/experiment_VR/mw_lsl_42chs.cfg"]))
-        MTthread = threading.Thread(target=log_mouse_position)
-        
-
+   
         # Start the threads
-        #GPthread.start()
         LRthread.start()
-
-        time.sleep(5)
+        GCthread = threading.Thread(target=execute_game_controller)
+        time.sleep(10)
         BAthread.start()
-        MTthread.start()  
-        #ETthread.start()
-        # SVthread.start()
 
         # No need to join the threads if you want the Python script to exit without waiting for the external processes
     except subprocess.CalledProcessError as e:

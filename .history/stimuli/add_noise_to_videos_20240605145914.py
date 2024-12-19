@@ -11,8 +11,6 @@ import numpy as np
 from scipy.io.wavfile import write
 from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
 
-#%%
-
 def generate_whistle_sound(duration_sec, sample_rate=44100, freq=500):
     # Generate time array
     t = np.linspace(0, duration_sec, int(duration_sec * sample_rate), endpoint=False)
@@ -51,40 +49,8 @@ def create_black_screen_video(duration_sec, output_file, fps=30, width=640, heig
     # Release VideoWriter
     out.release()
 
-#%%
-
-def create_flicker_screen_video(duration_sec, output_file, fps=30, width=640, height=360):
-    num_frames = int(duration_sec * fps)
-    # Crear VideoWriter
-    out = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height))
-    
-    # Frames negros y blancos
-    black_frame = np.zeros((height, width, 3), dtype=np.uint8)
-    white_frame = np.ones((height, width, 3), dtype=np.uint8) * 255
-    
-    # Calcular cuántos frames por medio ciclo
-    cycles_per_second = 2
-    frames_per_cycle = fps // cycles_per_second  # en este caso 30/5 = 6
-    
-    # Cada ciclo: mitad negro, mitad blanco
-    half_cycle_frames = frames_per_cycle // 2  # 6/2 = 3
-    
-    # Generar los frames
-    for i in range(num_frames):
-        cycle_index = i % frames_per_cycle
-        if cycle_index < half_cycle_frames:
-            # Negro
-            out.write(black_frame)
-        else:
-            # Blanco
-            out.write(white_frame)
-    
-    out.release()
-
-
-
 # Create black screen video of 1 second duration
-#create_flicker_screen_video(1, "black_flicker_1_sec.mp4")
+#create_black_screen_video(1, "black_screen_1_sec.mp4")
 
 #%%
 
@@ -103,6 +69,7 @@ def add_audio_to_video(video_file, audio_file, output_file):
 
     # Write final video with audio
     video_with_audio.write_videofile(output_file, codec='libx264', audio_codec='aac', fps=video_clip.fps)
+
 
 
 # Add audio to the black screen video
@@ -132,38 +99,29 @@ def append_videos(video1_file, video2_file, output_file, fps=30, codec="libx264"
 #%%
 
 def process_videos_in_folder(folder_path):
+    # Iterate over files in the folder
+    
     for filename in os.listdir(folder_path):
+        # Check if the file is a video file
         if filename.endswith(".mp4") or filename.endswith(".avi") or filename.endswith(".mov"):
+            # Process the video file (you can replace print with any processing logic)
             print("Processing video:", filename)
             
             video = cv2.VideoCapture(f'{folder_path}/{filename}')
             width_vid = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
             height_vid = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
             
-            # Crear flicker 1 seg con audio
-            create_flicker_screen_video(1, "flicker_1_sec.mp4", width=width_vid, height=height_vid)
-            add_audio_to_video("flicker_1_sec.mp4", "whistle_sound.wav", "flicker_1_sec_with_audio.mp4")
-
-            # Crear flicker 1 seg final con audio
-            create_flicker_screen_video(1, "flicker_1_sec_final.mp4", width=width_vid, height=height_vid)
-            add_audio_to_video("flicker_1_sec_final.mp4", "whistle_sound.wav", "flicker_1_sec_final_with_audio.mp4")
-
-            # Crear black screen 30 seg
-            create_black_screen_video(30, "black_screen_30_sec.mp4", width=width_vid, height=height_vid)
+            print(f'Width: {width_vid}')
+            print(f'Height: {height_vid}')
             
-            # Concatenar: flicker_1_sec_with_audio + video original + flicker_1_sec_final_with_audio + black_screen_30_sec
-            flicker_1_clip = VideoFileClip("flicker_1_sec_with_audio.mp4")
-            original_clip = VideoFileClip(f'{folder_path}/{filename}')
-            flicker_1_final_clip = VideoFileClip("flicker_1_sec_final_with_audio.mp4")
-            black_30_clip = VideoFileClip("black_screen_30_sec.mp4")
-
-            final_clip = concatenate_videoclips([flicker_1_clip, original_clip, flicker_1_final_clip, black_30_clip])
-            final_clip.write_videofile(f'final_videos_2D/{filename}', codec='libx264', audio_codec='aac', fps=30)
+            create_black_screen_video(1, "black_screen_1_sec.mp4", width=width_vid, height=height_vid)
+            add_audio_to_video("black_screen_1_sec.mp4", "whistle_sound.wav", "black_screen_with_audio.mp4")
+            
+            append_videos("black_screen_with_audio.mp4", f'{folder_path}/{filename}', f'final_videos/{filename}')
 
 #%%
-folder_path = "videos_2D"
+folder_path = "videos"
 process_videos_in_folder(folder_path)
 
 #os.mkdir("final_videos")
 #%%
-

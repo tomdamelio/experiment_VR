@@ -14,6 +14,7 @@ import numpy as np
 import sounddevice as sd
 from exp_params_without_stim import ExperimentParameters
 
+
 from psychopy import constants, core, data, event, gui, visual
 from psychopy.hardware import keyboard
 from psychopy.preferences import prefs
@@ -41,6 +42,8 @@ print("Current working directory:", os.getcwd())
 ##########################################################################
 # Set up LabStreamingLayer stream.
 ##########################################################################
+if ExperimentParameters.test:
+    outlet = 'test'
 
 if ExperimentParameters.use_lsl:
     info = StreamInfo(name='markers', type='Markers', channel_count=1,
