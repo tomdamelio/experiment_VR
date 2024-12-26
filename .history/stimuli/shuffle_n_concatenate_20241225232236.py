@@ -328,7 +328,7 @@ import pandas as pd
 
 
 def resize_clip(clip, target_resolution):
-    return clip.resized(target_resolution)
+    return clip.resize(target_resolution)
 
 def process_videos(video_paths, output_resolution):
     video_clips = []
@@ -396,7 +396,7 @@ def modify_paths_for_modality(video_list, modality):
     else:
         return video_list
 
-def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=True, condition_B=True , =(1280, 720)):output_resolution
+def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=True, condition_B=True , output_resolution=(1280, 720)):
     """
     Ejemplo:
     Subjects = ['01','02']
@@ -487,7 +487,7 @@ def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=
         order_matrix.to_excel(subject_order_matrix_path, index=False)
         
         # Guardar una copia en ../results/sub-{subject}/ses-{subject_sesion}/
-        results_order_matrix_path = os.path.join(results_dir, 'order_matrix_2.xlsx')
+        results_order_matrix_path = os.path.join(results_dir, 'order_matrix.xlsx')
         os.makedirs(os.path.dirname(results_order_matrix_path), exist_ok=True)
         order_matrix.to_excel(results_order_matrix_path, index=False)
 

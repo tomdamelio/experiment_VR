@@ -9,7 +9,7 @@ import os
 import cv2
 import numpy as np
 from scipy.io.wavfile import write
-from moviepy import *
+from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
 
 #%%
 
@@ -26,15 +26,15 @@ def generate_whistle_sound(duration_sec, sample_rate=44100, freq=500):
     return sample_rate, whistle_signal
 
 # Parameters for the whistle sound
-#duration_sec = 1
-#sample_rate, whistle_signal = generate_whistle_sound(duration_sec)
+duration_sec = 1
+sample_rate, whistle_signal = generate_whistle_sound(duration_sec)
 
 # Save whistle sound to file
-#write("whistle_sound.wav", sample_rate, whistle_signal)
+write("whistle_sound.wav", sample_rate, whistle_signal)
 
 #%%
 
-def create_black_screen_video(duration_sec, output_file, fps=60, width=640, height=360):
+def create_black_screen_video(duration_sec, output_file, fps=30, width=640, height=360):
     # Calculate number of frames
     num_frames = int(duration_sec * fps)
 
@@ -53,7 +53,7 @@ def create_black_screen_video(duration_sec, output_file, fps=60, width=640, heig
 
 #%%
 
-def create_flicker_screen_video(duration_sec, output_file, fps=60, width=640, height=360):
+def create_flicker_screen_video(duration_sec, output_file, fps=30, width=640, height=360):
     num_frames = int(duration_sec * fps)
     # Crear VideoWriter
     out = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height))
@@ -82,6 +82,7 @@ def create_flicker_screen_video(duration_sec, output_file, fps=60, width=640, he
     out.release()
 
 
+
 # Create black screen video of 1 second duration
 #create_flicker_screen_video(1, "black_flicker_1_sec.mp4")
 
@@ -95,10 +96,10 @@ def add_audio_to_video(video_file, audio_file, output_file):
     audio_clip = AudioFileClip(audio_file)
 
     # Set audio duration to match video duration
-    audio_clip = audio_clip.with_duration(video_clip.duration)
+    audio_clip = audio_clip.set_duration(video_clip.duration)
 
     # Add audio to video
-    video_with_audio = video_clip.with_audio(audio_clip)
+    video_with_audio = video_clip.set_audio(audio_clip)
 
     # Write final video with audio
     video_with_audio.write_videofile(output_file, codec='libx264', audio_codec='aac', fps=video_clip.fps)
@@ -110,13 +111,13 @@ def add_audio_to_video(video_file, audio_file, output_file):
 
 #%%
 
-def append_videos(video1_file, video2_file, output_file, fps=60, codec="libx264", audio_codec='aac'):
+def append_videos(video1_file, video2_file, output_file, fps=30, codec="libx264", audio_codec='aac'):
     # Load video clips
     video1_clip = VideoFileClip(video1_file)
     video2_clip = VideoFileClip(video2_file)
 
     # Set the frame rate for the output video
-    video2_clip = video2_clip.with_fps(fps)
+    video2_clip = video2_clip.set_fps(fps)
 
     # Concatenate video clips
     final_clip = concatenate_videoclips([video1_clip, video2_clip, video1_clip])
@@ -166,11 +167,7 @@ def process_videos_in_folder(modality="2D"):
 #%%
 process_videos_in_folder(modality='2D')
 
+#os.mkdir("final_videos")
 #%%
 process_videos_in_folder(modality='VR')
 #%%
-process_videos_in_folder(modality='luminance')
-
-# %%
-process_videos_in_folder(modality='fixation')
-# %%

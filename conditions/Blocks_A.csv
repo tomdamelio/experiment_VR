@@ -1,5 +1,5 @@
-﻿condsFile,dimension,hand
-../conditions/A/A_block_1_arousal_right.csv,arousal,right
-../conditions/A/A_block_2_arousal_right.csv,arousal,right
-../conditions/A/A_block_3_valence_right.csv,valence,right
-../conditions/A/A_block_4_valence_right.csv,valence,right
+﻿condsFile,dimension,luminance
+../conditions/A/A_block_1_arousal_right.csv,arousal,../stimuli/exp_videos/2D/green_intensity_video_3.mp4
+../conditions/A/A_block_2_arousal_right.csv,arousal,../stimuli/exp_videos/2D/green_intensity_video_7.mp4
+../conditions/A/A_block_3_valence_right.csv,valence,../stimuli/exp_videos/2D/green_intensity_video_9.mp4
+../conditions/A/A_block_4_valence_right.csv,valence,../stimuli/exp_videos/2D/green_intensity_video_12.mp4

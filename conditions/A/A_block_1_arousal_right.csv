@@ -1,5 +1,5 @@
-﻿id,movie_path,dimension,hand,stimulus_type,order_emojis_slider,block,luminance
-7,../stimuli/exp_videos/2D/7.mp4,arousal,right,positive,direct,1,no
-4,../stimuli/exp_videos/2D/4.mp4,arousal,right,positive,inverse,1,no
-9,../stimuli/exp_videos/2D/9.mp4,arousal,right,negative,direct,1,yes
-8,../stimuli/exp_videos/2D/8.mp4,arousal,right,negative,inverse,1,no
+﻿id,movie_path,dimension,stimulus_type,order_emojis_slider,block,luminance
+7,../stimuli/exp_videos/2D/7.mp4,arousal,positive,direct,1,../stimuli/exp_videos/2D/green_intensity_video_3.mp4
+4,../stimuli/exp_videos/2D/4.mp4,arousal,positive,direct,1,../stimuli/exp_videos/2D/green_intensity_video_3.mp4
+9,../stimuli/exp_videos/2D/9.mp4,arousal,negative,direct,1,../stimuli/exp_videos/2D/green_intensity_video_3.mp4
+8,../stimuli/exp_videos/2D/8.mp4,arousal,negative,direct,1,../stimuli/exp_videos/2D/green_intensity_video_3.mp4

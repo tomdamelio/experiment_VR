@@ -239,10 +239,10 @@ def generate_practice_videos(modality="2D"):
     fixation_path           = "./fixation_cross_final.mp4"
     
     # Cargar y redimensionar los videos
-    video_1             = VideoFileClip(video_path_1).resized((1280, 720))
-    video_2             = VideoFileClip(video_path_2).resized((1280, 720))
-    luminance_practice  = VideoFileClip(luminance_path_practice).resized((1280, 720))
-    fixation_clip       = VideoFileClip(fixation_path).resized((1280, 720))
+    video_1             = VideoFileClip(video_path_1)
+    video_2             = VideoFileClip(video_path_2)
+    luminance_practice  = VideoFileClip(luminance_path_practice)
+    fixation_clip       = VideoFileClip(fixation_path)
 
     # ---------------------------
     # RUTAS A LOS AUDIOS
@@ -328,7 +328,7 @@ import pandas as pd
 
 
 def resize_clip(clip, target_resolution):
-    return clip.resized(target_resolution)
+    return clip.resize(target_resolution)
 
 def process_videos(video_paths, output_resolution):
     video_clips = []
@@ -396,7 +396,7 @@ def modify_paths_for_modality(video_list, modality):
     else:
         return video_list
 
-def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=True, condition_B=True , =(1280, 720)):output_resolution
+def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=True, condition_B=True , output_resolution=(1280, 720)):
     """
     Ejemplo:
     Subjects = ['01','02']

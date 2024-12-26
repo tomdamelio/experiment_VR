@@ -26,11 +26,11 @@ def generate_whistle_sound(duration_sec, sample_rate=44100, freq=500):
     return sample_rate, whistle_signal
 
 # Parameters for the whistle sound
-#duration_sec = 1
-#sample_rate, whistle_signal = generate_whistle_sound(duration_sec)
+duration_sec = 1
+sample_rate, whistle_signal = generate_whistle_sound(duration_sec)
 
 # Save whistle sound to file
-#write("whistle_sound.wav", sample_rate, whistle_signal)
+write("whistle_sound.wav", sample_rate, whistle_signal)
 
 #%%
 
@@ -169,8 +169,3 @@ process_videos_in_folder(modality='2D')
 #%%
 process_videos_in_folder(modality='VR')
 #%%
-process_videos_in_folder(modality='luminance')
-
-# %%
-process_videos_in_folder(modality='fixation')
-# %%
