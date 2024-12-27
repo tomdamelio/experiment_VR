@@ -1,4 +1,4 @@
-﻿id,movie_path,dimension,stimulus_type,order_emojis_slider,block,luminance
-6,../stimuli/exp_videos/2D/6.mp4,valence,positive,direct,3,../stimuli/exp_videos/2D/green_intensity_video_9.mp4
-14,../stimuli/exp_videos/2D/14.mp4,valence,negative,direct,3,../stimuli/exp_videos/2D/green_intensity_video_9.mp4
-13,../stimuli/exp_videos/2D/13.mp4,valence,negative,direct,3,../stimuli/exp_videos/2D/green_intensity_video_9.mp4
+﻿id,movie_path,dimension,stimulus_type,order_emojis_slider,block,luminance,audio_report
+6,../stimuli/exp_videos/2D/6.mp4,valence,positive,direct,3,../stimuli/exp_videos/2D/green_intensity_video_9.mp4,yes
+14,../stimuli/exp_videos/2D/14.mp4,valence,negative,direct,3,../stimuli/exp_videos/2D/green_intensity_video_9.mp4,yes
+13,../stimuli/exp_videos/2D/13.mp4,valence,negative,direct,3,../stimuli/exp_videos/2D/green_intensity_video_9.mp4,yes

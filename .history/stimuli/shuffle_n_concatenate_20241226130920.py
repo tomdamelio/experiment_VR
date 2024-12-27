@@ -467,33 +467,22 @@ def get_video_files_from_csvs(csv_directory):
             "video_id": None  # o "instruction_block_{block_number}"
         })
 
-
         # ---- Agregamos los videos del bloque ----
-
         for _, row in df.iterrows():
-            movie_path = row['movie_path']
-            print(movie_path)
+            movie_paths = row['movie_path']
+            if audio_report_condition == 'yes':
+                intercalated_paths = [item for path in movie_paths for item in (path, './instructions_videos/post_stimulus_verbal_report.mp4')]
+            else:
+                intercalated_paths = [item for path in movie_paths for item in (path, './instructions_videos/post_stimulus_self_report.mp4')]
+            
+            # Opcional: Eliminar el último archivo de audio si es necesario
+            # intercalated_paths = intercalated_paths[:-1] if intercalated_paths else intercalated_paths
+            
             sequence_rows.append({
-                "path": movie_path,
+                "path": intercalated_paths,
                 "block_num": block_number,
                 "video_id": video_id
-            
             })
-            
-            if audio_report_condition == 'yes':
-                report_path = './instructions_videos/post_stimulus_verbal_report.mp4'
-            else:
-                report_path = './instructions_videos/post_stimulus_self_report.mp4'
-            
-            print(report_path)
-            
-            sequence_rows.append({
-                "path": report_path,
-                "block_num": block_number,
-                "video_id": None
-            
-            })
-                    
 
     if luminance_path != 'no':
         # ---- Tras recorrer todos los bloques, añadimos la instrucción para luminancia ----        
@@ -519,13 +508,19 @@ def get_video_files_from_csvs(csv_directory):
             "video_id": "luminance"
         })
 
-    # Convertimos todo a paths absolutos (opcional)
     for row in sequence_rows:
-    #    row["path"] = os.path.abspath(os.path.join(base_dir, row["path"]))
-        print(row["path"])
+        if isinstance(row["path"], list):
+            # Convertir cada elemento a path absoluto
+            abs_list = [
+                os.path.abspath(os.path.join(base_dir, single_path))
+                for single_path in row["path"]
+            ]
+            row["path"] = abs_list
+        else:
+            row["path"] = os.path.abspath(os.path.join(base_dir, row["path"]))
+
     # Construimos el DataFrame final en el orden de la secuencia
     df_final = pd.DataFrame(sequence_rows)
-    #print(df_final)
 
     return df_final
 
@@ -557,12 +552,10 @@ def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=
     if condition_A:
         video_files_df_A = get_video_files_from_csvs(cond_A_dir)
         video_files_A = video_files_df_A['path'].tolist()
-        #print(video_files_A)
         
     if condition_B:
         video_files_df_B = get_video_files_from_csvs(cond_B_dir)
         video_files_B = video_files_df_B['path'].tolist()
-        #print(video_files_A)
     
     # Iterar sobre cada sujeto
     for i, subject in enumerate(Subjects):
@@ -597,7 +590,7 @@ def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=
                 final_list_A = [initial_relaxation] + [calm_901_path] + video_files_A_mod + [rest_suprablock]
                 
                 output_file_A = f"{subject_dir}/{subject}_A_{actual_modality}_output_video.mp4"
-                #concatenate_videos(final_list_A, output_resolution, output_file_A)
+                concatenate_videos(final_list_A, output_resolution, output_file_A)
                 
                 df_A = pd.DataFrame({'path': final_list_A})
                 df_A['Participant'] = subject
@@ -618,7 +611,7 @@ def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=
                 final_list_B = video_files_B_mod + [final_relaxation] + [calm_902_path] + [experiment_end_task]
                 
                 output_file_B = f"{subject_dir}/{subject}_B_{actual_modality}_output_video.mp4"
-                #concatenate_videos(final_list_B, output_resolution, output_file_B)
+                concatenate_videos(final_list_B, output_resolution, output_file_B)
                 
                 df_B = pd.DataFrame({'path': final_list_B})
                 df_B['Participant'] = subject
@@ -631,21 +624,21 @@ def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=
                 order_matrix = pd.concat([order_matrix, df_B], ignore_index=True)
         
         # Guardar el order_matrix por sujeto en su carpeta de output_videos
-        subject_order_matrix_path = f'{subject_dir}/order_matrix.xlsx'
+        subject_order_matrix_path = f'{subject_dir}/order_matrix_3.xlsx'
         order_matrix.to_excel(subject_order_matrix_path, index=False)
         
         # Guardar una copia en ../results/sub-{subject}/ses-{subject_sesion}/
-        results_order_matrix_path = os.path.join(results_dir, 'order_matrix.xlsx')
+        results_order_matrix_path = os.path.join(results_dir, 'order_matrix_3.xlsx')
         os.makedirs(os.path.dirname(results_order_matrix_path), exist_ok=True)
         order_matrix.to_excel(results_order_matrix_path, index=False)
 
 
 #%%
 # Ejemplo de llamado:
-generate_videos(Subjects= ['08'],  
+generate_videos(Subjects= ['06'],  
                  Modality=['VR'], 
                  sesion=['A'],
-                 condition_A=True, condition_B=False,)
+                 condition_A=True, condition_B=True,)
 
 #%%
 

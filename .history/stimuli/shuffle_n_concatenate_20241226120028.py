@@ -456,8 +456,6 @@ def get_video_files_from_csvs(csv_directory):
         # Se irá actualizando en cada iteración, de modo que al final
         # contenga la del último bloque leído.
         luminance_path = df['luminance'].iloc[0]
-        luminance_order_emojis = df['order_emojis_slider'].iloc[0]
-        audio_report_condition = df['audio_report'].iloc[0]
 
         # ---- Audio de INICIO de bloque ----
         block_start_audio = f"./instructions_videos/block_{block_number}_audio.mp4"
@@ -467,45 +465,18 @@ def get_video_files_from_csvs(csv_directory):
             "video_id": None  # o "instruction_block_{block_number}"
         })
 
-
         # ---- Agregamos los videos del bloque ----
-
         for _, row in df.iterrows():
             movie_path = row['movie_path']
-            print(movie_path)
             sequence_rows.append({
                 "path": movie_path,
                 "block_num": block_number,
                 "video_id": video_id
-            
             })
-            
-            if audio_report_condition == 'yes':
-                report_path = './instructions_videos/post_stimulus_verbal_report.mp4'
-            else:
-                report_path = './instructions_videos/post_stimulus_self_report.mp4'
-            
-            print(report_path)
-            
-            sequence_rows.append({
-                "path": report_path,
-                "block_num": block_number,
-                "video_id": None
-            
-            })
-                    
 
     if luminance_path != 'no':
-        # ---- Tras recorrer todos los bloques, añadimos la instrucción para luminancia ----        
-        if luminance_order_emojis == 'direct':
-            luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
-        elif luminance_order_emojis == 'inverse':
-            luminance_instructions = "./instructions_videos/luminance_instructions_inverse.mp4"
-        else:
-            # Valor por defecto si hay un valor inesperado
-            luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
-            print(f"Valor inesperado para 'luminance_order_emojis': '{luminance_order_emojis}'. Usando 'direct' por defecto.")
-
+        # ---- Tras recorrer todos los bloques, añadimos la instrucción para luminancia ----
+        luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
         sequence_rows.append({
             "path": luminance_instructions,
             "block_num": None,
@@ -521,11 +492,10 @@ def get_video_files_from_csvs(csv_directory):
 
     # Convertimos todo a paths absolutos (opcional)
     for row in sequence_rows:
-    #    row["path"] = os.path.abspath(os.path.join(base_dir, row["path"]))
-        print(row["path"])
+        row["path"] = os.path.abspath(os.path.join(base_dir, row["path"]))
+
     # Construimos el DataFrame final en el orden de la secuencia
     df_final = pd.DataFrame(sequence_rows)
-    #print(df_final)
 
     return df_final
 
@@ -557,12 +527,10 @@ def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=
     if condition_A:
         video_files_df_A = get_video_files_from_csvs(cond_A_dir)
         video_files_A = video_files_df_A['path'].tolist()
-        #print(video_files_A)
         
     if condition_B:
         video_files_df_B = get_video_files_from_csvs(cond_B_dir)
         video_files_B = video_files_df_B['path'].tolist()
-        #print(video_files_A)
     
     # Iterar sobre cada sujeto
     for i, subject in enumerate(Subjects):
@@ -593,11 +561,10 @@ def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=
                 video_files_A_mod = modify_paths_for_modality(video_files_A, actual_modality)
                 initial_relaxation = "./instructions_videos/initial_relaxation_video_audio.mp4"
                 calm_901_path = f"./calm_videos/{actual_modality}/901.mp4"
-                rest_suprablock = "./instructions_videos/rest_suprablock_text.mp4"
-                final_list_A = [initial_relaxation] + [calm_901_path] + video_files_A_mod + [rest_suprablock]
+                final_list_A = [initial_relaxation] + [calm_901_path] + video_files_A_mod
                 
                 output_file_A = f"{subject_dir}/{subject}_A_{actual_modality}_output_video.mp4"
-                #concatenate_videos(final_list_A, output_resolution, output_file_A)
+                concatenate_videos(final_list_A, output_resolution, output_file_A)
                 
                 df_A = pd.DataFrame({'path': final_list_A})
                 df_A['Participant'] = subject
@@ -618,7 +585,7 @@ def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=
                 final_list_B = video_files_B_mod + [final_relaxation] + [calm_902_path] + [experiment_end_task]
                 
                 output_file_B = f"{subject_dir}/{subject}_B_{actual_modality}_output_video.mp4"
-                #concatenate_videos(final_list_B, output_resolution, output_file_B)
+                concatenate_videos(final_list_B, output_resolution, output_file_B)
                 
                 df_B = pd.DataFrame({'path': final_list_B})
                 df_B['Participant'] = subject
@@ -631,21 +598,21 @@ def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=
                 order_matrix = pd.concat([order_matrix, df_B], ignore_index=True)
         
         # Guardar el order_matrix por sujeto en su carpeta de output_videos
-        subject_order_matrix_path = f'{subject_dir}/order_matrix.xlsx'
+        subject_order_matrix_path = f'{subject_dir}/order_matrix_3.xlsx'
         order_matrix.to_excel(subject_order_matrix_path, index=False)
         
         # Guardar una copia en ../results/sub-{subject}/ses-{subject_sesion}/
-        results_order_matrix_path = os.path.join(results_dir, 'order_matrix.xlsx')
+        results_order_matrix_path = os.path.join(results_dir, 'order_matrix_3.xlsx')
         os.makedirs(os.path.dirname(results_order_matrix_path), exist_ok=True)
         order_matrix.to_excel(results_order_matrix_path, index=False)
 
 
 #%%
 # Ejemplo de llamado:
-generate_videos(Subjects= ['08'],  
+generate_videos(Subjects= ['05'],  
                  Modality=['VR'], 
                  sesion=['A'],
-                 condition_A=True, condition_B=False,)
+                 condition_A=True, condition_B=True,)
 
 #%%
 

@@ -597,7 +597,7 @@ def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=
                 final_list_A = [initial_relaxation] + [calm_901_path] + video_files_A_mod + [rest_suprablock]
                 
                 output_file_A = f"{subject_dir}/{subject}_A_{actual_modality}_output_video.mp4"
-                #concatenate_videos(final_list_A, output_resolution, output_file_A)
+                concatenate_videos(final_list_A, output_resolution, output_file_A)
                 
                 df_A = pd.DataFrame({'path': final_list_A})
                 df_A['Participant'] = subject
@@ -618,7 +618,7 @@ def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=
                 final_list_B = video_files_B_mod + [final_relaxation] + [calm_902_path] + [experiment_end_task]
                 
                 output_file_B = f"{subject_dir}/{subject}_B_{actual_modality}_output_video.mp4"
-                #concatenate_videos(final_list_B, output_resolution, output_file_B)
+                concatenate_videos(final_list_B, output_resolution, output_file_B)
                 
                 df_B = pd.DataFrame({'path': final_list_B})
                 df_B['Participant'] = subject
@@ -631,18 +631,18 @@ def generate_videos(Subjects=['06'], Modality=['VR'], sesion=['A'], condition_A=
                 order_matrix = pd.concat([order_matrix, df_B], ignore_index=True)
         
         # Guardar el order_matrix por sujeto en su carpeta de output_videos
-        subject_order_matrix_path = f'{subject_dir}/order_matrix.xlsx'
+        subject_order_matrix_path = f'{subject_dir}/order_matrix_3.xlsx'
         order_matrix.to_excel(subject_order_matrix_path, index=False)
         
         # Guardar una copia en ../results/sub-{subject}/ses-{subject_sesion}/
-        results_order_matrix_path = os.path.join(results_dir, 'order_matrix.xlsx')
+        results_order_matrix_path = os.path.join(results_dir, 'order_matrix_3.xlsx')
         os.makedirs(os.path.dirname(results_order_matrix_path), exist_ok=True)
         order_matrix.to_excel(results_order_matrix_path, index=False)
 
 
 #%%
 # Ejemplo de llamado:
-generate_videos(Subjects= ['08'],  
+generate_videos(Subjects= ['07'],  
                  Modality=['VR'], 
                  sesion=['A'],
                  condition_A=True, condition_B=False,)
