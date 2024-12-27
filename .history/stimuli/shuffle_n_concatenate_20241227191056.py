@@ -457,7 +457,7 @@ def get_video_files_from_csvs(csv_directory):
         sequence_rows.append({
             "path": block_start_audio,
             "block_num": block_number,
-            "video_code": "audio_instruction"
+            "video_id": None
         })
 
         # 2) Los videos mezclados del bloque y su respectivo post_stimulus
@@ -467,13 +467,13 @@ def get_video_files_from_csvs(csv_directory):
             # Ej:  video_id = f"{video_id_base}_row{idx}"
             #      o simplemente 'video_id_base'
             # Depende de cómo quieras identificar cada video
-            video_code = f'{video_id_base}'  
+            video_id = video_id_base  
 
             # (a) Agrego el video
             sequence_rows.append({
                 "path": movie_path,
                 "block_num": block_number,
-                "video_code": video_code
+                "video_id": video_id
             })
 
             # (b) Determino el path de reporte post-stim
@@ -485,31 +485,31 @@ def get_video_files_from_csvs(csv_directory):
             sequence_rows.append({
                 "path": report_path,
                 "block_num": block_number,
-                "video_code": None
+                "video_id": None
             })
 
-        # Después de recorrer todos los CSV
-        if last_luminance_path != 'no':
-            # Añadimos la instrucción para luminancia
-            if last_luminance_order_emojis == 'direct':
-                luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
-            elif last_luminance_order_emojis == 'inverse':
-                luminance_instructions = "./instructions_videos/luminance_instructions_inverse.mp4"
-            else:
-                luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
+    # Después de recorrer todos los CSV
+    if last_luminance_path != 'no':
+        # Añadimos la instrucción para luminancia
+        if last_luminance_order_emojis == 'direct':
+            luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
+        elif last_luminance_order_emojis == 'inverse':
+            luminance_instructions = "./instructions_videos/luminance_instructions_inverse.mp4"
+        else:
+            luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
 
-            sequence_rows.append({
-                "path": luminance_instructions,
-                "block_num": None,
-                "video_code": "luminance_instructions"
-            })
+        sequence_rows.append({
+            "path": luminance_instructions,
+            "block_num": None,
+            "video_id": "luminance_instructions"
+        })
 
-            # Añadimos el path de luminancia
-            sequence_rows.append({
-                "path": last_luminance_path,
-                "block_num": None,
-                "video_code": "luminance"
-            })
+        # Añadimos el path de luminancia
+        sequence_rows.append({
+            "path": last_luminance_path,
+            "block_num": None,
+            "video_id": "luminance"
+        })
 
     # Convertimos todo a DataFrame
     df_final = pd.DataFrame(sequence_rows)
@@ -593,7 +593,7 @@ def generate_videos(
                 final_list_A.append({
                     "path": calm_901_path,
                     "block_num": None,
-                    "video_code": "calm_901"
+                    "video_id": "calm_901"
                 })
 
                 # Extendemos con las filas devueltas por get_video_files_from_csvs()
@@ -603,16 +603,16 @@ def generate_videos(
                 final_list_A.append({
                     "path": rest_suprablock,
                     "block_num": None,
-                    "video_code": "rest_suprablock"
+                    "video_id": "rest_suprablock"
                 })
 
                 # C) Guardamos en un DataFrame la secuencia (orden de presentación)
                 df_A = pd.DataFrame(final_list_A)
-                df_A['participant'] = subject
-                df_A['suprablock'] = 'A'
-                df_A['order_presentation'] = range(1, len(df_A) + 1)
-                df_A['modality'] = actual_modality
-                df_A['session'] = subject_sesion
+                df_A['Participant'] = subject
+                df_A['Block'] = 'A'
+                df_A['Orden_de_presentacion'] = range(1, len(df_A) + 1)
+                df_A['Modality'] = actual_modality
+                df_A['Session'] = subject_sesion
 
                 # D) Concatenar videos en un solo .mp4
                 output_file_A = f"{subject_dir}/{subject}_A_{actual_modality}_output_video.mp4"
@@ -642,25 +642,25 @@ def generate_videos(
                 final_list_B.append({
                     "path": final_relaxation,
                     "block_num": None,
-                    "video_code": "final_relaxation"
+                    "video_id": "final_relaxation"
                 })
                 final_list_B.append({
                     "path": calm_902_path,
                     "block_num": None,
-                    "video_code": "calm_902"
+                    "video_id": "calm_902"
                 })
                 final_list_B.append({
                     "path": experiment_end_task,
                     "block_num": None,
-                    "video_code": "experiment_end_task"
+                    "video_id": "experiment_end_task"
                 })
 
                 df_B = pd.DataFrame(final_list_B)
-                df_B['participant'] = subject
-                df_B['suprablock'] = 'B'
-                df_B['order_presentation'] = range(1, len(df_B) + 1)
-                df_B['modality'] = actual_modality
-                df_B['session'] = subject_sesion
+                df_B['Participant'] = subject
+                df_B['Block'] = 'B'
+                df_B['Orden_de_presentacion'] = range(1, len(df_B) + 1)
+                df_B['Modality'] = actual_modality
+                df_B['Session'] = subject_sesion
 
                 # Concatenar
                 output_file_B = f"{subject_dir}/{subject}_B_{actual_modality}_output_video.mp4"
@@ -680,9 +680,9 @@ def generate_videos(
 
 #%%
 # Ejemplo de llamado:
-generate_videos(Subjects= ['16', '17'],
+generate_videos(Subjects= ['10', '11'],
                  Modality=['VR','2D'], 
-                 sesion=['B','A'],
+                 sesion=['A','B'],
                  condition_A=True, condition_B=True,)
 
 #%%

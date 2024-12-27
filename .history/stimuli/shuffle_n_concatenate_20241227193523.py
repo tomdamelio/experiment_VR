@@ -680,7 +680,7 @@ def generate_videos(
 
 #%%
 # Ejemplo de llamado:
-generate_videos(Subjects= ['16', '17'],
+generate_videos(Subjects= ['14', '15'],
                  Modality=['VR','2D'], 
                  sesion=['B','A'],
                  condition_A=True, condition_B=True,)
