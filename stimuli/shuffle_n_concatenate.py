@@ -1,9 +1,16 @@
-
 #%%
 import cv2
 import numpy as np
 import pandas as pd
 import ast
+import os
+import random
+from moviepy import *
+#%%
+
+# Crear directorios necesarios
+os.makedirs('./videos_fixation', exist_ok=True)
+os.makedirs('./videos_luminance', exist_ok=True)
 
 def generate_green_intensity_video(subject, id_value, max_duration, output_filename=None):
     """
@@ -60,13 +67,13 @@ def generate_green_intensity_video(subject, id_value, max_duration, output_filen
         actual_duration = min(df_annotations["time"].max(), max_duration)
         
         # Configuración del video
-        width, height = 1280, 720  # Resolución del video
+        width, height = 3840, 2048  # Resolución del video
         fps = 60  # Frames por segundo
         frames = int(fps * actual_duration)  # Total de frames
         
         # Configurar el nombre del archivo de salida
         if output_filename is None:
-            output_filename = f'green_intensity_video_{id_value}.mp4'
+            output_filename = f'./videos_luminance/green_intensity_video_{id_value}.mp4'
         
         # Crear el escritor de video
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -126,8 +133,8 @@ id_values = [1, 3, 7, 9, 12]  # IDs para los cuales se generarán los videos
 max_duration = 60.0  # Duración máxima del video en segundos
 
 # Generar videos para cada id_value en la lista
-#for id_val in id_values:
-#    generate_green_intensity_video(subject, id_val, max_duration)
+for id_val in id_values:
+    generate_green_intensity_video(subject, id_val, max_duration)
 
 
 #%%
@@ -147,7 +154,7 @@ def generate_fixation_cross():
 
     # Creamos el clip de pantalla negra con la duración deseada
     black_screen_clip = (
-        ColorClip(size=(1280, 720), color=(0, 0, 0))
+        ColorClip(size=(3840, 2048), color=(0, 0, 0))
         .with_duration(duration_seconds)
     )
 
@@ -161,7 +168,7 @@ def generate_fixation_cross():
             font_size=50,
             font="C:/Windows/Fonts/arial.ttf",
             method='caption',
-            size=(1280, 720)  # ensures the textclip has a 1280x720 canvas
+            size=(3840, 2048)  # ensures the textclip has a 1280x720 canvas
         )
         .with_duration(duration_seconds)
         .with_position(('center', 'center'))
@@ -170,22 +177,16 @@ def generate_fixation_cross():
     # Generamos la composición del clip (pantalla + texto)
     compo = CompositeVideoClip(
         [black_screen_clip, cross_text],
-        size=(1280, 720)  # force the final size
+        size=(3840, 2048)  # force the final size
     )
 
-    #compo.write_videofile('fixation_cross.mp4', codec='libx264', audio_codec='aac', fps=60)
+    compo.write_videofile('./videos_fixation/fixation_cross.mp4', codec='libx264', audio_codec='aac', fps=60)
     
     return compo
 
-#generate_fixation_cross()
+generate_fixation_cross()
 
 #%%
-
-import os
-import pandas as pd
-import numpy as np
-import random
-from moviepy import *
 
 def generate_countdown():
     """
@@ -198,7 +199,7 @@ def generate_countdown():
     """
 
     duration_seconds = 30
-    width, height = 1280, 720
+    width, height = 3840, 2048
     
     # Dimensiones y ubicación de la barra
     bar_max_width = int(width * 0.05)  # 10% del ancho total
@@ -242,7 +243,7 @@ def generate_countdown():
     ).with_fps(60)
     
     countdown_clip.write_videofile(
-        "countdown_bar.mp4",
+        "./videos_fixation/countdown_bar.mp4",
         codec='libx264',
         fps=60
     )
@@ -252,11 +253,6 @@ generate_countdown()
 
 
 #%%
-
-import os
-import pandas as pd
-import random
-from moviepy import *
 
 def resize_clip(clip, target_resolution):
     return clip.resized(target_resolution)
@@ -422,7 +418,7 @@ def generate_videos(
     modality=['VR'],
     sesion_A=True,       # Renombrado en vez de condition_A
     sesion_B=True,       # Renombrado en vez de condition_B
-    output_resolution=(1280, 720)
+    output_resolution=(3840, 2048)
 ):
     """
     Genera los videos y crea dos order_matrix (uno por cada sesión) si sesion_A y sesion_B son True.
@@ -621,7 +617,7 @@ def generate_videos(
 #%%
 # Ejemplo de uso (solo si deseas llamarla directamente):
 generate_videos(
-    subjects=['07'],
+    subjects=['08'],
     modality=['VR'],
     sesion_A=True,
     sesion_B=True
