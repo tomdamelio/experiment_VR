@@ -1,9 +1,9 @@
+
 #%%
 import os
 import pandas as pd
 import random
 from moviepy import *
-
 
 def generate_instruction(audio_path):
     """
@@ -11,7 +11,7 @@ def generate_instruction(audio_path):
     """
     audio_clip = AudioFileClip(audio_path)
     black_screen_clip = (
-        ColorClip(size=(3840, 2048), color=(0, 0, 0))
+        ColorClip(size=(1280, 720), color=(0, 0, 0))
         .with_duration(audio_clip.duration)
         .with_audio(audio_clip)
     )
@@ -75,124 +75,7 @@ def generate_instruction_videos(input_dir, output_dir):
         except Exception as e:
             print(f"Error al procesar '{input_audio_path}': {e}")
 
-#generate_instruction_videos(input_dir='./instructions_audios', output_dir='./instructions_videos')
-
-#%%
-def generate_practice_videos(modality="2D"):
-    """
-    Genera un video de práctica concatenando los siguientes elementos:
-    1. welcome_and_baseline_audio.wav
-    2. fixation_cross (5 minutos)
-    3. valence_practice_instruction_audio.wav
-    4. Video 1
-    5. post_stimulus_self_report_practice.wav
-    6. arousal_practice_instructions_audio.wav
-    7. Video 2
-    8. post_stimulus_self_report.wav
-    9. luminance_practice_instructions_audio.wav
-    10.luminance video
-    11. end_practice.wav
-
-    Parámetros:
-    -----------
-    modality : str
-        "2D" o "VR" para especificar la carpeta de la que se toman los videos.
-    """
-
-    # ---------------------------
-    # RUTAS A LOS VIDEOS
-    # ---------------------------
-    video_path_1            = f"./practice_videos/{modality}/991.mp4"
-    video_path_2            = f"./practice_videos/{modality}/994.mp4"
-    luminance_path_practice = f"./practice_videos/{modality}/green_intensity_video_1.mp4"
-    fixation_path           = "./final_videos_fixation/fixation_cross.mp4"
-    countdown_bar_path      = "./final_videos_fixation/countdown_bar.mp4"
-
-        
-    # Cargar y redimensionar los videos
-    video_1             = VideoFileClip(video_path_1).resized((3840, 2048))
-    video_2             = VideoFileClip(video_path_2).resized((3840, 2048))
-    luminance_practice  = VideoFileClip(luminance_path_practice).resized((3840, 2048))
-    fixation_clip       = VideoFileClip(fixation_path).resized((3840, 2048))
-    countdown_bar       = VideoFileClip(countdown_bar_path).resized((3840, 2048))
-
-    # ---------------------------
-    # RUTAS A LOS AUDIOS
-    # (TODOS en ./instructions_audios)
-    # ---------------------------
-    welcome_and_baseline_audio_path          = "./instructions_audios/welcome_text_2_baseline_instructions_text.wav"
-    valence_practice_instruction_audio_path  = "./instructions_audios/valence_practice_instructions_text.wav"
-    post_stimulus_self_report_practice_path  = "./instructions_audios/post_stimulus_self_report_text_1.wav"
-    post_stimulus_self_report_practice_2     = "./instructions_audios/post_stimulus_self_report_practice.wav"
-    arousal_practice_instructions_audio_path = "./instructions_audios/arousal_practice_instructions_text.wav"
-    post_stimulus_verbal_report_path         = "./instructions_audios/11_post_stimulus_verbal_report.wav"  
-    luminance_practice_instructions_path     = "./instructions_audios/luminance_practice_instructions_text.wav"
-    end_practice_audio_path                  = "./instructions_audios/12_end_practice.wav"
-
-    # ---------------------------
-    # CREAR CLIPS
-    # ---------------------------
-    # 1) Clip de bienvenida
-    welcome_and_baseline_clip = generate_instruction(welcome_and_baseline_audio_path)
-    
-    # 2) Pantalla con cruz de fijación durante 5 minutos
-    #fixation_clip = generate_fixation_cross()
-    
-    # 3) Resto de audios en pantallas negras
-    valence_practice_clip     = generate_instruction(valence_practice_instruction_audio_path)
-    post_stimulus_clip        = generate_instruction(post_stimulus_self_report_practice_path)
-    post_stimulus_2_clip      = generate_instruction(post_stimulus_self_report_practice_2)
-    arousal_instructions_clip = generate_instruction(arousal_practice_instructions_audio_path)
-    post_stimulus_self_report = generate_instruction(post_stimulus_verbal_report_path)
-    luminance_practice_clip   = generate_instruction(luminance_practice_instructions_path)
-    end_practice_clip         = generate_instruction(end_practice_audio_path)
-
-    # ---------------------------
-    # DEFINIR EL ORDEN DE CONCATENACIÓN
-    # ---------------------------
-    clips_in_order = [
-        welcome_and_baseline_clip,   # 1
-        fixation_clip,               # 2 
-        valence_practice_clip,       # 3
-        video_1,                     # 4
-        post_stimulus_clip,          # 5
-        post_stimulus_2_clip,        # 5b
-        arousal_instructions_clip,   # 6
-        video_2,                     # 7
-        post_stimulus_self_report,   # 8
-        countdown_bar,               # 9
-        luminance_practice_clip,     # 10
-        luminance_practice,          # 11 
-        end_practice_clip            # 12
-    ]
-
-    for idx, clip in enumerate(clips_in_order):
-        # clip.size --> tamaño (width, height)
-        # clip.mask  --> la máscara del clip si existe
-        print(f"Clip {idx}: size={clip.size}")
-        
-        if clip.mask:
-            print(f"    Clip {idx} MASK size = {clip.mask.size}")
-
-
-    # ---------------------------
-    # CONCATENAR TODOS LOS CLIPS
-    # ---------------------------
-    final_clip = concatenate_videoclips(clips_in_order)
-
-    # ---------------------------
-    # EXPORTAR
-    # ---------------------------
-    output_path = f"./practice_videos/{modality}/S08_practice_{modality}.mp4"
-    final_clip.write_videofile(
-        output_path,
-        codec="libx264",
-        audio_codec="aac"
-    )
-
-# Ejemplo de uso:
-#generate_practice_videos("2D")         # Modalidad "2D" por defecto
-generate_practice_videos("VR")     # Modalidad "VR"
+generate_instruction_videos(input_dir='./instructions_audios', output_dir='./instructions_videos')
 
 
 #%%
@@ -366,37 +249,4 @@ process_videos_in_folder(modality='luminance')
 
 # %%
 process_videos_in_folder(modality='fixation')
-
-# %%
-
-def check_practice_videos_size(modality="2D"):
-    """
-    Carga los videos de práctica y muestra sus dimensiones originales.
-
-    Parámetros:
-    -----------
-    modality : str
-        "2D" o "VR" para especificar la carpeta de la que se toman los videos.
-    """
-    # Rutas a los videos
-    video_path_1 = f"./practice_videos/{modality}/991.mp4"
-    video_path_2 = f"./practice_videos/{modality}/994.mp4"
-    
-    # Cargar los videos sin redimensionar
-    video_1 = VideoFileClip(video_path_1)
-    video_2 = VideoFileClip(video_path_2)
-    
-    # Imprimir dimensiones
-    print(f"\nDimensiones de los videos de práctica ({modality}):")
-    print(f"Video 991.mp4: {video_1.size}")
-    print(f"Video 994.mp4: {video_2.size}")
-    
-    # Cerrar los clips para liberar recursos
-    video_1.close()
-    video_2.close()
-
-# Ejemplo de uso:
-#check_practice_videos_size("2D")
-check_practice_videos_size("VR")
-
 # %%

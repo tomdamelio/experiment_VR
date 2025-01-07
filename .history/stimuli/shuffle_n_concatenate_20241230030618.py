@@ -534,7 +534,7 @@ def generate_videos(
                 # 7) Concatenar videos en un solo .mp4
                 output_file_A = os.path.join(subject_dir, f"{subject}_A_{actual_modality}_output_video.mp4")
                 paths_for_A = [item['path'] for item in final_list_A]
-                concatenate_videos(paths_for_A, output_resolution, output_file_A)
+                #concatenate_videos(paths_for_A, output_resolution, output_file_A)
 
                 # 8) Guardar order_matrix para la sesión A
                 order_matrix_A_path = os.path.join(subject_dir, f"order_matrix_{subject}_A_{actual_modality}.xlsx")
@@ -608,7 +608,7 @@ def generate_videos(
                 # 6) Concatenar videos
                 output_file_B = os.path.join(subject_dir, f"{subject}_B_{actual_modality}_output_video.mp4")
                 paths_for_B = [item['path'] for item in final_list_B]
-                concatenate_videos(paths_for_B, output_resolution, output_file_B)
+                #concatenate_videos(paths_for_B, output_resolution, output_file_B)
 
                 # 7) Guardar order_matrix en un archivo aparte
                 order_matrix_B_path = os.path.join(subject_dir, f"order_matrix_{subject}_B_{actual_modality}.xlsx")

@@ -250,7 +250,6 @@ def generate_countdown():
 generate_countdown()
 
 
-
 #%%
 
 import os
@@ -367,13 +366,6 @@ def get_video_files_from_csvs(csv_directory):
                     "description": "verbal_report"
                 })
                 
-                black_screen_5 = './black_screen_5_sec.mp4'
-                sequence_rows.append({
-                    "path": black_screen_5,
-                    "block_num": block_number,
-                    "description": "black_screen_5_seconds"
-                })
-                
             else:
                 report_path = './instructions_videos/post_stimulus_self_report.mp4'
                 sequence_rows.append({
@@ -390,33 +382,34 @@ def get_video_files_from_csvs(csv_directory):
                 
             ii += 1
 
-        # Tras recorrer todos los CSVs, añadimos las instrucciones de luminancia si corresponde
-        if last_luminance_path != 'no':
-            if last_luminance_order_emojis == 'direct':
-                luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
-            elif last_luminance_order_emojis == 'inverse':
-                luminance_instructions = "./instructions_videos/luminance_instructions_inverse.mp4"
-            else:
-                luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
+    # Tras recorrer todos los CSVs, añadimos las instrucciones de luminancia si corresponde
+    if last_luminance_path != 'no':
+        if last_luminance_order_emojis == 'direct':
+            luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
+        elif last_luminance_order_emojis == 'inverse':
+            luminance_instructions = "./instructions_videos/luminance_instructions_inverse.mp4"
+        else:
+            luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
 
-            sequence_rows.append({
-                "path": luminance_instructions,
-                "block_num": None,
-                "description": "luminance_instructions"
-            })
+        sequence_rows.append({
+            "path": luminance_instructions,
+            "block_num": None,
+            "description": "luminance_instructions"
+        })
 
-            sequence_rows.append({
-                "path": last_luminance_path,
-                "block_num": None,
-                "description": "luminance",
-                "dimension": "luminance",
-                "order_emojis_slider": last_luminance_order_emojis,
-            })
+        sequence_rows.append({
+            "path": last_luminance_path,
+            "block_num": None,
+            "description": "luminance",
+            "dimension": "luminance",
+            "order_emojis_slider": last_luminance_order_emojis,
+        })
 
     df_final = pd.DataFrame(sequence_rows)
     return df_final
 
 
+#%%
 def generate_videos(
     subjects=['06'],
     modality=['VR'],
@@ -475,7 +468,7 @@ def generate_videos(
                 )
 
                 # 2) Armamos la lista final (como diccionarios)
-                initial_relaxation = "./instructions_videos/initial_relaxation_video_text.mp4"
+                initial_relaxation = "./instructions_videos/initial_relaxation_video_audio.mp4"
                 calm_901_path = f"./calm_videos/{actual_modality}/901.mp4"
                 rest_suprablock = "./instructions_videos/rest_suprablock_text.mp4"
 
@@ -556,7 +549,7 @@ def generate_videos(
                 # 2) Secuencia
                 final_relaxation = "./instructions_videos/final_relaxation_video_audio.mp4"
                 calm_902_path = f"./calm_videos/{actual_modality}/902.mp4"
-                experiment_end_task = "./instructions_videos/experiment_end_text.mp4"
+                experiment_end_task = "./instructions_videos/experiment_end_task.mp4"
 
                 final_list_B = df_B_mod.to_dict('records')
                 final_list_B.append({
@@ -621,7 +614,7 @@ def generate_videos(
 #%%
 # Ejemplo de uso (solo si deseas llamarla directamente):
 generate_videos(
-    subjects=['07'],
+    subjects=['28'],
     modality=['VR'],
     sesion_A=True,
     sesion_B=True

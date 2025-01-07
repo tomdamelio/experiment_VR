@@ -1,4 +1,0 @@
-﻿id,movie_path,dimension,stimulus_type,order_emojis_slider,block,luminance,audio_report
-6,../stimuli/exp_videos/2D/6.mp4,arousal,positive,inverse,7,../stimuli/exp_videos/2D/green_intensity_video_9.mp4,no
-14,../stimuli/exp_videos/2D/14.mp4,arousal,negative,inverse,7,../stimuli/exp_videos/2D/green_intensity_video_9.mp4,no
-13,../stimuli/exp_videos/2D/13.mp4,arousal,negative,inverse,7,../stimuli/exp_videos/2D/green_intensity_video_9.mp4,no

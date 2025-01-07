@@ -250,7 +250,6 @@ def generate_countdown():
 generate_countdown()
 
 
-
 #%%
 
 import os
@@ -367,13 +366,6 @@ def get_video_files_from_csvs(csv_directory):
                     "description": "verbal_report"
                 })
                 
-                black_screen_5 = './black_screen_5_sec.mp4'
-                sequence_rows.append({
-                    "path": black_screen_5,
-                    "block_num": block_number,
-                    "description": "black_screen_5_seconds"
-                })
-                
             else:
                 report_path = './instructions_videos/post_stimulus_self_report.mp4'
                 sequence_rows.append({
@@ -417,6 +409,7 @@ def get_video_files_from_csvs(csv_directory):
     return df_final
 
 
+#%%
 def generate_videos(
     subjects=['06'],
     modality=['VR'],
@@ -534,7 +527,7 @@ def generate_videos(
                 # 7) Concatenar videos en un solo .mp4
                 output_file_A = os.path.join(subject_dir, f"{subject}_A_{actual_modality}_output_video.mp4")
                 paths_for_A = [item['path'] for item in final_list_A]
-                concatenate_videos(paths_for_A, output_resolution, output_file_A)
+                #concatenate_videos(paths_for_A, output_resolution, output_file_A)
 
                 # 8) Guardar order_matrix para la sesión A
                 order_matrix_A_path = os.path.join(subject_dir, f"order_matrix_{subject}_A_{actual_modality}.xlsx")
@@ -608,7 +601,7 @@ def generate_videos(
                 # 6) Concatenar videos
                 output_file_B = os.path.join(subject_dir, f"{subject}_B_{actual_modality}_output_video.mp4")
                 paths_for_B = [item['path'] for item in final_list_B]
-                concatenate_videos(paths_for_B, output_resolution, output_file_B)
+                #concatenate_videos(paths_for_B, output_resolution, output_file_B)
 
                 # 7) Guardar order_matrix en un archivo aparte
                 order_matrix_B_path = os.path.join(subject_dir, f"order_matrix_{subject}_B_{actual_modality}.xlsx")
@@ -621,7 +614,7 @@ def generate_videos(
 #%%
 # Ejemplo de uso (solo si deseas llamarla directamente):
 generate_videos(
-    subjects=['07'],
+    subjects=['29'],
     modality=['VR'],
     sesion_A=True,
     sesion_B=True

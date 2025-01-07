@@ -183,78 +183,6 @@ def generate_fixation_cross():
 
 import os
 import pandas as pd
-import numpy as np
-import random
-from moviepy import *
-
-def generate_countdown():
-    """
-    Crea un clip de 30 segundos (30s) que muestra una barra de progreso
-    sobre un fondo negro. La barra comienza vacía (en t=0) y se llena
-    progresivamente hasta completar todo su ancho (en t=30s).
-    
-    Además, se dibuja un contorno que muestra la posición máxima que
-    alcanzará la barra al finalizar la cuenta.
-    """
-
-    duration_seconds = 30
-    width, height = 1280, 720
-    
-    # Dimensiones y ubicación de la barra
-    bar_max_width = int(width * 0.05)  # 10% del ancho total
-    bar_height = 10
-    # Centramos verticalmente
-    bar_y1 = (height - bar_height) // 2
-    bar_y2 = bar_y1 + bar_height
-    # Dejamos 45% de espacio a la izquierda (x1), y la barra crece a la derecha
-    bar_x1 = int(width * 0.475)
-    # Coordenada final de la barra "completa"
-    bar_x1_full = bar_x1 + bar_max_width
-
-    def make_frame(t):
-        # Calcula el porcentaje de la barra que se ha "llenado"
-        fraction = t / duration_seconds  # valor entre 0 y 1
-        current_bar_width = int(bar_max_width * fraction)
-        
-        # Creamos un fondo negro
-        frame = np.zeros((height, width, 3), dtype=np.uint8)
-        
-        # ------------------ Pintar la parte llena de la barra ------------------
-        bar_x2 = bar_x1 + current_bar_width
-        # "Pintamos" la parte llena de la barra en color verde (0,255,0)
-        frame[bar_y1:bar_y2, bar_x1:bar_x2] = (0, 255, 0)  
-        
-        # ------------------ Dibujar el contorno "final" de la barra ------------------
-        # Top edge
-        frame[bar_y1:bar_y1+1, bar_x1:bar_x1_full] = (0, 255, 0)
-        # Bottom edge
-        frame[bar_y2-1:bar_y2, bar_x1:bar_x1_full] = (0, 255, 0)
-        # Left edge
-        frame[bar_y1:bar_y2, bar_x1:bar_x1+1] = (0, 255, 0)
-        # Right edge
-        frame[bar_y1:bar_y2, bar_x1_full-1:bar_x1_full] = (0, 255, 0)
-
-        return frame
-
-    countdown_clip = VideoClip(
-        make_frame,
-        duration=duration_seconds
-    ).with_fps(60)
-    
-    countdown_clip.write_videofile(
-        "countdown_bar.mp4",
-        codec='libx264',
-        fps=60
-    )
-    
-generate_countdown()
-
-
-
-#%%
-
-import os
-import pandas as pd
 import random
 from moviepy import *
 
@@ -319,35 +247,21 @@ def get_video_files_from_csvs(csv_directory):
         last_luminance_order_emojis = luminance_order_emojis
 
         # 1) Instrucción de inicio de bloque
-        block_start_audio = f"./instructions_videos/block_{block_number}_text.mp4"
+        block_start_audio = f"./instructions_videos/block_{block_number}_audio.mp4"
         sequence_rows.append({
             "path": block_start_audio,
             "block_num": block_number,
             "description": "audio_instruction"
         })
-        
-        ii = 0
+
         # 2) Videos mezclados del bloque y su post_stimulus
         for _, row in df.iterrows():
-            # Pre-stim
-            if ii > 0:
-                stim_start_audio = f"./instructions_videos/block_{block_number}_text_reminder.mp4"
-                sequence_rows.append({
-                    "path": stim_start_audio,
-                    "block_num": block_number,
-                    "description": "audio_instruction"
-                })
-                
             movie_path = row['movie_path']
-            dimension = row['dimension']
-            order_emojis_slider = row['order_emojis_slider']
             video_id = os.path.splitext(os.path.basename(movie_path))[0]
 
             sequence_rows.append({
                 "path": movie_path,
                 "block_num": block_number,
-                "dimension": dimension,
-                "order_emojis_slider": order_emojis_slider,
                 "description": "video",
                 "video_id": video_id
             })
@@ -358,22 +272,8 @@ def get_video_files_from_csvs(csv_directory):
                 sequence_rows.append({
                     "path": report_path,
                     "block_num": block_number,
-                    "description": "instruction_post_stimulus_verbal_report"
+                    "description": "post_stimulus_verbal_report"
                 })
-                count_down_30 = './videos_fixation/countdown_bar.mp4'
-                sequence_rows.append({
-                    "path": count_down_30,
-                    "block_num": block_number,
-                    "description": "verbal_report"
-                })
-                
-                black_screen_5 = './black_screen_5_sec.mp4'
-                sequence_rows.append({
-                    "path": black_screen_5,
-                    "block_num": block_number,
-                    "description": "black_screen_5_seconds"
-                })
-                
             else:
                 report_path = './instructions_videos/post_stimulus_self_report.mp4'
                 sequence_rows.append({
@@ -381,40 +281,42 @@ def get_video_files_from_csvs(csv_directory):
                     "block_num": block_number,
                     "description": "post_stimulus_self_report"
                 })
-                black_screen_5 = './black_screen_5_sec.mp4'
-                sequence_rows.append({
-                    "path": black_screen_5,
-                    "block_num": block_number,
-                    "description": "black_screen_5_seconds"
-                })
-                
-            ii += 1
 
-        # Tras recorrer todos los CSVs, añadimos las instrucciones de luminancia si corresponde
-        if last_luminance_path != 'no':
-            if last_luminance_order_emojis == 'direct':
-                luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
-            elif last_luminance_order_emojis == 'inverse':
-                luminance_instructions = "./instructions_videos/luminance_instructions_inverse.mp4"
-            else:
-                luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
+    # Tras recorrer todos los CSVs, añadimos las instrucciones de luminancia si corresponde
+    if last_luminance_path != 'no':
+        if last_luminance_order_emojis == 'direct':
+            luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
+        elif last_luminance_order_emojis == 'inverse':
+            luminance_instructions = "./instructions_videos/luminance_instructions_inverse.mp4"
+        else:
+            luminance_instructions = "./instructions_videos/luminance_instructions_direct.mp4"
 
-            sequence_rows.append({
-                "path": luminance_instructions,
-                "block_num": None,
-                "description": "luminance_instructions"
-            })
+        sequence_rows.append({
+            "path": luminance_instructions,
+            "block_num": None,
+            "description": "luminance_instructions"
+        })
 
-            sequence_rows.append({
-                "path": last_luminance_path,
-                "block_num": None,
-                "description": "luminance",
-                "dimension": "luminance",
-                "order_emojis_slider": last_luminance_order_emojis,
-            })
+        sequence_rows.append({
+            "path": last_luminance_path,
+            "block_num": None,
+            "description": "luminance"
+        })
 
     df_final = pd.DataFrame(sequence_rows)
     return df_final
+
+def generate_instruction(audio_path):
+    """
+    Pantalla negra con duración igual al audio + el audio embebido.
+    """
+    audio_clip = AudioFileClip(audio_path)
+    black_screen_clip = (
+        ColorClip(size=(1280, 720), color=(0, 0, 0))
+        .with_duration(audio_clip.duration)
+        .with_audio(audio_clip)
+    )
+    return black_screen_clip
 
 
 def generate_videos(
@@ -475,7 +377,7 @@ def generate_videos(
                 )
 
                 # 2) Armamos la lista final (como diccionarios)
-                initial_relaxation = "./instructions_videos/initial_relaxation_video_text.mp4"
+                initial_relaxation = "./instructions_videos/initial_relaxation_video_audio.mp4"
                 calm_901_path = f"./calm_videos/{actual_modality}/901.mp4"
                 rest_suprablock = "./instructions_videos/rest_suprablock_text.mp4"
 
@@ -505,7 +407,7 @@ def generate_videos(
 
                 # 4) Asignamos columns fijas:
                 df_A['participant'] = subject
-                #df_A['suprablock'] = 'A'  # O "sesion_A", como prefieras
+                df_A['suprablock'] = 'A'  # O "sesion_A", como prefieras
                 df_A['modality'] = actual_modality
                 df_A['session'] = 'A'    # Para que sea claro que es la sesión "A"
 
@@ -522,11 +424,7 @@ def generate_videos(
                 # 6) Reordenar columnas
                 # Queremos que vayan primero: participant, suprablock, order_presentation, modality, session
                 desired_order = [
-                    'participant', 
-                    'session', 
-                    'modality', 
-                    'order_presentation', 
-                    'video_id'
+                    'participant', 'suprablock', 'order_presentation', 'modality', 'session'
                 ]
                 other_cols = [c for c in df_A.columns if c not in desired_order]
                 df_A = df_A[desired_order + other_cols]
@@ -556,7 +454,7 @@ def generate_videos(
                 # 2) Secuencia
                 final_relaxation = "./instructions_videos/final_relaxation_video_audio.mp4"
                 calm_902_path = f"./calm_videos/{actual_modality}/902.mp4"
-                experiment_end_task = "./instructions_videos/experiment_end_text.mp4"
+                experiment_end_task = "./instructions_videos/experiment_end_task.mp4"
 
                 final_list_B = df_B_mod.to_dict('records')
                 final_list_B.append({
@@ -579,7 +477,7 @@ def generate_videos(
 
                 # 3) Asignar columnas fijas
                 df_B['participant'] = subject
-                #df_B['suprablock'] = 'B'
+                df_B['suprablock'] = 'B'
                 df_B['modality'] = actual_modality
                 df_B['session'] = 'B'
 
@@ -594,13 +492,7 @@ def generate_videos(
 
                 # 5) Reordenar columnas
                 desired_order = [
-                    'participant', 
-                    'session',
-                    'modality', 
-                    'order_presentation', 
-                    'video_id',
-                    'dimension',
-                    'order_emojis_slider'
+                    'participant', 'suprablock', 'order_presentation', 'modality', 'session'
                 ]
                 other_cols = [c for c in df_B.columns if c not in desired_order]
                 df_B = df_B[desired_order + other_cols]
@@ -618,13 +510,11 @@ def generate_videos(
                 results_order_matrix_B_path = os.path.join(results_dir, f"order_matrix_{subject}_B_{actual_modality}.xlsx")
                 df_B.to_excel(results_order_matrix_B_path, index=False)
 
-#%%
-# Ejemplo de uso (solo si deseas llamarla directamente):
-generate_videos(
-    subjects=['07'],
-    modality=['VR'],
-    sesion_A=True,
-    sesion_B=True
-)
 
-# %%
+# Ejemplo de uso (solo si deseas llamarla directamente):
+# generate_videos(
+#     subjects=['23'],
+#     modality=['VR'],
+#     sesion_A=True,
+#     sesion_B=True
+# )
