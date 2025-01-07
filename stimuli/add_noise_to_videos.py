@@ -156,14 +156,14 @@ def generate_practice_videos(modality="2D"):
         valence_practice_clip,       # 3
         video_1,                     # 4
         post_stimulus_clip,          # 5
-        post_stimulus_2_clip,        # 5b
-        arousal_instructions_clip,   # 6
-        video_2,                     # 7
-        post_stimulus_self_report,   # 8
-        countdown_bar,               # 9
-        luminance_practice_clip,     # 10
-        luminance_practice,          # 11 
-        end_practice_clip            # 12
+        post_stimulus_2_clip,        # 6
+        arousal_instructions_clip,   # 7
+        video_2,                     # 8
+        post_stimulus_self_report,   # 9
+        countdown_bar,               # 10
+        luminance_practice_clip,     # 11
+        luminance_practice,          # 12 
+        end_practice_clip            # 13
     ]
 
     for idx, clip in enumerate(clips_in_order):
