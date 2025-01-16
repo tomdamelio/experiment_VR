@@ -6,7 +6,15 @@ import ast
 import os
 import random
 from moviepy import *
+from concurrent.futures import ThreadPoolExecutor
+import concurrent.futures
+import threading
+import time
+from datetime import datetime
 #%%
+
+# Obtener el directorio del script actual
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Crear directorios necesarios
 os.makedirs('./videos_fixation', exist_ok=True)
@@ -128,13 +136,13 @@ def generate_green_intensity_video(subject, id_value, max_duration, output_filen
 
 #%%
 # Parámetros principales
-subject = "02"
-id_values = [1, 3, 7, 9, 12]  # IDs para los cuales se generarán los videos
-max_duration = 60.0  # Duración máxima del video en segundos
-
-# Generar videos para cada id_value en la lista
-for id_val in id_values:
-    generate_green_intensity_video(subject, id_val, max_duration)
+#subject = "02"
+#id_values = [1, 3, 7, 9, 12]  # IDs para los cuales se generarán los videos
+#max_duration = 60.0  # Duración máxima del video en segundos
+#
+## Generar videos para cada id_value en la lista
+#for id_val in id_values:
+#    generate_green_intensity_video(subject, id_val, max_duration)
 
 
 #%%
@@ -184,21 +192,21 @@ def generate_fixation_cross():
     
     return compo
 
-generate_fixation_cross()
+#generate_fixation_cross()
 
 #%%
 
 def generate_countdown():
     """
-    Crea un clip de 30 segundos (30s) que muestra una barra de progreso
+    Crea un clip de 45 segundos (45s) que muestra una barra de progreso
     sobre un fondo negro. La barra comienza vacía (en t=0) y se llena
-    progresivamente hasta completar todo su ancho (en t=30s).
+    progresivamente hasta completar todo su ancho (en t=45s).
     
     Además, se dibuja un contorno que muestra la posición máxima que
     alcanzará la barra al finalizar la cuenta.
     """
 
-    duration_seconds = 30
+    duration_seconds = 45
     width, height = 3840, 2048
     
     # Dimensiones y ubicación de la barra
@@ -248,7 +256,7 @@ def generate_countdown():
         fps=60
     )
     
-generate_countdown()
+#generate_countdown()
 
 
 
@@ -259,13 +267,16 @@ def resize_clip(clip, target_resolution):
 
 def process_videos(video_paths, output_resolution):
     video_clips = []
-    for i, video in enumerate(video_paths):
+    for video in video_paths:
+        # Si el path no es absoluto, convertirlo
+        if not os.path.isabs(video):
+            video = os.path.join(SCRIPT_DIR, video)
         try:
             clip = VideoFileClip(video)
-            clip = resize_clip(clip, output_resolution)
+            clip = clip.resized(output_resolution)
             video_clips.append(clip)
         except Exception as e:
-            print(f"Failed to process video: {video}, Error: {e}")
+            print(f"Error procesando video {video}: {e}")
     return video_clips
 
 def concatenate_videos(video_paths, output_resolution, output_path):
@@ -412,20 +423,112 @@ def get_video_files_from_csvs(csv_directory):
     df_final = pd.DataFrame(sequence_rows)
     return df_final
 
+def process_session(session_params):
+    """
+    Procesa una sesión individual (A o B)
+    """
+    subject, actual_modality, session, df_session, subject_dir, results_dir = session_params
+    
+    thread_id = threading.current_thread().name
+    start_time = datetime.now()
+    print(f"\n[{start_time}] Iniciando sesión {session} en thread {thread_id}")
+    
+    # Armamos la lista final según la sesión
+    if session == 'A':
+        initial_relaxation = "./instructions_videos/initial_relaxation_video_text.mp4"
+        calm_video_path = f"./calm_videos/{actual_modality}/901.mp4"
+        
+        final_list = [
+            {
+                "path": initial_relaxation,
+                "block_num": None,
+                "description": "initial_relaxation"
+            },
+            {
+                "path": calm_video_path,
+                "block_num": None,
+                "description": "calm_901"
+            }
+        ]
+        final_list.extend(df_session.to_dict('records'))
+        final_list.append({
+            "path": "./instructions_videos/rest_suprablock_text.mp4",
+            "block_num": None,
+            "description": "rest_suprablock"
+        })
+    else:  # session B
+        final_list = df_session.to_dict('records')
+        final_list.extend([
+            {
+                "path": "./instructions_videos/final_relaxation_video_audio.mp4",
+                "block_num": None,
+                "description": "final_relaxation"
+            },
+            {
+                "path": f"./calm_videos/{actual_modality}/902.mp4",
+                "block_num": None,
+                "description": "calm_902"
+            },
+            {
+                "path": "./instructions_videos/experiment_end_text.mp4",
+                "block_num": None,
+                "description": "experiment_end_task"
+            }
+        ])
+
+    # Crear DataFrame y procesar
+    df = pd.DataFrame(final_list)
+    df['participant'] = subject
+    df['modality'] = actual_modality
+    df['session'] = session
+
+    # Asignar order_presentation
+    counter = 0
+    for idx, row in df.iterrows():
+        if "./stimuli/exp_videos" in row['path']:
+            counter += 1
+            df.at[idx, 'order_presentation'] = counter
+        else:
+            df.at[idx, 'order_presentation'] = None
+
+    # Reordenar columnas
+    desired_order = [
+        'participant', 
+        'session',
+        'modality', 
+        'order_presentation', 
+        'video_id',
+        'dimension',
+        'order_emojis_slider'
+    ]
+    other_cols = [c for c in df.columns if c not in desired_order]
+    df = df[desired_order + other_cols]
+
+    # Concatenar videos
+    output_file = os.path.join(subject_dir, f"{subject}_{session}_{actual_modality}_output_video.mp4")
+    paths = [item['path'] for item in final_list]
+    concatenate_videos(paths, (3840, 2048), output_file)
+
+    # Guardar order_matrix
+    order_matrix_path = os.path.join(subject_dir, f"order_matrix_{subject}_{session}_{actual_modality}.xlsx")
+    df.to_excel(order_matrix_path, index=False)
+    
+    # Guardar en results
+    results_order_matrix_path = os.path.join(results_dir, f"order_matrix_{subject}_{session}_{actual_modality}.xlsx")
+    df.to_excel(results_order_matrix_path, index=False)
+
+    end_time = datetime.now()
+    duration = end_time - start_time
+    print(f"[{end_time}] Finalizada sesión {session} en thread {thread_id}")
+    print(f"Duración total de sesión {session}: {duration}")
 
 def generate_videos(
     subjects=['06'],
     modality=['VR'],
-    sesion_A=True,       # Renombrado en vez de condition_A
-    sesion_B=True,       # Renombrado en vez de condition_B
+    sesion_A=True,
+    sesion_B=True,
     output_resolution=(3840, 2048)
 ):
-    """
-    Genera los videos y crea dos order_matrix (uno por cada sesión) si sesion_A y sesion_B son True.
-    - 'order_presentation' solo se asigna a los estímulos (./stimuli/exp_videos).
-    - Columns: 'participant', 'suprablock', 'order_presentation', 'modality', 'session', ...
-    """
-    
     base_dir = os.path.dirname(os.path.abspath(__file__))
     os.makedirs(f'{base_dir}/output_videos', exist_ok=True)
 
@@ -433,186 +536,43 @@ def generate_videos(
     cond_A_dir = os.path.join(experiment_vr_dir, 'conditions', 'A')
     cond_B_dir = os.path.join(experiment_vr_dir, 'conditions', 'B')
 
-    # Cargar DF base para A o B (si se piden)
-    video_files_df_A = None
-    video_files_df_B = None
-    if sesion_A:
-        video_files_df_A = get_video_files_from_csvs(cond_A_dir)
-    if sesion_B:
-        video_files_df_B = get_video_files_from_csvs(cond_B_dir)
+    # Cargar DFs base
+    video_files_df_A = get_video_files_from_csvs(cond_A_dir) if sesion_A else None
+    video_files_df_B = get_video_files_from_csvs(cond_B_dir) if sesion_B else None
 
-    # Iterar sobre cada participante
     for i, subject in enumerate(subjects):
-
         subject_dir = os.path.join(base_dir, "output_videos", subject)
         os.makedirs(subject_dir, exist_ok=True)
 
-        # (Opcional) Podrías tener un directorio de results
-        results_dir = os.path.join(
-            base_dir, '..', 'results', f'sub-{subject}'
-        )
+        results_dir = os.path.join(base_dir, '..', 'results', f'sub-{subject}')
         os.makedirs(results_dir, exist_ok=True)
 
-        # Determinar la(s) modalidad(es) a generar
         subject_modality = modality[i] if i < len(modality) else modality[0]
-        if subject_modality == 'both':
-            modalities_to_generate = ['VR', '2D']
-        else:
-            modalities_to_generate = [subject_modality]
+        modalities_to_generate = ['VR', '2D'] if subject_modality == 'both' else [subject_modality]
 
         for actual_modality in modalities_to_generate:
+            print(f"\nProcesando modalidad: {actual_modality}")
+            session_params = []
             
-            # ===================== SESIÓN A =====================
             if sesion_A and video_files_df_A is not None:
-                # 1) Modificamos paths (VR <-> 2D)
                 df_A_mod = video_files_df_A.copy()
-                df_A_mod['path'] = df_A_mod['path'].apply(
-                    lambda p: p.replace('2D', actual_modality)
-                )
-
-                # 2) Armamos la lista final (como diccionarios)
-                initial_relaxation = "./instructions_videos/initial_relaxation_video_text.mp4"
-                calm_901_path = f"./calm_videos/{actual_modality}/901.mp4"
-                rest_suprablock = "./instructions_videos/rest_suprablock_text.mp4"
-
-                final_list_A = [
-                    {
-                        "path": initial_relaxation,
-                        "block_num": None,
-                        "description": "initial_relaxation"
-                    },
-                    {
-                        "path": calm_901_path,
-                        "block_num": None,
-                        "description": "calm_901"
-                    }
-                ]
-                # Extendemos con lo que vino de CSV
-                final_list_A.extend(df_A_mod.to_dict('records'))
-                # Añadimos la pausa final
-                final_list_A.append({
-                    "path": rest_suprablock,
-                    "block_num": None,
-                    "description": "rest_suprablock"
-                })
-
-                # 3) Convertimos a DataFrame
-                df_A = pd.DataFrame(final_list_A)
-
-                # 4) Asignamos columns fijas:
-                df_A['participant'] = subject
-                #df_A['suprablock'] = 'A'  # O "sesion_A", como prefieras
-                df_A['modality'] = actual_modality
-                df_A['session'] = 'A'    # Para que sea claro que es la sesión "A"
-
-                # 5) Asignar 'order_presentation' solo a los estímulos
-                #    Por ejemplo, contando videos de la carpeta ./stimuli/exp_videos
-                counter_A = 0
-                for idx, row in df_A.iterrows():
-                    if "./stimuli/exp_videos" in row['path']:
-                        counter_A += 1
-                        df_A.at[idx, 'order_presentation'] = counter_A
-                    else:
-                        df_A.at[idx, 'order_presentation'] = None
-
-                # 6) Reordenar columnas
-                # Queremos que vayan primero: participant, suprablock, order_presentation, modality, session
-                desired_order = [
-                    'participant', 
-                    'session', 
-                    'modality', 
-                    'order_presentation', 
-                    'video_id'
-                ]
-                other_cols = [c for c in df_A.columns if c not in desired_order]
-                df_A = df_A[desired_order + other_cols]
-
-                # 7) Concatenar videos en un solo .mp4
-                output_file_A = os.path.join(subject_dir, f"{subject}_A_{actual_modality}_output_video.mp4")
-                paths_for_A = [item['path'] for item in final_list_A]
-                concatenate_videos(paths_for_A, output_resolution, output_file_A)
-
-                # 8) Guardar order_matrix para la sesión A
-                order_matrix_A_path = os.path.join(subject_dir, f"order_matrix_{subject}_A_{actual_modality}.xlsx")
-                df_A.to_excel(order_matrix_A_path, index=False)
-
-                # (Opcional) copia en results
-                results_order_matrix_A_path = os.path.join(results_dir, f"order_matrix_{subject}_A_{actual_modality}.xlsx")
-                df_A.to_excel(results_order_matrix_A_path, index=False)
-
-
-            # ===================== SESIÓN B =====================
+                df_A_mod['path'] = df_A_mod['path'].apply(lambda p: p.replace('2D', actual_modality))
+                session_params.append((subject, actual_modality, 'A', df_A_mod, subject_dir, results_dir))
+            
             if sesion_B and video_files_df_B is not None:
-                # 1) Modificar paths
                 df_B_mod = video_files_df_B.copy()
-                df_B_mod['path'] = df_B_mod['path'].apply(
-                    lambda p: p.replace('2D', actual_modality)
-                )
+                df_B_mod['path'] = df_B_mod['path'].apply(lambda p: p.replace('2D', actual_modality))
+                session_params.append((subject, actual_modality, 'B', df_B_mod, subject_dir, results_dir))
 
-                # 2) Secuencia
-                final_relaxation = "./instructions_videos/final_relaxation_video_audio.mp4"
-                calm_902_path = f"./calm_videos/{actual_modality}/902.mp4"
-                experiment_end_task = "./instructions_videos/experiment_end_text.mp4"
-
-                final_list_B = df_B_mod.to_dict('records')
-                final_list_B.append({
-                    "path": final_relaxation,
-                    "block_num": None,
-                    "description": "final_relaxation"
-                })
-                final_list_B.append({
-                    "path": calm_902_path,
-                    "block_num": None,
-                    "description": "calm_902"
-                })
-                final_list_B.append({
-                    "path": experiment_end_task,
-                    "block_num": None,
-                    "description": "experiment_end_task"
-                })
-
-                df_B = pd.DataFrame(final_list_B)
-
-                # 3) Asignar columnas fijas
-                df_B['participant'] = subject
-                #df_B['suprablock'] = 'B'
-                df_B['modality'] = actual_modality
-                df_B['session'] = 'B'
-
-                # 4) Asignar order_presentation solo para ./stimuli/exp_videos
-                counter_B = 0
-                for idx, row in df_B.iterrows():
-                    if "./stimuli/exp_videos" in row['path']:
-                        counter_B += 1
-                        df_B.at[idx, 'order_presentation'] = counter_B
-                    else:
-                        df_B.at[idx, 'order_presentation'] = None
-
-                # 5) Reordenar columnas
-                desired_order = [
-                    'participant', 
-                    'session',
-                    'modality', 
-                    'order_presentation', 
-                    'video_id',
-                    'dimension',
-                    'order_emojis_slider'
-                ]
-                other_cols = [c for c in df_B.columns if c not in desired_order]
-                df_B = df_B[desired_order + other_cols]
-
-                # 6) Concatenar videos
-                output_file_B = os.path.join(subject_dir, f"{subject}_B_{actual_modality}_output_video.mp4")
-                paths_for_B = [item['path'] for item in final_list_B]
-                concatenate_videos(paths_for_B, output_resolution, output_file_B)
-
-                # 7) Guardar order_matrix en un archivo aparte
-                order_matrix_B_path = os.path.join(subject_dir, f"order_matrix_{subject}_B_{actual_modality}.xlsx")
-                df_B.to_excel(order_matrix_B_path, index=False)
-
-                # (Opcional) copia en results
-                results_order_matrix_B_path = os.path.join(results_dir, f"order_matrix_{subject}_B_{actual_modality}.xlsx")
-                df_B.to_excel(results_order_matrix_B_path, index=False)
+            print(f"Iniciando procesamiento paralelo de {len(session_params)} sesiones...")
+            
+            start_time_total = datetime.now()
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                futures = [executor.submit(process_session, params) for params in session_params]
+                concurrent.futures.wait(futures)
+            end_time_total = datetime.now()
+            
+            print(f"\nTiempo total de procesamiento: {end_time_total - start_time_total}")
 
 #%%
 # Ejemplo de uso (solo si deseas llamarla directamente):
