@@ -39,7 +39,7 @@ def generate_instruction_videos(input_dir, output_dir):
     """
     # Verificar si el directorio de entrada existe
     if not os.path.isdir(input_dir):
-        raise ValueError(f"El directorio de entrada '{input_dir}' no existe.")
+        raise ValueError(f"The input directory '{input_dir}' does not exist.")
     
     # Crear el directorio de salida si no existe
     os.makedirs(output_dir, exist_ok=True)
@@ -371,12 +371,12 @@ process_videos_in_folder(modality='fixation')
 
 def check_practice_videos_size(modality="2D"):
     """
-    Carga los videos de práctica y muestra sus dimensiones originales.
+    Loads practice videos and shows their original dimensions.
 
-    Parámetros:
+    Parameters:
     -----------
     modality : str
-        "2D" o "VR" para especificar la carpeta de la que se toman los videos.
+        "2D" or "VR" to specify the folder from which videos are taken.
     """
     # Rutas a los videos
     video_path_1 = f"./practice_videos/{modality}/991.mp4"
@@ -398,5 +398,19 @@ def check_practice_videos_size(modality="2D"):
 # Ejemplo de uso:
 #check_practice_videos_size("2D")
 check_practice_videos_size("VR")
+
+# %%
+
+def get_video_files_from_csvs(csv_directory):
+    """
+    Reads all CSVs in 'csv_directory', extracts video paths (movie_path column),
+    and from the first row of each CSV, the luminance path (luminance column).
+
+    Returns a DataFrame in the already mixed order where each row is:
+        - A block start instruction (path, block_num, description="audio_instruction")
+        - The mixed videos of that block (path, block_num, description="video")
+        - Their respective post_stimulus (verbal or self_report)
+    Finally, when finished, adds (if applicable) the instruction and luminance path.
+    """
 
 # %%

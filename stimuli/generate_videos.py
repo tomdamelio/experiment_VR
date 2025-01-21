@@ -44,13 +44,13 @@ def generate_green_intensity_video(subject, id_value, max_duration, output_filen
         # Leer datos de anotaciones
         df_beh = pd.read_csv(csv_path)
     except FileNotFoundError:
-        print(f"El archivo CSV no se encontró en la ruta: {csv_path}")
+        print(f"The CSV file was not found at the path: {csv_path}")
         return
     except pd.errors.EmptyDataError:
-        print(f"El archivo CSV está vacío: {csv_path}")
+        print(f"The CSV file is empty: {csv_path}")
         return
     except Exception as e:
-        print(f"Ocurrió un error al leer el archivo CSV: {e}")
+        print(f"An error occurred while reading the CSV file: {e}")
         return
 
     # Filtrar la fila donde 'id' es id_value y 'hand' es 'right'
@@ -65,7 +65,7 @@ def generate_green_intensity_video(subject, id_value, max_duration, output_filen
             # Convertir la cadena a una lista de listas utilizando ast.literal_eval
             annotations = ast.literal_eval(continuous_annotation)
         except (ValueError, SyntaxError) as e:
-            print(f"Error al parsear 'continuous_annotation': {e}")
+            print(f"Error parsing 'continuous_annotation': {e}")
             return
         
         # Crear un DataFrame con las anotaciones
@@ -121,18 +121,18 @@ def generate_green_intensity_video(subject, id_value, max_duration, output_filen
             # Opcional: Mostrar progreso cada 5 segundos
             if (idx + 1) % (fps * 5) == 0 or (idx + 1) == frames:
                 progress = (idx + 1) / frames * 100
-                print(f"Procesado {idx + 1}/{frames} frames ({progress:.2f}%)")
+                print(f"Processed {idx + 1}/{frames} frames ({progress:.2f}%)")
         
         # Liberar el objeto VideoWriter
         out.release()
         
-        print(f"Video generado exitosamente como '{output_filename}' con una duración de {actual_duration:.2f} segundos.")
+        print(f"Video generated successfully as '{output_filename}' with a duration of {actual_duration:.2f} seconds.")
     
     else:
         if len(filtered_beh) == 0:
-            print(f"No se encontró ninguna fila con id={id_value} y hand='right'.")
+            print(f"No row found with id={id_value} and hand='right'.")
         else:
-            print(f"Se encontraron {len(filtered_beh)} filas con id={id_value} y hand='right'. Se esperaba solo una.")
+            print(f"Found {len(filtered_beh)} rows with id={id_value} and hand='right'. Expected only one.")
 
 #%%
 # Parámetros principales
@@ -276,7 +276,7 @@ def process_videos(video_paths, output_resolution):
             clip = clip.resized(output_resolution)
             video_clips.append(clip)
         except Exception as e:
-            print(f"Error procesando video {video}: {e}")
+            print(f"Error processing video {video}: {e}")
     return video_clips
 
 def concatenate_videos(video_paths, output_resolution, output_path):
@@ -584,3 +584,50 @@ generate_videos(
 )
 
 # %%
+
+def generate_instruction(audio_path):
+    """
+    Black screen with duration equal to audio + embedded audio.
+    """
+
+def generate_instruction_videos(input_dir, output_dir):
+    """
+    Generates .mp4 videos from .wav audio files in a specified directory.
+    Each video consists of a black screen with the audio duration and embedded audio.
+
+    Parameters
+    ----------
+    input_dir : str
+        Directory containing .wav audio files.
+    output_dir : str
+        Directory where resulting .mp4 video files will be saved.
+        If it doesn't exist, it will be created automatically.
+
+    Usage example
+    --------------
+    generate_instruction_videos(
+        input_dir='./instructions_audios',
+        output_dir='./instructions_videos'
+    )
+    """
+
+def generate_practice_videos(modality="2D"):
+    """
+    Generates a practice video by concatenating the following elements:
+    1. welcome_and_baseline_audio.wav
+    2. fixation_cross (5 minutes)
+    3. valence_practice_instruction_audio.wav
+    4. Video 1
+    5. post_stimulus_self_report_practice.wav
+    6. arousal_practice_instructions_audio.wav
+    7. Video 2
+    8. post_stimulus_self_report.wav
+    9. luminance_practice_instructions_audio.wav
+    10.luminance video
+    11. end_practice.wav
+
+    Parameters:
+    -----------
+    modality : str
+        "2D" or "VR" to specify the folder from which videos are taken.
+    """

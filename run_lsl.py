@@ -97,16 +97,15 @@ def initialize_lsl_recording(info_dict, physio_file_name):
         
         # Asegurar que el directorio existe
         os.makedirs(save_path, exist_ok=True)
+
+        # Contador para los runs
+        run_count = len([name for name in os.listdir(save_path) if name.endswith('.xdf')]) + 1
         
         # Configurar Lab Recorder con los parámetros correctos
         s.sendall(b"select all\n")
         
-        # Configurar el Study Root
-        study_root_cmd = f"study_root {save_path}\n"
-        s.sendall(study_root_cmd.encode())
-        
         # Configurar el nombre del archivo
-        filename = f"sub-{info_dict['ID']}_ses-{info_dict['session'].lower()}_task-{info_dict['block'].lower()}_run-001_eeg.xdf"
+        filename = f"sub-{info_dict['ID']}_ses-{info_dict['session'].lower()}_task-{info_dict['block'].lower()}_run-{run_count:03d}_eeg.xdf"
         filename_cmd = f"filename {os.path.join(save_path, filename)}\n"
         s.sendall(filename_cmd.encode())
         
@@ -306,7 +305,11 @@ def get_participant_info():
                 # Guardar grabación de audio
                 actual_samples = int(recording_duration * root.samplerate)
                 trimmed_recording = root.recording[:actual_samples]
-                audio_file_name = f"sub-{info['ID']}_ses-{info['session'].lower()}_task-{info['block'].lower()}_audio.wav"
+                
+                # Contador para los archivos de audio
+                audio_run_count = len([name for name in os.listdir(root.audio_folder) if name.endswith('.wav')]) + 1
+                
+                audio_file_name = f"sub-{info['ID']}_ses-{info['session'].lower()}_task-{info['block'].lower()}_audio_run-{audio_run_count:03d}.wav"
                 audio_path = os.path.join(root.audio_folder, audio_file_name)
                 write(audio_path, root.samplerate, np.int16(trimmed_recording * 32767))
                 print(f"Grabación de audio guardada en {audio_path}")
@@ -345,7 +348,7 @@ def get_participant_info():
     tk.Label(root, text="Bloque:").grid(row=2, column=0, padx=5, pady=5)
     block_var = tk.StringVar(value="A")
     block_dropdown = ttk.Combobox(root, textvariable=block_var, 
-                                values=["A", "B"], 
+                                values=["PRACTICE", "A", "B"], 
                                 state="readonly")
     block_dropdown.grid(row=2, column=1, padx=5, pady=5, sticky='ew')
     
