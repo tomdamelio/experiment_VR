@@ -373,6 +373,13 @@ def get_video_files_from_csvs(csv_directory):
                     "block_num": block_number,
                     "description": "verbal_report"
                 })
+
+                confidence_verbal_report_instructions_text_path = "./instructions_videos/confidence_verbal_report_text.mp4"
+                sequence_rows.append({
+                    "path": confidence_verbal_report_instructions_text_path,
+                    "block_num": block_number,
+                    "description": "confidence_verbal_report"
+                })
                 
                 black_screen_5 = './black_screen_5_sec.mp4'
                 sequence_rows.append({
@@ -418,6 +425,12 @@ def get_video_files_from_csvs(csv_directory):
                 "description": "luminance",
                 "dimension": "luminance",
                 "order_emojis_slider": last_luminance_order_emojis,
+            })
+
+            sequence_rows.append({
+                "path": "./instructions_videos/confidence_luminance_practice_instructions_text.mp4",
+                "block_num": None,
+                "description": "confidence_luminance_instructions"
             })
 
     df_final = pd.DataFrame(sequence_rows)
@@ -577,7 +590,7 @@ def generate_videos(
 #%%
 # Ejemplo de uso (solo si deseas llamarla directamente):
 generate_videos(
-    subjects=['08'],
+    subjects=['09'],
     modality=['VR'],
     sesion_A=True,
     sesion_B=True

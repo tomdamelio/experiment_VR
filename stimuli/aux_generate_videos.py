@@ -75,7 +75,7 @@ def generate_instruction_videos(input_dir, output_dir):
         except Exception as e:
             print(f"Error al procesar '{input_audio_path}': {e}")
 
-#generate_instruction_videos(input_dir='./instructions_audios', output_dir='./instructions_videos')
+#generate_instruction_videos(input_dir='./instructions_audios/new_audios', output_dir='./instructions_videos/new_videos')
 
 #%%
 def generate_practice_videos(modality="2D"):
@@ -85,13 +85,14 @@ def generate_practice_videos(modality="2D"):
     2. fixation_cross (5 minutos)
     3. valence_practice_instruction_audio.wav
     4. Video 1
-    5. post_stimulus_self_report_practice.wav
+    5. post_stimulus_self_report_practice_new.wav
     6. arousal_practice_instructions_audio.wav
     7. Video 2
     8. post_stimulus_self_report.wav
     9. luminance_practice_instructions_audio.wav
     10.luminance video
-    11. end_practice.wav
+    11.confidence_luminance_practice_instructions_text.wav
+    12.end_practice.wav
 
     Parámetros:
     -----------
@@ -127,6 +128,7 @@ def generate_practice_videos(modality="2D"):
     arousal_practice_instructions_audio_path = "./instructions_audios/arousal_practice_instructions_text.wav"
     post_stimulus_verbal_report_path         = "./instructions_audios/11_post_stimulus_verbal_report.wav"  
     luminance_practice_instructions_path     = "./instructions_audios/luminance_practice_instructions_text.wav"
+    confidence_luminance_practice_instructions_text_path = "./instructions_audios/confidence_luminance_practice_instructions_text.wav"
     end_practice_audio_path                  = "./instructions_audios/12_end_practice.wav"
 
     # ---------------------------
@@ -145,7 +147,9 @@ def generate_practice_videos(modality="2D"):
     arousal_instructions_clip = generate_instruction(arousal_practice_instructions_audio_path)
     post_stimulus_self_report = generate_instruction(post_stimulus_verbal_report_path)
     luminance_practice_clip   = generate_instruction(luminance_practice_instructions_path)
+    confidence_luminance_practice_clip   = generate_instruction(confidence_luminance_practice_instructions_text_path)
     end_practice_clip         = generate_instruction(end_practice_audio_path)
+
 
     # ---------------------------
     # DEFINIR EL ORDEN DE CONCATENACIÓN
@@ -162,8 +166,9 @@ def generate_practice_videos(modality="2D"):
         post_stimulus_self_report,   # 9
         countdown_bar,               # 10
         luminance_practice_clip,     # 11
-        luminance_practice,          # 12 
-        end_practice_clip            # 13
+        luminance_practice,          # 12
+        confidence_luminance_practice_clip, # 13
+        end_practice_clip            # 14
     ]
 
     for idx, clip in enumerate(clips_in_order):
@@ -183,7 +188,7 @@ def generate_practice_videos(modality="2D"):
     # ---------------------------
     # EXPORTAR
     # ---------------------------
-    output_path = f"./practice_videos/{modality}/S08_practice_{modality}.mp4"
+    output_path = f"./practice_videos/{modality}/S09_practice_{modality}.mp4"
     final_clip.write_videofile(
         output_path,
         codec="libx264",
@@ -192,7 +197,7 @@ def generate_practice_videos(modality="2D"):
 
 # Ejemplo de uso:
 #generate_practice_videos("2D")         # Modalidad "2D" por defecto
-generate_practice_videos("VR")     # Modalidad "VR"
+#generate_practice_videos("VR")     # Modalidad "VR"
 
 
 #%%
