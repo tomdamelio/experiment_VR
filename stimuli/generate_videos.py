@@ -473,7 +473,7 @@ def process_session(session_params):
         final_list = df_session.to_dict('records')
         final_list.extend([
             {
-                "path": "./instructions_videos/final_relaxation_video_audio.mp4",
+                "path": "./instructions_videos/final_relaxation_video_text.mp4",
                 "block_num": None,
                 "description": "final_relaxation"
             },
@@ -590,7 +590,7 @@ def generate_videos(
 #%%
 # Ejemplo de uso (solo si deseas llamarla directamente):
 generate_videos(
-    subjects=['09'],
+    subjects=['10'],
     modality=['VR'],
     sesion_A=True,
     sesion_B=True
