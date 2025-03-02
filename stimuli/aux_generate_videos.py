@@ -109,52 +109,41 @@ def generate_practice_videos(modality="2D"):
     fixation_path           = "./final_videos_fixation/fixation_cross.mp4"
     countdown_bar_path      = "./final_videos_fixation/countdown_bar.mp4"
 
-        
-    # Cargar y redimensionar los videos
+    # ---------------------------
+    # RUTAS A LOS VIDEOS DE INSTRUCCIONES
+    # ---------------------------
+    welcome_and_baseline_path          = "./instructions_videos/1_welcome_text_2_baseline_instructions_text.mp4"
+    valence_practice_instruction_path  = "./instructions_videos/valence_practice_instructions_text.mp4"
+    post_stimulus_self_report_path     = "./instructions_videos/post_stimulus_self_report_text_1.mp4"
+    post_stimulus_self_report_2_path   = "./instructions_videos/post_stimulus_self_report_practice.mp4"
+    arousal_practice_instructions_path = "./instructions_videos/arousal_practice_instructions_text.mp4"
+    post_stimulus_verbal_report_path   = "./instructions_videos/post_stimulus_verbal_report.mp4"
+    luminance_practice_path           = "./instructions_videos/luminance_practice_instructions_text.mp4"
+    confidence_luminance_practice_path = "./instructions_videos/confidence_luminance_practice_instructions_text_2.mp4"
+    confidence_verbal_report_path      = "./instructions_videos/confidence_verbal_report_text.mp4"
+    end_practice_path                  = "./instructions_videos/end_practice.mp4"
+
+    # ---------------------------
+    # CARGAR VIDEOS
+    # ---------------------------
+    # Videos de estímulos
     video_1             = VideoFileClip(video_path_1).resized((3840, 2048))
     video_2             = VideoFileClip(video_path_2).resized((3840, 2048))
     luminance_practice  = VideoFileClip(luminance_path_practice).resized((3840, 2048))
     fixation_clip       = VideoFileClip(fixation_path).resized((3840, 2048))
     countdown_bar       = VideoFileClip(countdown_bar_path).resized((3840, 2048))
 
-    # ---------------------------
-    # RUTAS A LOS AUDIOS
-    # (TODOS en ./instructions_audios)
-    # ---------------------------
-    welcome_and_baseline_audio_path          = "./instructions_audios/welcome_text_2_baseline_instructions_text.wav"
-    valence_practice_instruction_audio_path  = "./instructions_audios/valence_practice_instructions_text.wav"
-    post_stimulus_self_report_practice_path  = "./instructions_audios/post_stimulus_self_report_text_1.wav"
-    post_stimulus_self_report_practice_2     = "./instructions_audios/post_stimulus_self_report_practice.wav"
-    arousal_practice_instructions_audio_path = "./instructions_audios/arousal_practice_instructions_text.wav"
-    post_stimulus_verbal_report_path         = "./instructions_audios/11_post_stimulus_verbal_report.wav"  
-    luminance_practice_instructions_path     = "./instructions_audios/luminance_practice_instructions_text.wav"
-    luminance_practice_instructions_2_path = "./instructions_audios/luminance_practice_instructions_text_2.wav"
-    confidence_luminance_practice_instructions_text_path = "./instructions_audios/confidence_luminance_practice_instructions_text.wav"
-    confidence_verbal_report_instructions_text_path = "./instructions_audios/confidence_verbal_report_text.wav"
-    end_practice_audio_path                  = "./instructions_audios/12_end_practice.wav"
-
-    # ---------------------------
-    # CREAR CLIPS
-    # ---------------------------
-    # 1) Clip de bienvenida
-    welcome_and_baseline_clip = generate_instruction(welcome_and_baseline_audio_path)
-    
-    # 2) Pantalla con cruz de fijación durante 5 minutos
-    #fixation_clip = generate_fixation_cross()
-    
-    # 3) Resto de audios en pantallas negras
-    valence_practice_clip     = generate_instruction(valence_practice_instruction_audio_path)
-    post_stimulus_clip        = generate_instruction(post_stimulus_self_report_practice_path)
-    post_stimulus_2_clip      = generate_instruction(post_stimulus_self_report_practice_2)
-    arousal_instructions_clip = generate_instruction(arousal_practice_instructions_audio_path)
-    post_stimulus_self_report = generate_instruction(post_stimulus_verbal_report_path)
-    luminance_practice_clip   = generate_instruction(luminance_practice_instructions_path)
-    luminance_practice_clip_2   = generate_instruction(luminance_practice_instructions_2_path)
-    confidence_luminance_practice_clip   = generate_instruction(confidence_luminance_practice_instructions_text_path)
-    confidence_verbal_report_clip        = generate_instruction(confidence_verbal_report_instructions_text_path)
-    end_practice_clip         = generate_instruction(end_practice_audio_path)
-
-
+    # Videos de instrucciones
+    welcome_and_baseline_clip = VideoFileClip(welcome_and_baseline_path).resized((3840, 2048))
+    valence_practice_clip    = VideoFileClip(valence_practice_instruction_path).resized((3840, 2048))
+    post_stimulus_clip       = VideoFileClip(post_stimulus_self_report_path).resized((3840, 2048))
+    post_stimulus_2_clip     = VideoFileClip(post_stimulus_self_report_2_path).resized((3840, 2048))
+    arousal_instructions_clip = VideoFileClip(arousal_practice_instructions_path).resized((3840, 2048))
+    post_stimulus_self_report = VideoFileClip(post_stimulus_verbal_report_path).resized((3840, 2048))
+    luminance_practice_clip   = VideoFileClip(luminance_practice_path).resized((3840, 2048))
+    confidence_luminance_practice_clip = VideoFileClip(confidence_luminance_practice_path).resized((3840, 2048))
+    confidence_verbal_report_clip = VideoFileClip(confidence_verbal_report_path).resized((3840, 2048))
+    end_practice_clip = VideoFileClip(end_practice_path).resized((3840, 2048))
 
     # ---------------------------
     # DEFINIR EL ORDEN DE CONCATENACIÓN
@@ -172,22 +161,15 @@ def generate_practice_videos(modality="2D"):
         countdown_bar,               # 10
         confidence_verbal_report_clip, # 11
         luminance_practice_clip,     # 12
-        luminance_practice_clip_2,  # 13
         luminance_practice,          # 14
         confidence_luminance_practice_clip, # 15
         end_practice_clip            # 16
-
-
     ]
 
     for idx, clip in enumerate(clips_in_order):
-        # clip.size --> tamaño (width, height)
-        # clip.mask  --> la máscara del clip si existe
         print(f"Clip {idx}: size={clip.size}")
-        
         if clip.mask:
             print(f"    Clip {idx} MASK size = {clip.mask.size}")
-
 
     # ---------------------------
     # CONCATENAR TODOS LOS CLIPS
@@ -197,7 +179,7 @@ def generate_practice_videos(modality="2D"):
     # ---------------------------
     # EXPORTAR
     # ---------------------------
-    output_path = f"./practice_videos/{modality}/S10_b_practice_{modality}.mp4"
+    output_path = f"./practice_videos/{modality}/S11_practice_{modality}.mp4"
     final_clip.write_videofile(
         output_path,
         codec="libx264",
@@ -231,13 +213,12 @@ def generate_whistle_sound(duration_sec, sample_rate=44100, freq=500):
     return sample_rate, whistle_signal
 
 # Parameters for the whistle sound
-#duration_sec = 1
-#sample_rate, whistle_signal = generate_whistle_sound(duration_sec)
-
+duration_sec = 1
+sample_rate, whistle_signal = generate_whistle_sound(duration_sec)
 # Save whistle sound to file
-#write("whistle_sound.wav", sample_rate, whistle_signal)
+write("whistle_sound.wav", sample_rate, whistle_signal)
 
-
+#%%
 
 def create_black_screen_video(duration_sec, output_file, fps=60, width=640, height=360):
     # Calculate number of frames

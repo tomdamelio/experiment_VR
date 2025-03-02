@@ -590,10 +590,10 @@ def generate_videos(
 #%%
 # Ejemplo de uso (solo si deseas llamarla directamente):
 generate_videos(
-    subjects=['10'],
+    subjects=['11'],
     modality=['VR'],
     sesion_A=True,
-    sesion_B=True
+    sesion_B=False
 )
 
 # %%
