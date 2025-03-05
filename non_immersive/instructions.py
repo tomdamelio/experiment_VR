@@ -4,50 +4,50 @@ non_immersive_instructions_text = {
 
     # WELCOME Y BASELINE VAN JUNTAS AL MOMENTO DE GRABAR LOS AUDIOS
 
-    '1_welcome_text': "Te damos la bienvenida a este experimento sobre cómo cambian nuestras emociones en tiempo real!\n",
+    '1_welcome_text': "Hola. Te damos la bienvenida a este experimento sobre cómo cambian nuestras emociones en tiempo real!\n",
      
     '2_baseline_instructions_text': (
         "Primero, relajate y mirá la cruz en el centro de la pantalla durante 5 minutos.\n"
-        "Quedate lo más quieto/a y en silencio posible para no afectar las mediciones.\n\n"
+        "Quedate lo más quieto/a posible y en silencio para no afectar las mediciones.\n\n"
         "Cuando veas luces titilando, significa que un ensayo empieza o termina.\n\n"
         "Ahora sí, vamos a comenzar. Solo mirá la cruz por 5 minutos.\n"
     ),
 
     '3_valence_practice_instructions_text': "Vamos a practicar cómo reportar tu nivel de valencia emocional con el joystick,\n\n"
-        "de 'negativo' (izquierda) a 'positivo' (derecha).\n\n"
+        "de 'negativo' (a izquierda) a 'positivo' (a derecha).\n\n"
         "Al reportar en el extremo izquierdo con el joystick, sentis infelicidad,\n"
-        "molestia, insatisfacción, melancolía, desesperación, aburrimiento.\n"
+        "molestia, insatisfacción, melancolía, desesperación o aburrimiento.\n"
         "Al reportar en el extremo derecho, sentis felicidad plena, alegría,\n"
-        "satisfacción, bienestar y esperanza.\n\n"
-        "Reportar en el punto medio indica una valencia neutral.\n\n"
+        "satisfacción, bienestar o esperanza.\n\n"
+        "Reportar en el punto medio indica una valencia neutral. Es decir, ni positivo ni negativo. O ambas emociones al mismo tiempo.\n\n"
         "Es importante que te concentres en tus emociones realmente sentidas durante el video.\n\n"
         "Podés representar niveles intermedios ubicándote en cualquier otro punto de la escala con el joystick,\n"
         "indicando así cómo te sentís en tiempo real al ver el video.\n\n"
-        "Recorda: negativo a izquierda y positivo a derecha\n\n",
+        "Recordá: negativo a izquierda y positivo a derecha\n\n",
 
     '4_arousal_practice_instructions_text': "Ahora, vamos a practicar cómo reportar tu activación emocional\n"
-        "de 'calmado' (izquierda) a 'emocionado' (derecha).\n\n"
+        "de 'calmado' (a izquierda) a 'emocionado' (a derecha).\n\n"
         "Reportando en el extremo izquierdo con el joystick, sentis relajación, tranquilidad,\n"
         "inactividad, aburrimiento, somnolencia, o ausencia de excitación.\n\n"
         "Reportando en el extremo derecho, sentis estimulación completa,\n"
-        "emoción intensa, frenesí, nerviosismo, alerta y mayor activación.\n\n"
-        "Reportar en el punto medio indica una activacion emocional neutral.\n\n"
+        "emoción intensa, frenesí, nerviosismo, alerta o mayor activación.\n\n"
+        "Reportar en el punto medio indica una activacion emocional neutral. Es decir, ni calmado ni emocionado. O ambas emociones al mismo tiempo.\n\n"
         "Es importante que te concentres en tus emociones realmente sentidas durante el video.\n\n"
         "Podés representar niveles intermedios posicionándote en cualquier otro punto de la escala con el joystick,\n"
         "indicando así cómo te sentís en tiempo real al ver el video.\n\n"
-        "Recorda: calmado a izquierda y emocionado a derecha\n\n",
+        "Recordá: calmado a izquierda y emocionado a derecha\n\n",
 
     '5_post_stimulus_self_report_text_1': (
-        "Después de cada video, deberás indicar tu nivel tu experiencia emocional durante el video anterior.\n"
-        "Vas a repsonder verbalmente con un número entero del 1 al 9. Concéntrate en cómo te vos sentiste realmente mientras mirabas el video.\n"
+        "Después de cada video, deberás indicar tu experiencia emocional durante el video anterior.\n"
+        "Vas a responder verbalmente con un número entero del 1 al 9. Concéntrate en cómo te vos sentiste realmente mientras mirabas el video.\n"
     ),
         
     'motion_sickness_report_text': "Por favor, evaluá tu nivel de mareo por movimiento utilizando la escala de \n"
-        "1 (sin síntomas) a 9 (síntomas extremadamente severos).\n\n",
+        "1 (sin síntomas) a 9 (síntomas extremadamente severos de mareo).\n\n",
         "Hacé este reporte de mareo ahora.\n\n"
     
 '6_post_stimulus_self_report_practice': 
-    "Primero, decí cuánta confianza tenés en el reporte con joystick en el ensayo anterior"
+    "Primero, decí cuánta confianza tenés en el reporte que realizaste con el joystick en el ensayo anterior"
     "Siendo 1 = sin confianza, y 9 = máxima confianza.\n\n"
     "Realiza este reporte de confianza ahora.\n\n"
 
@@ -103,14 +103,16 @@ non_immersive_instructions_text = {
     "Siendo 1 = sin confianza, y 9 = máxima confianza.\n\n"
     "Realiza este reporte de confianza ahora.\n\n"
 
+    "Por favor, evaluá tu nivel de mareo por movimiento utilizando la escala de \n"
+    "1 (sin síntomas) a 9 (síntomas extremadamente severos de mareo).\n\n"
+    "Hacé este reporte de mareo ahora.\n\n"
 
-    "Si por algún motivo necesitás decirle algo al evaluador (por ejemplo, si no recordás "
-    "lo que significa alguna escala) podés hacerlo luego de terminar los reportes de emociones "
-    "después de cada video. Para hacerlo, tenés que pausar el video y llamar al evaluador "
-    "con el timbre.",
+    "Si por algún motivo necesitás decirle algo al evaluador (por ejemplo, si no recordás"
+    "lo que significa alguna escala, o si tenés algun problema con los sensores) podés pausar el video"
+    "y llamar al evlauador con el timbre una vez que termines de reportar tus emociones",
     
 '7_post_stimulus_self_report': 
-    "Primero, decí cuánta confianza tenés en el reporte con joystick en el ensayo anterior"
+    "Primero, decí cuánta confianza tenés en el reporte que realizaste con el joystick en el ensayo anterior"
     "Siendo 1 = sin confianza, y 9 = máxima confianza.\n\n"
     "Realiza este reporte de confianza ahora.\n\n"
 
@@ -164,23 +166,16 @@ non_immersive_instructions_text = {
     
     "Ahora, decí cuánta confianza tenés en el reporte verbal de tus emociones en el ensayo anterior"
     "Siendo 1 = sin confianza, y 9 = máxima confianza.\n\n"
-    "Realiza este reporte de confianza ahora.\n\n"
-
-
-    "Si por algún motivo necesitás decirle algo al evaluador (por ejemplo, si no recordás "
-    "lo que significa alguna escala) podés hacerlo luego de terminar los reportes de emociones "
-    "después de cada video. Para hacerlo, tenés que pausar el video y llamar al evaluador "
-    "con el timbre.",
-
+    "Realiza este reporte de confianza ahora.\n\n",
 
     '8_luminance_practice_instructions_text': "Algunos videos solo van a mostrar cambios de brillo (de verde oscuro a verde brillante).\n"
         "Reportá ese brillo en tiempo real con el joystick, de bajo brillo (a izquierda) a alto brillo (a derecha).\n"
-        "Mantenete atento/a a cómo varía el brillo en tiempo real. ¿Listo/a?\n"
-        "Recordá: bajo brillo a izquierda y alto brillo a derecha\n\n",
+        "Mantene tu atención a cómo varía el brillo en tiempo real.\n"
+        "Empezamos. Recordá: bajo brillo a izquierda y alto brillo a derecha\n\n",
 
 
     '8_bis_confidence_luminance_practice_instructions_text': 
-        "Primero, decí cuánta confianza tenés en el reporte con joystick en el ensayo anterior"
+        "Primero, decí cuánta confianza tenés en el reporte que realizaste con el joystick en el ensayo anterior"
         "Siendo 1 = sin confianza, y 9 = máxima confianza.\n\n"
         "Realiza este reporte de confianza ahora.\n\n",
 
@@ -192,17 +187,18 @@ non_immersive_instructions_text = {
     '9_luminance_instructions_direct':  "Ahora vas a reportar cómo cambia \n"
         "el brillo en la pantalla en tiempo real, en una dimensión \n"
         "que va desde 'bajo brillo' a izquierda 'alto brillo' a derecha.\n\n"
-        "Recordá: bajo brillo a izquierda y alto brillo a derecha\n\n"
+        "Empezamos. Recordá: bajo brillo a izquierda y alto brillo a derecha\n\n"
 
     '10_luminance_instructions_inverse':  "Ahora vas a reportar cómo cambia \n"
         "el brillo en la pantalla en tiempo real, en una dimensión \n"
         "que va desde 'alto brillo' a izquierda 'bajo brillo' a derecha.\n\n"
-        "Recordá: bajo brillo a izquierda y alto brillo a derecha\n\n"
+        "Empezamos. Recordá: alto brillo a izquierda y bajo brillo a derecha\n\n"
 
     '11_post_stimulus_verbal_report':
-        "Para empezar, decí cuánta confianza tenés en el reporte con joystick en el ensayo anterior"
+        "Para empezar, decí cuánta confianza tenés en el reporte que realizaste con el joystick en el ensayo anterior"
         "Siendo 1 = sin confianza, y 9 = máxima confianza.\n\n"
         "Realiza este reporte de confianza ahora.\n\n"
+        ""
         "Ahora vas a tener que reportar verbalmente como te sentiste al ver el video. \n\n"
         "Describí esta experiencia en orden cronológico, de principio a fin del video \n"
         "y con el mayor detalle posible, haciendo foco en como te sentiste *realmnete* mientras mirabas el video recien.\n\n",
@@ -214,7 +210,7 @@ non_immersive_instructions_text = {
 
 
     # END PRACTICE E INITIAL RELAXATION SE GRABAN JUNTOS
-    '12_end_practice': "¡Terminamos la práctica! Llamá al evaluador para confirmar si todo está listo para el experimento.\n"
+    '12_end_practice': "¡Terminamos la parte de práctica! Llamá al evaluador con el timbre\n"
 
     '13_initial_relaxation_video_text': "Antes de las tareas principales, vas a ver un video relajante. Solo miralo sin moverte ni reportar nada.\n"
 
@@ -224,7 +220,7 @@ non_immersive_instructions_text = {
         "Reportando en el extremo izquierdo con el joystick, sentis relajación, tranquilidad,\n"
         "inactividad, aburrimiento, somnolencia, o ausencia de excitación.\n\n"
         "Reportando en el extremo derecho, sentis estimulación completa,\n"
-        "emoción intensa, frenesí, nerviosismo, alerta y mayor activación.\n\n"
+        "emoción intensa, frenesí, nerviosismo, alerta o mayor activación.\n\n"
         "¡Empezamos! Recordá: calmado a la izquierda y emocionado a la derecha.\n\n",
         
     '15_block_1_text_reminder': 
@@ -234,9 +230,9 @@ non_immersive_instructions_text = {
     '16_block_2_text': 
         "En el siguiente video vas a reportar activación emocional."
         "Al posicionarte en el extremo izquierdo con el joystick, sentis una estimulación completa,\n"
-        "emoción intensa, frenesí, nerviosismo, alerta y mayor activación.\n"
+        "emoción intensa, frenesí, nerviosismo, alerta o mayor activación.\n"
         "Al posicionarte en el extremo derecho, se experimenta relajación, tranquilidad,\n"
-        "inactividad, aburrimiento, somnolencia y ausencia de excitación.\n\n"
+        "inactividad, aburrimiento, somnolencia o ausencia de excitación.\n\n"
         "¡Empezamos! Recordá: emocionado a la izquierda y calmado a la derecha.\n\n",
         
     '17_block_2_text_reminder': 
@@ -246,9 +242,9 @@ non_immersive_instructions_text = {
     '18_block_3_text': 
         "En el siguiente video vas a reportar valencia emocional."
         "Al reportar en el extremo izquierdo con el joystick, sentis infelicidad,\n"
-        "molestia, insatisfacción, melancolía, desesperación, aburrimiento.\n"
+        "molestia, insatisfacción, melancolía, desesperación, oaburrimiento.\n"
         "Al reportar en el extremo derecho, sentis felicidad plena, alegría,\n"
-        "satisfacción, bienestar y esperanza.\n\n"
+        "satisfacción, bienestar o esperanza.\n\n"
         "¡Empezamos! Recordá: negativo a la izquierda y positivo a la derecha.\n\n",
 
     '19_block_3_text_reminder': 
@@ -259,7 +255,7 @@ non_immersive_instructions_text = {
     '20_block_4_text': 
         "En el siguiente video vas a reportar valencia emocional.
         "Al reportar en el extremo izquierdo, sentis felicidad, alegría,\n"
-        "satisfacción, bienestar y esperanza.\n\n"
+        "satisfacción, bienestar o esperanza.\n\n"
         "Mientras que al reportar en el extremo derecho, sentis infelicidad,\n"
         "molestia, insatisfacción, melancolía, desesperación, aburrimiento.\n"
         "¡Empezamos! Recordá: positivo a la izquierda y negativo a la derecha.\n\n",
@@ -274,9 +270,9 @@ non_immersive_instructions_text = {
     '23_block_5_text': 
         "En el siguiente video vas a reportar valencia emocional."
         "Al reportar en el extremo izquierdo, sentis felicidad, alegría,\n"
-        "satisfacción, bienestar y esperanza.\n\n"
+        "satisfacción, bienestar o esperanza.\n\n"
         "Mientras que al reportar en el extremo derecho, sentis infelicidad,\n"
-        "molestia, insatisfacción, melancolía, desesperación, aburrimiento.\n"
+        "molestia, insatisfacción, melancolía, desesperación, o aburrimiento.\n"
         "¡Empezamos! Recordá: positivo a la izquierda y negativo a la derecha.\n\n",
 
 
@@ -288,9 +284,9 @@ non_immersive_instructions_text = {
     '25_block_6_text': 
         "En el siguiente video vas a reportar valencia emocional."
         "Al reportar en el extremo izquierdo, sentis infelicidad,\n"
-        "molestia, insatisfacción, melancolía, desesperación, aburrimiento.\n"
+        "molestia, insatisfacción, melancolía, desesperación, oaburrimiento.\n"
         "Al reportar en el extremo derecho, sentis felicidad, alegría,\n"
-        "satisfacción, bienestar y esperanza.\n\n"
+        "satisfacción, bienestar o esperanza.\n\n"
         "¡Empezamos! Recordá: negativo a la izquierda y positivo a la derecha.\n\n",
 
 
@@ -301,9 +297,9 @@ non_immersive_instructions_text = {
     '27_block_7_text': 
         "En el siguiente video vas a reportar activación emocional."
         "Al reportar en el extremo izquierdo, sentis una estimulación completa,\n"
-        "emoción intensa, frenesí, nerviosismo, alerta y mayor activación.\n"
+        "emoción intensa, frenesí, nerviosismo, alerta o mayor activación.\n"
         "Al reportar en el extremo derecho, se experimenta relajación, tranquilidad,\n"
-        "inactividad, aburrimiento, somnolencia y ausencia de excitación.\n\n"
+        "inactividad, aburrimiento, somnolencia o ausencia de excitación.\n\n"
         "¡Empezamos! Recordá: emocionado a la izquierda y calmado a la derecha.\n\n",
 
     '28_block_7_text_reminder': 
@@ -314,9 +310,9 @@ non_immersive_instructions_text = {
     '29_block_8_text': 
         "En el siguiente video vas a reportar activación emocional."
         "Al reportar en el extremo izquierdo, sentis relajación, tranquilidad,\n"
-        "inactividad, aburrimiento, somnolencia y ausencia de excitación.\n"
+        "inactividad, aburrimiento, somnolencia o ausencia de excitación.\n"
         "Al reportar en el extremo derecho, sentis una estimulación completa,\n"
-        "emoción intensa, frenesí, nerviosismo, alerta y mayor activación.\n\n"
+        "emoción intensa, frenesí, nerviosismo, alerta o mayor activación.\n\n"
         "¡Empezamos! Recordá: calmado a la izquierda y emocionado a la derecha.\n\n",
         
 

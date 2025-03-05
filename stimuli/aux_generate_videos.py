@@ -81,18 +81,19 @@ def generate_instruction_videos(input_dir, output_dir):
 def generate_practice_videos(modality="2D"):
     """
     Genera un video de práctica concatenando los siguientes elementos:
-    1. welcome_and_baseline_audio.wav
-    2. fixation_cross (5 minutos)
-    3. valence_practice_instruction_audio.wav
-    4. Video 1
-    5. post_stimulus_self_report_practice_new.wav
-    6. arousal_practice_instructions_audio.wav
-    7. Video 2
-    8. post_stimulus_self_report.wav
-    9. luminance_practice_instructions_audio.wav
-    10.luminance video
-    11.confidence_luminance_practice_instructions_text.wav
-    12.end_practice.wav
+    1. welcome_text.mp4
+    2. baseline_instructions_text.mp4
+    3. fixation_cross (5 minutos)
+    4. valence_practice_instructions_text.mp4
+    5. Video 1
+    6. post_stimulus_self_report_practice_new.wav
+    7. arousal_practice_instructions_audio.wav
+    8. Video 2
+    9. post_stimulus_self_report.wav
+    10.luminance_practice_instructions_audio.wav
+    11.luminance video
+    12.confidence_luminance_practice_instructions_text.wav
+    13.end_practice.wav
 
     Parámetros:
     -----------
@@ -112,7 +113,8 @@ def generate_practice_videos(modality="2D"):
     # ---------------------------
     # RUTAS A LOS VIDEOS DE INSTRUCCIONES
     # ---------------------------
-    welcome_and_baseline_path          = "./instructions_videos/1_welcome_text_2_baseline_instructions_text.mp4"
+    welcome_path                       = "./instructions_videos/1_welcome_text.mp4"
+    baseline_path                      = "./instructions_videos/2_baseline_instructions_text.mp4"
     valence_practice_instruction_path  = "./instructions_videos/valence_practice_instructions_text.mp4"
     post_stimulus_self_report_path     = "./instructions_videos/post_stimulus_self_report_text_1.mp4"
     post_stimulus_self_report_2_path   = "./instructions_videos/post_stimulus_self_report_practice.mp4"
@@ -134,7 +136,8 @@ def generate_practice_videos(modality="2D"):
     countdown_bar       = VideoFileClip(countdown_bar_path).resized((3840, 2048))
 
     # Videos de instrucciones
-    welcome_and_baseline_clip = VideoFileClip(welcome_and_baseline_path).resized((3840, 2048))
+    welcome_clip = VideoFileClip(welcome_path).resized((3840, 2048))
+    baseline_clip = VideoFileClip(baseline_path).resized((3840, 2048))
     valence_practice_clip    = VideoFileClip(valence_practice_instruction_path).resized((3840, 2048))
     post_stimulus_clip       = VideoFileClip(post_stimulus_self_report_path).resized((3840, 2048))
     post_stimulus_2_clip     = VideoFileClip(post_stimulus_self_report_2_path).resized((3840, 2048))
@@ -149,18 +152,19 @@ def generate_practice_videos(modality="2D"):
     # DEFINIR EL ORDEN DE CONCATENACIÓN
     # ---------------------------
     clips_in_order = [
-        welcome_and_baseline_clip,   # 1
-        fixation_clip,               # 2 
-        valence_practice_clip,       # 3
-        video_1,                     # 4
-        post_stimulus_clip,          # 5
-        post_stimulus_2_clip,        # 6
-        arousal_instructions_clip,   # 7
-        video_2,                     # 8
-        post_stimulus_self_report,   # 9
-        countdown_bar,               # 10
-        confidence_verbal_report_clip, # 11
-        luminance_practice_clip,     # 12
+        welcome_clip,                # 1
+        baseline_clip,               # 2
+        fixation_clip,               # 3 
+        valence_practice_clip,       # 4
+        video_1,                     # 5
+        post_stimulus_clip,          # 6
+        post_stimulus_2_clip,        # 7
+        arousal_instructions_clip,   # 8
+        video_2,                     # 9
+        post_stimulus_self_report,   # 10
+        countdown_bar,               # 11
+        confidence_verbal_report_clip, # 12
+        luminance_practice_clip,     # 13
         luminance_practice,          # 14
         confidence_luminance_practice_clip, # 15
         end_practice_clip            # 16
@@ -179,7 +183,7 @@ def generate_practice_videos(modality="2D"):
     # ---------------------------
     # EXPORTAR
     # ---------------------------
-    output_path = f"./practice_videos/{modality}/S11_practice_{modality}.mp4"
+    output_path = f"./practice_videos/{modality}/S12_practice_{modality}.mp4"
     final_clip.write_videofile(
         output_path,
         codec="libx264",

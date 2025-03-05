@@ -4,8 +4,85 @@ import pandas as pd
 import random
 from moviepy import *
 import concurrent.futures
+from pydub import AudioSegment
+import concurrent.futures
 
+def convert_m4a_to_wav(input_dir, output_dir=None, max_workers=8):
+    """
+    Convierte todos los archivos .m4a en un directorio a formato .wav.
+    
+    Parámetros
+    ----------
+    input_dir : str
+        Directorio que contiene los archivos .m4a a convertir.
+    output_dir : str, opcional
+        Directorio donde se guardarán los archivos .wav convertidos.
+        Si es None, se guardarán en el mismo directorio de entrada.
+    max_workers : int, opcional
+        Número máximo de hilos paralelos a utilizar. Por defecto es 8.
+    
+    Ejemplo de uso
+    --------------
+    convert_m4a_to_wav(
+        input_dir='./instructions_audios/m4a_files',
+        output_dir='./instructions_audios/wav_files',
+        max_workers=8
+    )
+    """
+    # Verificar si el directorio de entrada existe
+    if not os.path.isdir(input_dir):
+        raise ValueError(f"El directorio de entrada '{input_dir}' no existe.")
+    
+    # Si no se especifica un directorio de salida, usar el mismo que el de entrada
+    if output_dir is None:
+        output_dir = input_dir
+    else:
+        # Crear el directorio de salida si no existe
+        os.makedirs(output_dir, exist_ok=True)
+    
+    # Listar todos los archivos .m4a en el directorio de entrada
+    m4a_files = [f for f in os.listdir(input_dir) if f.lower().endswith('.m4a')]
+    
+    if not m4a_files:
+        print(f"No se encontraron archivos .m4a en el directorio '{input_dir}'.")
+        return
+    
+    print(f"Convirtiendo {len(m4a_files)} archivos .m4a a .wav con {max_workers} trabajadores paralelos...")
+    
+    def process_m4a_file(m4a_file):
+        """Procesa un único archivo m4a y lo convierte a wav."""
+        try:
+            input_path = os.path.join(input_dir, m4a_file)
+            base_name = os.path.splitext(m4a_file)[0]
+            output_path = os.path.join(output_dir, f"{base_name}.wav")
+            
+            # Cargar el archivo m4a y exportarlo como wav
+            audio = AudioSegment.from_file(input_path, format="m4a")
+            audio.export(output_path, format="wav")
+            
+            return f"Convertido: {m4a_file} -> {os.path.basename(output_path)}"
+        except Exception as e:
+            return f"Error al convertir '{m4a_file}': {e}"
+    
+    # Utilizar ThreadPoolExecutor para procesar archivos en paralelo
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(process_m4a_file, m4a_file) for m4a_file in m4a_files]
+        
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                print(future.result())
+            except Exception as e:
+                print(f"Error en el procesamiento: {e}")
+    
+    print("Conversión completada.")
 
+# Ejecutar la función con las carpetas especificadas
+#convert_m4a_to_wav(
+#    input_dir='./instructions_audios/audio_files/old',
+#    output_dir='./instructions_audios/audio_files/new',
+#    max_workers=8
+#)
+#%%
 def generate_instruction(audio_path):
     """
     Pantalla negra con duración igual al audio + el audio embebido.
@@ -117,6 +194,8 @@ def generate_instruction_videos(input_dir, output_dir, max_workers=8):
                 print(f"Error en el procesamiento: {e}")
     
     print("Procesamiento completado.")
+
+#%%
 
 generate_instruction_videos(input_dir='./instructions_audios/new_audio', output_dir='./instructions_videos/new_video')
 # %%
