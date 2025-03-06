@@ -104,14 +104,15 @@ def initialize_lsl_recording(info_dict, physio_file_name):
         # Configurar Lab Recorder con los parámetros correctos
         s.sendall(b"select all\n")
         
-        # Configurar el nombre del archivo
-        filename = f"sub-{info_dict['ID']}_ses-{info_dict['session'].lower()}_task-{info_dict['block'].lower()}_run-{run_count:03d}_eeg.xdf"
+        # Configurar el nombre del archivo con el día incluido
+        filename = f"sub-{info_dict['ID']}_ses-{info_dict['session'].lower()}_day-{info_dict['day'].lower()}_task-{info_dict['block'].lower()}_run-{run_count:03d}_eeg.xdf"
         filename_cmd = f"filename {os.path.join(save_path, filename)}\n"
         s.sendall(filename_cmd.encode())
         
         # Configurar los parámetros BIDS
         s.sendall(f"participant {info_dict['ID']}\n".encode())
         s.sendall(f"session {info_dict['session'].lower()}\n".encode())
+        s.sendall(f"day {info_dict['day'].lower()}\n".encode())  # Añadir día como parámetro BIDS
         s.sendall(f"task {info_dict['block'].lower()}\n".encode())
         s.sendall(b"run 001\n")
         s.sendall(b"modality eeg\n")
@@ -136,11 +137,13 @@ def get_participant_info():
             if 0 <= id_num <= 99:
                 info['ID'] = f"{id_num:02d}"
                 info['session'] = session_var.get()
+                info['day'] = day_var.get()  # Guardar el día seleccionado
                 info['block'] = block_var.get()
                 info['exp_name'] = f"Experiment_{info['block']}"
                 start_actual_recording()
                 id_entry.config(state='disabled')
                 session_dropdown.config(state='disabled')
+                day_dropdown.config(state='disabled')  # Deshabilitar el dropdown de día
                 block_dropdown.config(state='disabled')
                 start_btn.grid_forget()
                 stop_btn.grid(row=4, column=0, columnspan=2, pady=10, sticky='nsew')
@@ -216,6 +219,7 @@ def get_participant_info():
                         # Configurar interfaz
                         id_entry.config(state='disabled')
                         session_dropdown.config(state='disabled')
+                        day_dropdown.config(state='disabled')
                         block_dropdown.config(state='disabled')
                         start_btn.grid_forget()
                         stop_btn.grid(row=4, column=0, columnspan=2, pady=10, sticky='nsew')
@@ -309,7 +313,8 @@ def get_participant_info():
                 # Contador para los archivos de audio
                 audio_run_count = len([name for name in os.listdir(root.audio_folder) if name.endswith('.wav')]) + 1
                 
-                audio_file_name = f"sub-{info['ID']}_ses-{info['session'].lower()}_task-{info['block'].lower()}_audio_run-{audio_run_count:03d}.wav"
+                # Incluir el día en el nombre del archivo de audio
+                audio_file_name = f"sub-{info['ID']}_ses-{info['session'].lower()}_day-{info['day'].lower()}_task-{info['block'].lower()}_audio_run-{audio_run_count:03d}.wav"
                 audio_path = os.path.join(root.audio_folder, audio_file_name)
                 write(audio_path, root.samplerate, np.int16(trimmed_recording * 32767))
                 print(f"Grabación de audio guardada en {audio_path}")
@@ -336,7 +341,7 @@ def get_participant_info():
     id_entry = tk.Entry(root)
     id_entry.grid(row=0, column=1, padx=5, pady=5, sticky='ew')
     
-    # Sesión (ahora primero)
+    # Sesión
     tk.Label(root, text="Sesión:").grid(row=1, column=0, padx=5, pady=5)
     session_var = tk.StringVar(value="VR")
     session_dropdown = ttk.Combobox(root, textvariable=session_var, 
@@ -344,19 +349,27 @@ def get_participant_info():
                                   state="readonly")
     session_dropdown.grid(row=1, column=1, padx=5, pady=5, sticky='ew')
     
-    # Bloque (ahora segundo)
-    tk.Label(root, text="Bloque:").grid(row=2, column=0, padx=5, pady=5)
-    block_var = tk.StringVar(value="A")
+    # Día (nuevo)
+    tk.Label(root, text="Día:").grid(row=2, column=0, padx=5, pady=5)
+    day_var = tk.StringVar(value="A")
+    day_dropdown = ttk.Combobox(root, textvariable=day_var, 
+                              values=["A", "B"], 
+                              state="readonly")
+    day_dropdown.grid(row=2, column=1, padx=5, pady=5, sticky='ew')
+    
+    # Bloque (ahora en la fila 3)
+    tk.Label(root, text="Bloque:").grid(row=3, column=0, padx=5, pady=5)
+    block_var = tk.StringVar(value="PRACTICE")
     block_dropdown = ttk.Combobox(root, textvariable=block_var, 
-                                values=["PRACTICE", "A", "B"], 
+                                values=["PRACTICE", "01", "02"], 
                                 state="readonly")
-    block_dropdown.grid(row=2, column=1, padx=5, pady=5, sticky='ew')
+    block_dropdown.grid(row=3, column=1, padx=5, pady=5, sticky='ew')
     
     error_label = tk.Label(root, text="", fg="red")
-    error_label.grid(row=3, column=0, columnspan=2, pady=5)
+    error_label.grid(row=4, column=0, columnspan=2, pady=5)
     
     status_label = tk.Label(root, text="", fg="green")
-    status_label.grid(row=4, column=0, columnspan=2, pady=5)
+    status_label.grid(row=5, column=0, columnspan=2, pady=5)
     
     start_btn = tk.Button(root, text="Comenzar Grabación", command=start_recording)
     start_btn.grid(row=6, column=0, columnspan=2, pady=10, sticky='nsew')
