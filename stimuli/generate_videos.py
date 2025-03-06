@@ -394,13 +394,12 @@ def get_video_files_from_csvs(csv_directory):
                     "description": "confidence_verbal_report"
                 })
                 
-                black_screen_5 = './black_screen_5_sec.mp4'
                 sequence_rows.append({
-                    "path": black_screen_5,
+                    "path": './instructions_videos/mareo.mp4',
                     "block_num": block_number,
                     "block_order": block_order,
                     "suprablock_count": suprablock_count,
-                    "description": "black_screen_5_seconds"
+                    "description": "motion_sickness"
                 })
                 
             else:
@@ -412,13 +411,13 @@ def get_video_files_from_csvs(csv_directory):
                     "suprablock_count": suprablock_count,
                     "description": "post_stimulus_self_report"
                 })
-                black_screen_5 = './black_screen_5_sec.mp4'
+
                 sequence_rows.append({
-                    "path": black_screen_5,
+                    "path": './instructions_videos/mareo.mp4',
                     "block_num": block_number,
                     "block_order": block_order,
                     "suprablock_count": suprablock_count,
-                    "description": "black_screen_5_seconds"
+                    "description": "motion_sickness"
                 })
                 
             ii += 1
@@ -454,6 +453,7 @@ def get_video_files_from_csvs(csv_directory):
                 "path": "./instructions_videos/confidence_luminance_practice_instructions_text.mp4",
                 "block_num": None,
                 "block_order": block_order,
+                "suprablock_count": suprablock_count,
                 "description": "confidence_luminance_instructions"
             })
 
