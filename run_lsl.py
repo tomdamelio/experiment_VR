@@ -361,7 +361,7 @@ def get_participant_info():
     tk.Label(root, text="Bloque:").grid(row=3, column=0, padx=5, pady=5)
     block_var = tk.StringVar(value="PRACTICE")
     block_dropdown = ttk.Combobox(root, textvariable=block_var, 
-                                values=["PRACTICE", "01", "02"], 
+                                values=["PRACTICE", "01", "02", "03", "04"], 
                                 state="readonly")
     block_dropdown.grid(row=3, column=1, padx=5, pady=5, sticky='ew')
     

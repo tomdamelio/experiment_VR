@@ -264,7 +264,7 @@ non_immersive_instructions_text = {
         "En el siguiente video vas a reportar nuevamente valencia emocional.
         "¡Empezamos! Recordá: positivo a la izquierda y negativo a la derecha.\n\n",
     
-    '22_rest_suprablock_text': "¡Felicitaciones, terminaste la primera mitad del experimento!\n\n"
+    '22_rest_suprablock_text': "¡Felicitaciones, terminaste un bloque del experimento!\n\n"
         "Llamá al evaluador con el timbre para avisar que terminaste con esta parte.\n\n",
 
     '23_block_5_text': 

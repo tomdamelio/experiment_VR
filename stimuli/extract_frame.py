@@ -1,7 +1,9 @@
 import cv2
 
+# Modality
+modality = "2D"
 # Ruta del video de entrada
-video_path = "instruction_video.mp4"
+video_path = f"instruction_{modality}_video.mp4"
 # Ruta donde guardar la imagen
 output_path = "instruction_frame.jpg"
 

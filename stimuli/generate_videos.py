@@ -457,8 +457,8 @@ def get_video_files_from_csvs(csv_directory):
                 "description": "confidence_luminance_instructions"
             })
 
-        # Agregar pausa de descanso después de procesar los dos primeros archivos CSV
-        if block_order == 1:
+        # Agregar pausa de descanso después de procesar cada bloque excepto el último
+        if block_order != 3:
             sequence_rows.append({
                 "path": "./instructions_videos/rest_suprablock_text.mp4",
                 "block_num": None,
@@ -484,18 +484,36 @@ def process_session(session_params):
     
     # Determinar si es bloque 1 o bloque 2
     is_block1 = 'block1' in session
-    is_block2 = 'block2' in session
+    is_block4 = 'block4' in session
     
     # Iniciar la lista con elementos específicos según el bloque
     final_list = []
     
     # Elementos específicos para el bloque 1
     if is_block1:
+        fixation_path = "./final_videos_fixation/fixation_cross.mp4"
+        baseline_path = "./instructions_videos/2_baseline_instructions_text.mp4"
+        
         initial_relaxation = "./instructions_videos/initial_relaxation_video_text.mp4"
         calm_video_path_initial = f"./calm_videos/{actual_modality}/901.mp4"
         
         final_list.extend([
             {
+                "path": fixation_path,
+                "block_num": None,
+                "block_order": 0,
+                "suprablock_count": 1,
+                "description": "fixation"
+            },
+            {
+                "path": baseline_path,
+                "block_num": None,
+                "block_order": 0,
+                "suprablock_count": 1,
+                "description": "baseline"
+            },
+            {      
+                
                 "path": initial_relaxation,
                 "block_num": None,
                 "block_order": 0,
@@ -515,7 +533,7 @@ def process_session(session_params):
     final_list.extend(df_session.to_dict('records'))
     
     # Elementos específicos para el bloque 2
-    if is_block2:
+    if is_block4:
         final_relaxation = "./instructions_videos/final_relaxation_video_text.mp4"
         calm_video_path_final = f"./calm_videos/{actual_modality}/902.mp4"
         
@@ -524,21 +542,21 @@ def process_session(session_params):
                 "path": final_relaxation,
                 "block_num": None,
                 "block_order": 4,
-                "suprablock_count": 2,
+                "suprablock_count": 4,
                 "description": "final_relaxation"
             },
             {
                 "path": calm_video_path_final,
                 "block_num": None,
                 "block_order": 4,
-                "suprablock_count": 2,
+                "suprablock_count": 4,
                 "description": "calm_902"
             },
             {
                 "path": "./instructions_videos/experiment_end_text.mp4",
                 "block_num": None,
                 "block_order": 4,
-                "suprablock_count": 2,
+                "suprablock_count": 4,
                 "description": "experiment_end_task"
             }
         ])
@@ -657,15 +675,26 @@ def generate_videos(
                 # Separar en dos bloques
                 df_A_block1 = df_A_mod[df_A_mod['suprablock_count'] == 1].copy() if 1 in suprablock_values else pd.DataFrame()
                 df_A_block2 = df_A_mod[df_A_mod['suprablock_count'] == 2].copy() if 2 in suprablock_values else pd.DataFrame()
+                df_A_block3 = df_A_mod[df_A_mod['suprablock_count'] == 3].copy() if 3 in suprablock_values else pd.DataFrame()
+                df_A_block4 = df_A_mod[df_A_mod['suprablock_count'] == 4].copy() if 4 in suprablock_values else pd.DataFrame()
                 
+
                 print(f"Sesión A - Bloque 1: {len(df_A_block1)} filas")
                 print(f"Sesión A - Bloque 2: {len(df_A_block2)} filas")
+                print(f"Sesión A - Bloque 3: {len(df_A_block3)} filas")
+                print(f"Sesión A - Bloque 4: {len(df_A_block4)} filas")
                 
+
                 if not df_A_block1.empty:
                     session_params.append((subject, actual_modality, 'A_block1', df_A_block1, subject_dir, results_dir, test))
                 if not df_A_block2.empty:
                     session_params.append((subject, actual_modality, 'A_block2', df_A_block2, subject_dir, results_dir, test))
+                if not df_A_block3.empty:
+                    session_params.append((subject, actual_modality, 'A_block3', df_A_block3, subject_dir, results_dir, test))
+                if not df_A_block4.empty:
+                    session_params.append((subject, actual_modality, 'A_block4', df_A_block4, subject_dir, results_dir, test))
             
+
             if sesion_B and video_files_df_B is not None:
                 df_B_mod = video_files_df_B.copy()
                 df_B_mod['path'] = df_B_mod['path'].apply(lambda p: p.replace('2D', actual_modality) if isinstance(p, str) else p)
@@ -677,19 +706,29 @@ def generate_videos(
                 # Separar en dos bloques
                 df_B_block1 = df_B_mod[df_B_mod['suprablock_count'] == 1].copy() if 1 in suprablock_values else pd.DataFrame()
                 df_B_block2 = df_B_mod[df_B_mod['suprablock_count'] == 2].copy() if 2 in suprablock_values else pd.DataFrame()
+                df_B_block3 = df_B_mod[df_B_mod['suprablock_count'] == 3].copy() if 3 in suprablock_values else pd.DataFrame()
+                df_B_block4 = df_B_mod[df_B_mod['suprablock_count'] == 4].copy() if 4 in suprablock_values else pd.DataFrame()
                 
                 print(f"Sesión B - Bloque 1: {len(df_B_block1)} filas")
                 print(f"Sesión B - Bloque 2: {len(df_B_block2)} filas")
+                print(f"Sesión B - Bloque 3: {len(df_B_block3)} filas")
+                print(f"Sesión B - Bloque 4: {len(df_B_block4)} filas")
                 
+
                 if not df_B_block1.empty:
                     session_params.append((subject, actual_modality, 'B_block1', df_B_block1, subject_dir, results_dir, test))
                 if not df_B_block2.empty:
                     session_params.append((subject, actual_modality, 'B_block2', df_B_block2, subject_dir, results_dir, test))
+                if not df_B_block3.empty:
+                    session_params.append((subject, actual_modality, 'B_block3', df_B_block3, subject_dir, results_dir, test))
+                if not df_B_block4.empty:
+                    session_params.append((subject, actual_modality, 'B_block4', df_B_block4, subject_dir, results_dir, test))
+
 
             print(f"Iniciando procesamiento paralelo de {len(session_params)} bloques...")
             
             start_time_total = datetime.now()
-            with ThreadPoolExecutor(max_workers=4) as executor:
+            with ThreadPoolExecutor(max_workers=8) as executor:
                 futures = [executor.submit(process_session, params) for params in session_params]
                 concurrent.futures.wait(futures)
             end_time_total = datetime.now()
@@ -703,7 +742,7 @@ generate_videos(
     modality=['VR'],
     sesion_A=True,
     sesion_B=True,
-    test=False  # Cambiar a True para ejecutar en modo test
+    test=True  # Cambiar a True para ejecutar en modo test
 )
 
 # %%
